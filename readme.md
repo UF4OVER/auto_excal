@@ -2,6 +2,93 @@ AUTO
 ========
 Auto is a tool for automatically filling in data in Excel files. It can automatically fill in data based on the position of the mouse cursor, and also supports manual input of data. It can also automatically save data to a JSON file.
 
+> <b>if you have any questions, please contact me.<br><br><br>
+> <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>联系方式</title>
+  <style>
+    .contact-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      background-color: rgba(60,116,129,0.55);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .contact-title {
+      font-size: 24px;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .contact-info {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+    }
+
+    .contact-item {
+      text-align: center;
+    }
+
+    .contact-item img {
+      width: 50px;
+      height: 50px;
+      margin-bottom: 10px;
+    }
+
+    .contact-item p {
+      margin: 0;
+    }
+
+    .contact-item p.title {
+      font-size: 18px;
+      color: #555;
+    }
+
+    .contact-item p.content {
+      font-size: 16px;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+  <div class="contact-container">
+    <div class="contact-title">
+      <b>联系方式</b>
+    </div>
+    <div class="contact-info">
+      <div class="contact-item">
+        <img src="docs/邮箱登录.png" alt="Email Icon">
+        <p class="title">邮箱</p>
+        <p class="content">uf4hp
+                    @foxmail.com</p>
+      </div>
+      <div class="contact-item">
+        <img src="docs/手机登录.png" alt="Phone Icon">
+        <p class="title">电话</p>
+        <p class="content">+86 155 8406 5081(假)</p>
+      </div>
+      <div class="contact-item">
+        <img src="docs/img_4.png" alt="Address Icon">
+        <p class="title">地址</p>
+        <p class="content">China NEEPU</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+
+> Author: [HePing](https://github.com/UF4OVER) `click green to see more information`. <br>
+> Contact Me: [WeChat](https://github.com/UF4OVER/auto_excal/blob/master/docs/img_1.png) `cilck the green to add me.`<br>
 
 ## The First: Usage
 - Run the application.
