@@ -641,14 +641,9 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
 
 
 if __name__ == "__main__":
-
-
     app = QApplication(sys.argv)
-    try:
-        ui = MainWindow()
-        small_window = SmallWindow()
-        ui.show()
-        sys.exit(app.exec_())
-    except Exception as e:
-       print(e)
-       sys.exit(app.exec_())
+    ui = MainWindow()
+    small_window = SmallWindow()
+    ui.show()
+    sys.exit(app.exec_())
+
