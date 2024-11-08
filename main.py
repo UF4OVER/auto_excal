@@ -1,4 +1,6 @@
 import json
+from typing import List, Any
+
 import pyautogui
 import main_window as m
 import small_window as s
@@ -103,7 +105,7 @@ class SmallWindow(QMainWindow, s.Ui_MainWindow):
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
         # self.start_stop_bool = 0
         # self.start_stop_signal.connect(
-            # lambda: self.main_window.get_start_stop_bool(value=self.start_stop_bool))
+        # lambda: self.main_window.get_start_stop_bool(value=self.start_stop_bool))
 
     def init_ui(self):
         self.back_btu = self.ui.pushButton_3
@@ -161,29 +163,33 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
     data_updated = pyqtSignal(list, int, int)
     hightlighted_row_changed = pyqtSignal(int)  # 定义信号
     heping_updated = pyqtSignal(int)  # 定义信号
-    global small_window_send_signal_to_main_window
 
     def __init__(self):
         super().__init__()
 
         self.ui = m.Ui_MainWindow()
         self.ui.setupUi(self)
-
+        self.setAcceptDrops(True)
         self.setupUI()
         self.slot()
+
         self.cell_clicked_signal.connect(self.handle_cell_clicked)
         self.ui.tableWidget_2.itemChanged.connect(self.on_item_changed)
-        self.mouse_thread = None  # 鼠标双击线程
-        self.sheet = None
-        self.start_stop_bool = False  # 小窗传递的启动状态
 
+        self.mouse_thread = None  # 鼠标双击线程
+        self.sheet = None  # 存储表格数据
+        self.start_stop_bool = False  # 小窗传递的启动状态
+        self.dragEnterEvent_file_path = ""  # 拖入文件路径
+        self.file_paths = ""  # 存储拖入的文件路径
+        self.paths = ""
         self.heping = 1  # 默认为0,order选取
+        pyautogui.FAILSAFE = False  # 关闭此库的安全机制
 
         self.ui.tableWidget_2.verticalHeader().setVisible(False)  # 隐藏垂直表头
         self.ui.tableWidget_2.horizontalHeader().setVisible(False)  # 隐藏水平表头
         self.init_theme_combobox()
 
-    def setupUI(self):
+    def setupUI(self) -> None:
 
         self.flag = True
         self.sheet = None
@@ -192,8 +198,9 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
         self.add_file_btu = self.ui.pushButton_3  # 添加文件
         self.add_file_line = self.ui.lineEdit_3  # 添加文件输入框
 
+        self.clear_all_btu = self.ui.pushButton  # 清空所有数据
+
         self.start_btu = self.ui.pushButton_7  # 开始子线程监控鼠标双击事件
-        # self.start_btu.clicked.connect(self.start_or_stop_detection)
 
         self.small_win_btu = self.ui.pushButton_6  # 打开小窗口
         self.preview_btu = self.ui.pushButton_5  # 预览按钮
@@ -231,8 +238,8 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
         #  '浅蓝绿色.xml','light_teal.xml',
         #  '浅黄色.xml''light_yellow.xml']
 
-    def slot(self):
-        self.add_file_btu.clicked.connect(self.add_file)
+    def slot(self) -> None:
+        self.add_file_btu.clicked.connect(self.get_file_path)
         self.ui.tableWidget.cellClicked.connect(self.on_cell_clicked)  # 绑定单元格点击事件
         self.ui.tableWidget_2.itemChanged.connect(self.save_to_json)  # 绑定单元格内容改变事件
         self.small_win_btu.clicked.connect(self.open_small_window)  # 打开小窗口
@@ -240,10 +247,59 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
         # self.preview_btu.clicked.connect(self.save_to_json_btu)  # 保存到json
         self.start_btu.clicked.connect(self.start_or_stop_detection)  # 开启监控
         self.add_one_data_btu.clicked.connect(self.add_one_data)  # 添加一行数据
-        self.theme_comboBox.currentIndexChanged.connect(self.change_theme)
+        self.theme_comboBox.currentIndexChanged.connect(self.change_theme)  # 切换主题
+        self.clear_all_btu.clicked.connect(self.clear_all)
 
-    def init_theme_combobox(self):
+    def clear_all(self):
+        # 清除表格中的所有数据和json文件中的所有数据
+        reply = QMessageBox.question(self, '确认', '确定要清除所有数据吗？', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            self.command_output_print("info", "清除所有数据成功")
+
+            self.ui.tableWidget_2.clearContents()
+            self.ui.tableWidget_2.setRowCount(0)
+            self.ui.tableWidget_2.setColumnCount(0)
+
+            self.ui.tableWidget.clearContents()
+            self.ui.tableWidget.setRowCount(0)
+            self.ui.tableWidget.setColumnCount(0)
+
+            self.dragEnterEvent_file_path = ""
+            self.file_paths = ""
+            self.mouse_thread = None  # 鼠标双击线程
+            self.sheet = None
+            self.start_stop_bool = False  # 小窗传递的启动状态
+            self.heping = 1  # 默认为0,order选取
+            self.paths = ""
+
+            self.add_file_line.setText("")  # 清除输入框
+            self.name_start_input.setText("")
+            self.name_end_input.setText("")
+            self.xuehao_start_input.setText("")
+            self.xuehao_end_input.setText("")
+            self.score_start_input.setText("")
+            self.score_end_input.setText("")
+
+        else:
+            pass
+
+    def dragEnterEvent(self, event):
+        file = event.mimeData().urls()[0].toLocalFile()
+        if file not in self.paths:
+            self.paths += file + "\n"
+            # 判断文件是不是 xlsx结尾
+            if file.endswith(".xlsx"):
+                self.dragEnterEvent_file_path = file
+                self.command_output_print("info", f"成功拖入文件:{file}")
+                self.add_file()
+
+
+            else:
+                self.command_output_print("error", "请拖入xlsx文件！！！")
+
+    def init_theme_combobox(self) -> None:
         themes = [
+            ('浅粉色', 'light_pink.xml'),
             ('深琥珀色', 'dark_amber.xml'),
             ('深蓝色', 'dark_blue.xml'),
             ('深青色', 'dark_cyan.xml'),
@@ -258,7 +314,6 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
             ('浅青色', 'light_cyan.xml'),
             ('浅青色 500', 'light_cyan_500.xml'),
             ('浅绿色', 'light_lightgreen.xml'),
-            ('浅粉色', 'light_pink.xml'),
             ('亮红色', 'light_red.xml'),
             ('浅蓝绿色', 'light_teal.xml'),
             ('浅黄色', 'light_yellow.xml')
@@ -267,17 +322,20 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
         for display_text, theme_file in themes:
             self.theme_comboBox.addItem(display_text, theme_file)
 
-    def change_theme(self, index):
+    def change_theme(self, index) -> None:
         theme_file = self.theme_comboBox.itemData(index)
         if theme_file:
             apply_stylesheet(app, theme=theme_file)
             self.command_output_print("info", f"已切换到主题: {theme_file}")
 
-    def open_small_window(self):
+    def open_small_window(self) -> None:
         """
         打开小窗
         :return:
         """
+        if not self.file_paths or not self.sheet:
+            self.command_output_print("error", "请先选择文件")
+            return
         self.small_win = SmallWindow()
         print("open_small_window")
         self.small_win.show()
@@ -288,14 +346,17 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
         self.hightlighted_row_changed.emit(self.heping)
         # self.heping_updated.emit(self.heping)
 
-    def on_item_changed(self):
+    def on_item_changed(self) -> None:
+        if not self.sheet or not self.file_paths:
+            self.command_output_print("error", "请先选择文件")
+            return
         # 获取表格数据并发送信号
         data = self.get_table_data()
         rows = self.ui.tableWidget_2.rowCount()
         cols = self.ui.tableWidget_2.columnCount()
         self.data_updated.emit(data, rows, cols)
 
-    def get_table_data(self):
+    def get_table_data(self) -> list[list[str | Any]]:
         data = []
         for row in range(self.ui.tableWidget_2.rowCount()):
             row_data = []
@@ -309,30 +370,18 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
         return data
 
     # ---------------------单元格点击事件---------------------------#
-    def on_cell_clicked(self, row, column):  # 绑定单元格点击事件
+    def on_cell_clicked(self, row, column) -> None:  # 绑定单元格点击事件
         thread = CellClickThread(self.ui.tableWidget, row, column, self.cell_clicked_signal)  # 创建线程
         thread.start()
 
-    def handle_cell_clicked(self, data):  # 处理单元格点击事件
+    def handle_cell_clicked(self, data) -> None:  # 处理单元格点击事件
         row, column = data
         cell_value = self.ui.tableWidget.item(row, column).text()
         print(f"点击了单元格 ({row + 1}, {column + 1})，内容为: {cell_value}")
         self.command_output_print("msg", f"点击了单元格 ({row + 1}, {column + 1})，内容为: {cell_value}")
 
-    # @staticmethod
-    # def get_start_stop_bool(value):
-    #     small_window_send_signal_to_main_window = value
-    #
-    # def saas(self):
-    #     print("sad")
-    #     if small_window_send_signal_to_main_window != small_window_send_signal_to_main_window:
-    #         self.command_output_print("info", "开始监控")
-    #         self.mouse_thread.start()
-
-    # ----------------------------------------------------------#
-
     # -------------------子线程监控鼠标双击事件---------------------#
-    def start_or_stop_detection(self):
+    def start_or_stop_detection(self) -> None:
         try:
             if self.sheet:
                 if self.mouse_thread is None:
@@ -368,20 +417,27 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
             self.command_output_print("msg", f"姓名:{name_dict_value}")
             self.command_output_print("msg", f"学号:{id_dict_value}")
             self.command_output_print("msg", f"操行分:{col_conduct_points_dict_value}")
-            pyautogui.typewrite(str(id_dict_value))  # 键入学号
-            time.sleep(0.1)
 
+
+            pyautogui.typewrite(str(id_dict_value))
+            time.sleep(0.2)
+            pyautogui.moveTo(0, 0)
             pyautogui.press('tab')
-            time.sleep(0.1)
-
+            time.sleep(0.2)
             pyautogui.press('enter')
-            time.sleep(0.1)
-
-            pyautogui.typewrite(str(col_conduct_points_dict_value))  # 键入操行分
-            time.sleep(0.1)
-
-            pyautogui.press('tab')
-            time.sleep(0.1)
+            time.sleep(0.2)
+            # 判断分数构成，模拟对应的数字键盘
+            if len(str(col_conduct_points_dict_value)) == 1:
+                pyautogui.press(str(col_conduct_points_dict_value))
+            elif len(str(col_conduct_points_dict_value)) == 3:
+                pyautogui.press(str(col_conduct_points_dict_value)[0])
+                print(str(col_conduct_points_dict_value)[0])
+                time.sleep(0.1)
+                pyautogui.press(".")
+                print(".")
+                time.sleep(0.1)
+                pyautogui.press(str(col_conduct_points_dict_value)[2])
+                print(str(col_conduct_points_dict_value)[2])
 
         except Exception as e:
             self.command_output_print("error", f"{e}")
@@ -396,6 +452,25 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
         event.accept()
 
     # ----------------------------------------------------------#
+    def get_file_path(self) -> None:
+        file_path_temp1, _ = QFileDialog.getOpenFileName(self, "选择文件", "/", "Excel文件 (*.xlsx *.xls)")
+        file_path_temp2 = self.ui.lineEdit_3.text()
+        file_path_temp3 = self.dragEnterEvent_file_path
+
+        if file_path_temp1:
+            self.file_paths = file_path_temp1
+            self.command_output_print("info", f"加载了文件{self.file_paths}")
+            self.add_file()
+        elif file_path_temp2:
+            self.file_paths = file_path_temp2
+            self.command_output_print("info", f"加载了文件{self.file_paths}")
+            self.add_file()
+        elif file_path_temp3:
+            self.file_paths = file_path_temp3
+            self.command_output_print("info", f"加载了文件{self.file_paths}")
+            self.add_file()
+        else:
+            self.command_output_print("error", "未选择文件")
 
     def add_file(self) -> None:
         """
@@ -403,17 +478,14 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
         :return:
         """
         # 使用 QFileDialog 获取文件路径
-        file_path_temp1, _ = QFileDialog.getOpenFileName(self, "选择文件", "/", "Excel文件 (*.xlsx *.xls)")
-        file_path_temp2 = self.ui.lineEdit_3.text()
-        file_paths = file_path_temp1 if file_path_temp1 else file_path_temp2
 
-        if file_paths:
-            self.command_output_print("info", f"加载了文件{file_paths}")
+        if self.file_paths:
+            self.command_output_print("info", f"加载了文件{self.file_paths}")
 
             try:
-                self.ui.lineEdit_3.setText(file_paths)
+                self.ui.lineEdit_3.setText(self.file_paths)
 
-                wb = load_workbook(file_paths)
+                wb = load_workbook(self.file_paths)
                 self.sheet = wb.active
 
                 rows = self.sheet.max_row
@@ -487,6 +559,10 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
                 print(f"加载文件时发生错误: {e}")
 
     def add_one_data(self) -> None:
+
+        if not self.file_paths or not self.sheet:
+            self.command_output_print("error", "未选择文件")
+            return
         self.command_output_print("info", "添加一行数据到输入")
 
         # 弹出一个对话框，里面有三个输入框，分别输入姓名，学号，分数
@@ -643,7 +719,5 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     ui = MainWindow()
-    small_window = SmallWindow()
     ui.show()
     sys.exit(app.exec_())
-

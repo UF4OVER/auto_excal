@@ -51,7 +51,7 @@ if sys.platform == "win32":
 # 设置项目信息
 setup(
     name="原神",
-    version="2.2.1",
+    version="2.4.0",
     description="AUTO-INPUT",
     options={"build_exe": build_exe_options},
     executables=[

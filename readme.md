@@ -6,6 +6,10 @@ Auto is a tool for automatically filling in data in Excel files. It can automati
 > Author: [HePing](https://github.com/UF4OVER) `click green to see more information`. <br>
 > Contact Me: [WeChat](https://github.com/UF4OVER/auto_excal/blob/master/docs/img_1.png) `cilck the green to add me.`<br>
 
+
+> notice: As of 2024-11-08, the software is the latest version with version number '2.4.0'.<br>
+- Updated the mouse movement event, and the modified source code is as follows:
+  <img src="docs/img5.png">
 ## The First: Usage
 - Run the application.
     - Windows: Double-click `原神.exe`
@@ -16,6 +20,10 @@ Auto is a tool for automatically filling in data in Excel files. It can automati
   -![GIF1.gif](docs/GIF1.gif)
   - if you want to add data, you can click the `添加` button，of course, you can also add author information hhhhhh....
   - then you can push the `开始` button to start monitoring.:
+  - ![img6.png](docs/img6.png)
+  - then you can see the following window:
+  - ![GIF4.gif](docs/GIF4.gif)
+  - >Note: The operation in the above figure can actually directly query the name
   - open the website you need to input data, then click the left mouse button, if a double click is detected, then the data will be automatically populated, and the data will be automatically saved to a JSON file.
   - if you want to creat a new table, you can click the `结束` button，this button will only pause the double-click thread and will not stop the entire program.
 - Theme：
