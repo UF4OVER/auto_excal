@@ -28,6 +28,8 @@ build_exe_options = {
         "threading",
         "time",
         "sys",
+        "os",
+        "re",
 
         "qt_material",
         "openpyxl",
@@ -51,7 +53,7 @@ if sys.platform == "win32":
 # 设置项目信息
 setup(
     name="原神",
-    version="2.4.0",
+    version="2.4.5",
     description="AUTO-INPUT",
     options={"build_exe": build_exe_options},
     executables=[

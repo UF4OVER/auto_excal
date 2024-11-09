@@ -1,36 +1,45 @@
 AUTO
 ========
-Auto is a tool for automatically filling in data in Excel files. It can automatically fill in data based on the position of the mouse cursor, and also supports manual input of data. It can also automatically save data to a JSON file.
+Auto 是一种在 Excel 文件中自动填充数据的工具。它可以根据鼠标光标的位置自动填充数据，还支持手动输入数据。
+> <b>如果您有任何问题，请与我联系.<br>
+> Author: [HePing](https://github.com/UF4OVER) `点击查看更多信息`. <br>
+> Contact Me: [WeChat](https://github.com/UF4OVER/auto_excal/blob/master/docs/img_1.png) `点击链接来添加我的联系方式.`<br>
 
-> <b>if you have any questions, please contact me.<br>
-> Author: [HePing](https://github.com/UF4OVER) `click green to see more information`. <br>
-> Contact Me: [WeChat](https://github.com/UF4OVER/auto_excal/blob/master/docs/img_1.png) `cilck the green to add me.`<br>
 
 
-> notice: As of 2024-11-08, the software is the latest version with version number '2.4.0'.<br>
-- Updated the mouse movement event, and the modified source code is as follows:
-  <img src="docs/img5.png">
+## 更新日志:
+
+### 更新: 2024 年 11 月 9 日，该软件为最新版本，版本号为“2.4.5”.<br>
+  - 添加了自选数据插入，用户可以插入表中连续的任意一段数据来单独填入表格。
+  - 表格可以直接拖入而不用重复输入。
+  - 支持数据一行一行的删除
+  - ![GIF5.gif](docs/GIF5.gif)
+  - ![GIF7.gif](docs/GIF7.gif)
+### 更新: 2024 年 11 月 8 日，该软件为最新版本，版本号为“2.4.0”.<br>
+  - 更新了鼠标移动事件，修改后的源码如下:
+  - ![img5.png](docs/img5.png)
+
 ## The First: Usage
-- Run the application.
-    - Windows: Double-click `原神.exe`
-    - macOS: not Available At This Time
-  - and you can see the following window:
+- 运行应用程序.
+    - Windows: 双击 `main.exe`
+    - macOS:目前不可用
+  - 您可以看到以下窗口:
   -![img.png](docs/img.png)
-  - then select the Excel file you want to fill in data.
+  - 然后选择要填写数据的 Excel 文件。
   -![GIF1.gif](docs/GIF1.gif)
-  - if you want to add data, you can click the `添加` button，of course, you can also add author information hhhhhh....
-  - then you can push the `开始` button to start monitoring.:
+  - 如果要添加数据，可以单击 `添加` 按钮，当然，您也可以添加作者信息 hhhhhh....
+  - 然后，您可以点击 `开始` 按钮开始监控.:
   - ![img6.png](docs/img6.png)
-  - then you can see the following window:
+  - 然后你可以看到以下窗口:
   - ![GIF4.gif](docs/GIF4.gif)
-  - >Note: The operation in the above figure can actually directly query the name
-  - open the website you need to input data, then click the left mouse button, if a double click is detected, then the data will be automatically populated, and the data will be automatically saved to a JSON file.
-  - if you want to creat a new table, you can click the `结束` button，this button will only pause the double-click thread and will not stop the entire program.
+  - >注意：上图中的操作其实可以直接查询 name
+  - 打开需要输入数据的网站，然后点击鼠标左键，如果检测到双击，则会自动填充数据，
+  - 如果要创建新表格，可以点击“结束”按钮，此按钮只会暂停双击线程，不会停止整个程序。
 - Theme：
-  - you can change the theme of the application by clicking the following button.
+  - 您可以通过单击以下按钮来更改应用程序的主题。
   - ![GIF2.gif](docs/GIF2.gif)
 - small window:
-  - you can click the `小窗` button to open a small window and the small window will be displayed on the <b>TOP</b> of the other window.
+  - 您可以点击 `小窗`按钮打开一个小窗口，小窗口将显示在另一个窗口<b>的顶部</b>。  
   - ![GIF3.gif](docs/GIF3.gif)
 
 ## The End

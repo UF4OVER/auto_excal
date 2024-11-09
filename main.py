@@ -1,4 +1,4 @@
-import json
+import os
 from typing import List, Any
 
 import pyautogui
@@ -7,13 +7,15 @@ import small_window as s
 import threading
 import time
 import sys
+import re
+import json
 
 from qt_material import apply_stylesheet
 from openpyxl.reader.excel import load_workbook
 from pynput import mouse
 
 from PyQt5.QtCore import pyqtSignal, Qt
-from PyQt5.QtGui import QColor, QTextCharFormat
+from PyQt5.QtGui import QColor, QTextCharFormat, QTextCursor
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QTableWidgetItem, QMessageBox, \
     QInputDialog, QLineEdit, QTableWidget
 
@@ -75,6 +77,9 @@ class mouse_detection_threads(threading.Thread):
 
 
 class CellClickThread(threading.Thread):
+    """
+    处理单元格点击事件
+    """
     def __init__(self, table_widget, row, column, signal):
         super().__init__()
         self.table_widget = table_widget
@@ -91,6 +96,9 @@ class CellClickThread(threading.Thread):
 
 
 class SmallWindow(QMainWindow, s.Ui_MainWindow):
+    """
+    处理小窗
+    """
     # start_stop_signal = pyqtSignal(bool)
 
     def __init__(self):
@@ -159,7 +167,8 @@ class SmallWindow(QMainWindow, s.Ui_MainWindow):
 
 
 class MainWindow(QMainWindow, m.Ui_MainWindow):
-    cell_clicked_signal = pyqtSignal(tuple)
+    cell_clicked_signal_1 = pyqtSignal(tuple)
+    cell_clicked_signal_2 = pyqtSignal(tuple)
     data_updated = pyqtSignal(list, int, int)
     hightlighted_row_changed = pyqtSignal(int)  # 定义信号
     heping_updated = pyqtSignal(int)  # 定义信号
@@ -173,21 +182,30 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
         self.setupUI()
         self.slot()
 
-        self.cell_clicked_signal.connect(self.handle_cell_clicked)
+        self.cell_clicked_signal_1.connect(self.handle_cell_clicked_1)
+        self.cell_clicked_signal_2.connect(self.handle_cell_clicked_2)
         self.ui.tableWidget_2.itemChanged.connect(self.on_item_changed)
 
         self.mouse_thread = None  # 鼠标双击线程
         self.sheet = None  # 存储表格数据
         self.start_stop_bool = False  # 小窗传递的启动状态
-        self.dragEnterEvent_file_path = ""  # 拖入文件路径
         self.file_paths = ""  # 存储拖入的文件路径
         self.paths = ""
         self.heping = 1  # 默认为0,order选取
+        self.base_table_row = 0
+        self.base_table_col = 0
+        self.new_table_row = 0
+        self.new_table_col = 0
+        self.setAcceptDrops(True)
         pyautogui.FAILSAFE = False  # 关闭此库的安全机制
+        self.specify_data_signal = False
 
         self.ui.tableWidget_2.verticalHeader().setVisible(False)  # 隐藏垂直表头
         self.ui.tableWidget_2.horizontalHeader().setVisible(False)  # 隐藏水平表头
         self.init_theme_combobox()
+
+        self.name_start_input.focusInEvent = self.on_name_start_focus_in
+        self.name_end_input.focusInEvent = self.on_name_end_focus_in
 
     def setupUI(self) -> None:
 
@@ -218,6 +236,9 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
 
         self.theme_comboBox = self.ui.comboBox
 
+        self.specify_data_btu = self.ui.pushButton_9
+        self.del_new_table_data_btu = self.ui.pushButton_8
+
         # ['深琥珀色.xml','dark_amber.xml',
         #  '深蓝色.xml','dark_blue.xml',
         #  '深青色.xml','dark_cyan.xml',
@@ -240,7 +261,8 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
 
     def slot(self) -> None:
         self.add_file_btu.clicked.connect(self.get_file_path)
-        self.ui.tableWidget.cellClicked.connect(self.on_cell_clicked)  # 绑定单元格点击事件
+        self.ui.tableWidget.cellClicked.connect(self.on_cell_clicked)  # 绑定大号单元格点击事件
+        self.ui.tableWidget_2.cellClicked.connect(self.insert_other_data)
         self.ui.tableWidget_2.itemChanged.connect(self.save_to_json)  # 绑定单元格内容改变事件
         self.small_win_btu.clicked.connect(self.open_small_window)  # 打开小窗口
         self.preview_btu.clicked.connect(self.on_item_changed)
@@ -249,10 +271,15 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
         self.add_one_data_btu.clicked.connect(self.add_one_data)  # 添加一行数据
         self.theme_comboBox.currentIndexChanged.connect(self.change_theme)  # 切换主题
         self.clear_all_btu.clicked.connect(self.clear_all)
+        self.specify_data_btu.clicked.connect(self.specify_data)  # 添加指定数据
+        self.del_new_table_data_btu.clicked.connect(self.del_new_table_data)
+
+        self.ui.pushButton_4.clicked.connect(self.specify_data_preview)
 
     def clear_all(self):
         # 清除表格中的所有数据和json文件中的所有数据
-        reply = QMessageBox.question(self, '确认', '确定要清除所有数据吗？', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        reply = QMessageBox.question(self, '确认', '确定要清除所有数据吗？', QMessageBox.Yes | QMessageBox.No,
+                                     QMessageBox.No)
         if reply == QMessageBox.Yes:
             self.command_output_print("info", "清除所有数据成功")
 
@@ -264,7 +291,6 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
             self.ui.tableWidget.setRowCount(0)
             self.ui.tableWidget.setColumnCount(0)
 
-            self.dragEnterEvent_file_path = ""
             self.file_paths = ""
             self.mouse_thread = None  # 鼠标双击线程
             self.sheet = None
@@ -279,19 +305,23 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
             self.xuehao_end_input.setText("")
             self.score_start_input.setText("")
             self.score_end_input.setText("")
+            if os.path.exists("data.json"):
+                os.remove("data.json")
+
 
         else:
             pass
 
     def dragEnterEvent(self, event):
+        self.clear_all()
         file = event.mimeData().urls()[0].toLocalFile()
         if file not in self.paths:
             self.paths += file + "\n"
             # 判断文件是不是 xlsx结尾
             if file.endswith(".xlsx"):
-                self.dragEnterEvent_file_path = file
                 self.command_output_print("info", f"成功拖入文件:{file}")
-                self.add_file()
+                self.file_paths = file
+                self.add_file()  # 此函数不能执行
 
 
             else:
@@ -371,16 +401,93 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
 
     # ---------------------单元格点击事件---------------------------#
     def on_cell_clicked(self, row, column) -> None:  # 绑定单元格点击事件
-        thread = CellClickThread(self.ui.tableWidget, row, column, self.cell_clicked_signal)  # 创建线程
+        thread = CellClickThread(self.ui.tableWidget, row, column, self.cell_clicked_signal_1)  # 创建线程
         thread.start()
 
-    def handle_cell_clicked(self, data) -> None:  # 处理单元格点击事件
+    def insert_other_data(self, row, column) -> None:
+        thread = CellClickThread(self.ui.tableWidget_2, row, column, self.cell_clicked_signal_2)  # 创建线程
+        thread.start()
+
+    def handle_cell_clicked_1(self, data) -> None:  # 处理单元格点击事件
         row, column = data
         cell_value = self.ui.tableWidget.item(row, column).text()
         print(f"点击了单元格 ({row + 1}, {column + 1})，内容为: {cell_value}")
+        self.base_table_row = row + 1
+        self.base_table_col = column + 1
+        self.command_output_print("msg", f"点击了单元格 ({row + 1}, {column + 1})，内容为: {cell_value}")
+
+    def handle_cell_clicked_2(self, data) -> None:
+        row, column = data
+        cell_value = self.ui.tableWidget_2.item(row, column).text()
+        print(f"点击了单元格 ({row + 1}, {column + 1})，内容为: {cell_value}")
+        self.new_table_row = row + 1
+        self.new_table_col = column + 1
         self.command_output_print("msg", f"点击了单元格 ({row + 1}, {column + 1})，内容为: {cell_value}")
 
     # -------------------子线程监控鼠标双击事件---------------------#
+
+    def specify_data(self):
+        self.specify_data_signal = not self.specify_data_signal
+        if self.sheet and self.specify_data_signal:
+            self.specify_data_btu.setText("停止")
+        else:
+            self.specify_data_btu.setText("插入")
+
+    def specify_data_preview(self) -> None:
+        # 创建一个确认对话框
+        reply = QMessageBox.question(self, "确认", "插入数据将清除原来数据？", QMessageBox.Yes | QMessageBox.No,
+                                     QMessageBox.No)
+        if reply == QMessageBox.Yes and self.sheet:
+            self.ui.tableWidget_2.setRowCount(0)
+            self.ui.tableWidget_2.setColumnCount(0)
+            self.ui.tableWidget_2.clearContents()
+            # 一个字符串可能是(12, 3)，(1, 23)，(122, 123)的格式,一个函数取出其中的整数
+            matche_1 = re.findall(r'\d+', self.name_start_input.text())
+            integer_1 = [int(match) for match in matche_1]
+            self.name_start_row, self.name_start_col = integer_1
+
+            matche_2 = re.findall(r'\d+', self.name_end_input.text())
+            integer_2 = [int(match) for match in matche_2]
+            self.name_end_row, self.name_end_col = integer_2
+
+            self.ui.tableWidget_2.setRowCount(self.name_end_row - self.name_start_row + 1)
+            self.ui.tableWidget_2.setColumnCount(3)
+            print(self.name_start_row, self.name_start_col)
+            print(self.name_end_row, self.name_end_col)
+
+            for i in range(self.name_start_row, self.name_end_row + 1):
+                for j in range(self.name_start_col, self.name_start_col + 3):
+                    item = QTableWidgetItem(str(self.sheet.cell(row=i, column=j).value))
+                    self.ui.tableWidget_2.setItem(i - self.name_start_row, j - self.name_start_col, item)
+            self.ui.tableWidget_2.viewport().update()
+            self.save_to_json()
+
+    def on_name_start_focus_in(self, event):
+        if self.sheet and self.specify_data_signal:
+            try:
+                self.name_start_input.setText(f"{self.base_table_row, self.base_table_col}")
+                self.xuehao_start_input.setText(f"{self.base_table_row, self.base_table_col + 1}")
+                self.score_start_input.setText(f"{self.base_table_row, self.base_table_col + 2}")
+
+                QLineEdit.focusInEvent(self.name_start_input, event)
+
+            except Exception as e:
+                print("错误", e)
+
+    def on_name_end_focus_in(self, event):
+        if self.sheet and self.specify_data_signal:
+            try:
+                self.name_end_input.setText(f"{self.base_table_row, self.base_table_col}")
+                self.xuehao_end_input.setText(f"{self.base_table_row, self.base_table_col + 1}")
+                self.score_end_input.setText(f"{self.base_table_row, self.base_table_col + 2}")
+                QLineEdit.focusInEvent(self.name_end_input, event)
+            except Exception as e:
+                print("错误", e)
+
+    def del_new_table_data(self):
+        self.ui.tableWidget_2.removeRow(self.new_table_row - 1)
+        self.save_to_json()
+
     def start_or_stop_detection(self) -> None:
         try:
             if self.sheet:
@@ -400,50 +507,43 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
             self.command_output_print("error", "先选择文件 (><) !!")
 
     def on_double_click(self) -> None:
-        try:
-            data = self.read_json_file()
-            id = self.get_data_by_order(data, self.heping)
-            id_dict_value = id[0]["xuehao"]
-            col_conduct_points_dict_value = id[0]["score"]
-            name_dict_value = id[0]["name"]
 
-            self.heping = self.heping + 1
+        data = self.read_json_file()
+        id = self.get_data_by_order(data, self.heping)
+        id_dict_value = id[0]["xuehao"]
+        col_conduct_points_dict_value = id[0]["score"]
+        name_dict_value = id[0]["name"]
 
-            self.hightlighted_row_changed.emit(self.heping - 2)
-            self.heping_updated.emit(self.heping)
+        self.heping = self.heping + 1
 
-            self.command_output_print("warning", f"第{self.heping - 1}次:")
-            self.command_output_print("info", f"当前键入:")
-            self.command_output_print("msg", f"姓名:{name_dict_value}")
-            self.command_output_print("msg", f"学号:{id_dict_value}")
-            self.command_output_print("msg", f"操行分:{col_conduct_points_dict_value}")
+        self.hightlighted_row_changed.emit(self.heping - 2)
+        self.heping_updated.emit(self.heping)
 
+        self.command_output_print("warning", f"第{self.heping - 1}次:")
+        self.command_output_print("info", f"当前键入:")
+        self.command_output_print("msg", f"姓名:{name_dict_value}")
+        self.command_output_print("msg", f"学号:{id_dict_value}")
+        self.command_output_print("msg", f"操行分:{col_conduct_points_dict_value}")
 
-            pyautogui.typewrite(str(id_dict_value))
-            time.sleep(0.2)
-            pyautogui.moveTo(0, 0)
-            pyautogui.press('tab')
-            time.sleep(0.2)
-            pyautogui.press('enter')
-            time.sleep(0.2)
-            # 判断分数构成，模拟对应的数字键盘
-            if len(str(col_conduct_points_dict_value)) == 1:
-                pyautogui.press(str(col_conduct_points_dict_value))
-            elif len(str(col_conduct_points_dict_value)) == 3:
-                pyautogui.press(str(col_conduct_points_dict_value)[0])
-                print(str(col_conduct_points_dict_value)[0])
-                time.sleep(0.1)
-                pyautogui.press(".")
-                print(".")
-                time.sleep(0.1)
-                pyautogui.press(str(col_conduct_points_dict_value)[2])
-                print(str(col_conduct_points_dict_value)[2])
-
-        except Exception as e:
-            self.command_output_print("error", f"{e}")
-
-        finally:
-            self.command_output_print("msg", "完成")
+        pyautogui.typewrite(str(id_dict_value))
+        time.sleep(0.2)
+        pyautogui.moveTo(0, 0)
+        pyautogui.press('tab')
+        time.sleep(0.2)
+        pyautogui.press('enter')
+        time.sleep(0.2)
+        # 判断分数构成，模拟对应的数字键盘
+        if len(str(col_conduct_points_dict_value)) == 1:
+            pyautogui.press(str(col_conduct_points_dict_value))
+        elif len(str(col_conduct_points_dict_value)) == 3:
+            pyautogui.press(str(col_conduct_points_dict_value)[0])
+            print(str(col_conduct_points_dict_value)[0])
+            time.sleep(0.1)
+            pyautogui.press(".")
+            print(".")
+            time.sleep(0.1)
+            pyautogui.press(str(col_conduct_points_dict_value)[2])
+            print(str(col_conduct_points_dict_value)[2])
 
     def closeEvent(self, event) -> None:
         if self.mouse_thread is not None:
@@ -455,7 +555,6 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
     def get_file_path(self) -> None:
         file_path_temp1, _ = QFileDialog.getOpenFileName(self, "选择文件", "/", "Excel文件 (*.xlsx *.xls)")
         file_path_temp2 = self.ui.lineEdit_3.text()
-        file_path_temp3 = self.dragEnterEvent_file_path
 
         if file_path_temp1:
             self.file_paths = file_path_temp1
@@ -463,10 +562,6 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
             self.add_file()
         elif file_path_temp2:
             self.file_paths = file_path_temp2
-            self.command_output_print("info", f"加载了文件{self.file_paths}")
-            self.add_file()
-        elif file_path_temp3:
-            self.file_paths = file_path_temp3
             self.command_output_print("info", f"加载了文件{self.file_paths}")
             self.add_file()
         else:
@@ -477,7 +572,6 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
         选择文件
         :return:
         """
-        # 使用 QFileDialog 获取文件路径
 
         if self.file_paths:
             self.command_output_print("info", f"加载了文件{self.file_paths}")
@@ -597,7 +691,7 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
             QMessageBox.critical(self, "错误", "请输入完整的信息")
             self.command_output_print("error", "请输入完整的信息")
 
-    def command_output_print(self, level, msg) -> None:
+    def command_output_print(self, level: object, msg: object) -> None:
         """
         打印命令行输出
         :param level: info:blue,error:red,msg:black,warning:orange,debug:green
@@ -620,9 +714,24 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
 
         format = QTextCharFormat()
         format.setForeground(color)
+
+        # 获取当前的光标
         cursor = self.ui.textBrowser.textCursor()
+
+        # 移动光标到文档末尾
+        cursor.movePosition(QTextCursor.End)
+
+        # 插入文本
         cursor.insertText(f"[{level}] {msg}\n", format)
+
+        # 再次移动光标到文档末尾
+        cursor.movePosition(QTextCursor.End)
+
+        # 设置光标位置
         self.ui.textBrowser.setTextCursor(cursor)
+
+        # 确保滚动条滚动到底部
+        self.ui.textBrowser.ensureCursorVisible()
 
     def get_data_by_order(self, data, order) -> list:
         """
@@ -637,7 +746,6 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
 
     def save_to_json(self) -> None:
         data_list = []
-
         try:
             row_count = self.ui.tableWidget_2.rowCount()
             names = [self.ui.tableWidget_2.item(i, 0).text() if self.ui.tableWidget_2.item(i, 0) else None for i in
@@ -659,41 +767,6 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
                     data_list.append(data)
             with open('data.json', 'w') as f:
                 json.dump(data_list, f, ensure_ascii=False, indent=4)
-
-        except Exception as e:
-            self.command_output_print("error", f"保存数据时发生错误: {e}")
-
-    def get_int_to_str(self, a) -> tuple:
-        """
-        将整数转换为字符串，并在末尾添加逗号和空格
-        :param a: 整数
-        :return: 转换后的字符串
-        """
-        text = a.strip('()')
-        parts = text.split(',')
-        row = int(parts[0].strip())
-        col = int(parts[1].strip())
-
-        return row, col
-
-    def save_to_json_btu(self) -> None:
-        data_list = []
-
-        try:
-            self.command_output_print("debug", "还没写呢，不知道这个实现什么功能")
-
-            # for name, xuehao, score in zip(names, xuehaos, scores):
-            #     if name is not None and xuehao is not None and score is not None:
-            #         order = names.index(name) + 1
-            #         data = {
-            #             "order": order,
-            #             "name": name,
-            #             "xuehao": xuehao,
-            #             "score": score
-            #         }
-            #         data_list.append(data)
-            # with open('data.json', 'w') as f:
-            #     json.dump(data_list, f, ensure_ascii=False, indent=4)
 
         except Exception as e:
             self.command_output_print("error", f"保存数据时发生错误: {e}")
