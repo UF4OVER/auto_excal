@@ -24,7 +24,6 @@ class mouse_detection_threads(threading.Thread):
     """
     处理鼠标双击的子线程
     """
-
     def __init__(self, parent=None):
         print("mouse_detection_threads")
         super().__init__()
@@ -63,12 +62,6 @@ class mouse_detection_threads(threading.Thread):
                     self.listener.stop()
                     self.listener = None
                 time.sleep(0.1)
-
-    def pause(self):
-        self.paused = True
-
-    def resume(self):
-        self.paused = False
 
     def stop(self):
         self.running = False
@@ -111,9 +104,6 @@ class SmallWindow(QMainWindow, s.Ui_MainWindow):
         self.solt()
         self.ui.tableWidget.setEditTriggers(QTableWidget.NoEditTriggers)
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
-        # self.start_stop_bool = 0
-        # self.start_stop_signal.connect(
-        # lambda: self.main_window.get_start_stop_bool(value=self.start_stop_bool))
 
     def init_ui(self):
         self.back_btu = self.ui.pushButton_3
@@ -123,18 +113,6 @@ class SmallWindow(QMainWindow, s.Ui_MainWindow):
     def solt(self):
         self.back_btu.clicked.connect(self.close_window)
         self.clear_btu.clicked.connect(self.claer_table)
-
-        # self.paused_btu.clicked.connect(self.reverse)
-
-    # def reverse(self):
-    #     print("点击了反转")
-    #     self.start_stop_bool = not self.start_stop_bool
-    #     value = self.start_stop_bool
-    #     if value:
-    #         self.paused_btu.setText("暂停")
-    #     else:
-    #         self.paused_btu.setText("开始")
-    #     self.start_stop_signal.emit(value)
 
     def update_table_data(self, data, rows, cols):
         self.ui.tableWidget.setRowCount(rows)
@@ -154,9 +132,6 @@ class SmallWindow(QMainWindow, s.Ui_MainWindow):
                 item.setForeground(QColor("lightblue"))
                 print("highlighted cell:", row_index, col)
 
-    def update_heping_value(self, value):
-        self.index_row = value
-
     def claer_table(self):
         print("small_window claer_table")
         self.ui.tableWidget.clearContents()
@@ -171,7 +146,6 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
     cell_clicked_signal_2 = pyqtSignal(tuple)
     data_updated = pyqtSignal(list, int, int)
     hightlighted_row_changed = pyqtSignal(int)  # 定义信号
-    heping_updated = pyqtSignal(int)  # 定义信号
 
     def __init__(self):
         super().__init__()
@@ -521,7 +495,6 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
         self.heping = self.heping + 1
 
         self.hightlighted_row_changed.emit(self.heping - 2)
-        self.heping_updated.emit(self.heping)
 
         self.command_output_print("warning", f"第{self.heping - 1}次:")
         self.command_output_print("info", f"当前键入:")
@@ -553,12 +526,6 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
             print(str(col_conduct_points_dict_value)[2])
         # 再次移动到双击位置
         pyautogui.moveTo(x, y + 60)
-
-    def closeEvent(self, event) -> None:
-        if self.mouse_thread is not None:
-            self.mouse_thread.stop()
-            self.mouse_thread.join()
-        event.accept()
 
     # ----------------------------------------------------------#
     def get_file_path(self) -> None:
@@ -716,31 +683,19 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
             color = QColor("black")
         elif level == "warning":
             color = QColor("orange")
-        elif level == "debug":
-            color = QColor("green")
         else:
-            print("未知级别")
+            color = QColor("green")
 
         format = QTextCharFormat()
         format.setForeground(color)
 
-        # 获取当前的光标
         cursor = self.ui.textBrowser.textCursor()
+        cursor.movePosition(QTextCursor.End)  # 移动光标到文档末尾
+        cursor.insertText(f"[{level}] {msg}\n", format)  # 插入文本
+        cursor.movePosition(QTextCursor.End)  # 再次移动光标到文档末尾
 
-        # 移动光标到文档末尾
-        cursor.movePosition(QTextCursor.End)
-
-        # 插入文本
-        cursor.insertText(f"[{level}] {msg}\n", format)
-
-        # 再次移动光标到文档末尾
-        cursor.movePosition(QTextCursor.End)
-
-        # 设置光标位置
-        self.ui.textBrowser.setTextCursor(cursor)
-
-        # 确保滚动条滚动到底部
-        self.ui.textBrowser.ensureCursorVisible()
+        self.ui.textBrowser.setTextCursor(cursor)  # 设置光标位置
+        self.ui.textBrowser.ensureCursorVisible()  # 确保滚动条滚动到底部
 
     def get_data_by_order(self, data, order) -> list:
         """
