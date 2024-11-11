@@ -1,8 +1,6 @@
 import sys
 from cx_Freeze import setup, Executable
-
-# 定义构建选项
-# 添加依赖包
+# cx_Freeze配置
 build_exe_options = {
     "packages": [
         "json",
@@ -27,14 +25,9 @@ build_exe_options = {
     "excludes": []
 }
 
-# 设置 GUI 基础
-# 默认为 None
-base = None
-if sys.platform == "win32":
-    base = "Win32GUI"
+base = "Win32GUI"
 
-# 设置项目信息
-# 添加作者信息
+
 setup(
     name="原神",
     version="2.4.6",

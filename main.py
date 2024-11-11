@@ -1,5 +1,4 @@
 import os
-from typing import List, Any
 
 import pyautogui
 import main_window as m
@@ -362,7 +361,7 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
         cols = self.ui.tableWidget_2.columnCount()
         self.data_updated.emit(data, rows, cols)
 
-    def get_table_data(self) -> list[list[str | Any]]:
+    def get_table_data(self):
         data = []
         for row in range(self.ui.tableWidget_2.rowCount()):
             row_data = []
@@ -753,8 +752,8 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
             return []
 
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    ui = MainWindow()
-    ui.show()
-    sys.exit(app.exec_())
+
+app = QApplication(sys.argv)
+ui = MainWindow()
+ui.show()
+sys.exit(app.exec_())
