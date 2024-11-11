@@ -17,7 +17,7 @@ class Ui_MainWindow(object):
         MainWindow.resize(890, 561)
         MainWindow.setMinimumSize(QtCore.QSize(631, 510))
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("C:/Users/33974/.designer/backup/icon.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("icon.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
         MainWindow.setStyleSheet("font: 11pt \"微软雅黑\";")
         self.centralwidget = QtWidgets.QWidget(MainWindow)

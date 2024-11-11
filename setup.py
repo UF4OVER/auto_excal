@@ -1,26 +1,8 @@
 import sys
 from cx_Freeze import setup, Executable
 
-
-"""
-import json
-import pyautogui
-import main_window as m
-import small_window as s
-import threading
-import time
-import sys
-
-from qt_material import apply_stylesheet
-from openpyxl.reader.excel import load_workbook
-from pynput import mouse
-
-from PyQt5.QtCore 
-from PyQt5.QtGui 
-from PyQt5.QtWidgets """
-
-
 # 定义构建选项
+# 添加依赖包
 build_exe_options = {
     "packages": [
         "json",
@@ -46,14 +28,16 @@ build_exe_options = {
 }
 
 # 设置 GUI 基础
+# 默认为 None
 base = None
 if sys.platform == "win32":
     base = "Win32GUI"
 
 # 设置项目信息
+# 添加作者信息
 setup(
     name="原神",
-    version="2.4.5",
+    version="2.4.6",
     description="AUTO-INPUT",
     options={"build_exe": build_exe_options},
     executables=[

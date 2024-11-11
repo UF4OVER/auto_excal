@@ -321,8 +321,10 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
             if file.endswith(".xlsx"):
                 self.command_output_print("info", f"成功拖入文件:{file}")
                 self.file_paths = file
-                self.add_file()  # 此函数不能执行
-
+                # pass
+                self.add_file()
+                # time: 2024 11 08 上函数不能执行
+                # time: 2024 11 09 变量写错了，没进if
 
             else:
                 self.command_output_print("error", "请拖入xlsx文件！！！")
@@ -510,6 +512,8 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
 
         data = self.read_json_file()
         id = self.get_data_by_order(data, self.heping)
+        # 判断是否有相同id的数据
+        # todo 这里需要优化
         id_dict_value = id[0]["xuehao"]
         col_conduct_points_dict_value = id[0]["score"]
         name_dict_value = id[0]["name"]
@@ -524,14 +528,17 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
         self.command_output_print("msg", f"姓名:{name_dict_value}")
         self.command_output_print("msg", f"学号:{id_dict_value}")
         self.command_output_print("msg", f"操行分:{col_conduct_points_dict_value}")
-
+        # 双击时光标位置输入学号
         pyautogui.typewrite(str(id_dict_value))
-        time.sleep(0.2)
+        # 获取双击时光标位置
+        x, y = pyautogui.position()
+        # 将光标移动到左上角
         pyautogui.moveTo(0, 0)
+        time.sleep(0.1)
         pyautogui.press('tab')
-        time.sleep(0.2)
+        time.sleep(0.1)
         pyautogui.press('enter')
-        time.sleep(0.2)
+        time.sleep(0.1)
         # 判断分数构成，模拟对应的数字键盘
         if len(str(col_conduct_points_dict_value)) == 1:
             pyautogui.press(str(col_conduct_points_dict_value))
@@ -544,6 +551,8 @@ class MainWindow(QMainWindow, m.Ui_MainWindow):
             time.sleep(0.1)
             pyautogui.press(str(col_conduct_points_dict_value)[2])
             print(str(col_conduct_points_dict_value)[2])
+        # 再次移动到双击位置
+        pyautogui.moveTo(x, y + 60)
 
     def closeEvent(self, event) -> None:
         if self.mouse_thread is not None:
