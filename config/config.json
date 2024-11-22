@@ -1,0 +1,34 @@
+{
+    "Update": {
+        "CheckUpdateAtStartUp": true
+    },
+    "DesktopLyric": {
+        "Alignment": "Center",
+        "FontFamily": "Microsoft YaHei",
+        "FontSize": 50,
+        "HighlightColor": "#ff0099bc",
+        "StrokeColor": "#ff000000",
+        "StrokeSize": 5
+    },
+    "Folders": {
+        "Download": "E:/python/auto_excal_new/flu/download",
+        "LocalMusic": []
+    },
+    "MainWindow": {
+        "DpiScale": 1.25,
+        "EnableAcrylicBackground": false,
+        "Language": "zh_CN",
+        "MinimizeToTray": true,
+        "PlayBarColor": "#ff225c7f",
+        "RecentPlayNumbers": 300
+    },
+    "Online": {
+        "MvQuality": "Full HD",
+        "PageSize": 30,
+        "SongQuality": "Standard quality"
+    },
+    "QFluentWidgets": {
+        "ThemeColor": "#ff28afe9",
+        "ThemeMode": "Dark"
+    }
+}

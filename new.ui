@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1213</width>
+    <height>857</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <item row="0" column="0">
+    <widget class="QWidget" name="widget" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QWidget" name="widget_2" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="3,1">
+         <item>
+          <widget class="QWidget" name="widget_4" native="true">
+           <layout class="QVBoxLayout" name="verticalLayout" stretch="4,1">
+            <property name="spacing">
+             <number>20</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="TableWidget" name="tableWidget"/>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="groupBox_2">
+              <property name="styleSheet">
+               <string notr="true">
+QGroupBox::indicator:checked {
+    background-color: #28afe9; /* 选中时的背景颜色 */
+}
+QGroupBox::indicator:unchecked {
+    background-color: #e74c3c; /* 未选中时的背景颜色 */
+}</string>
+              </property>
+              <property name="title">
+               <string>debug输出</string>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="5">
+               <property name="leftMargin">
+                <number>5</number>
+               </property>
+               <property name="topMargin">
+                <number>5</number>
+               </property>
+               <property name="rightMargin">
+                <number>5</number>
+               </property>
+               <property name="bottomMargin">
+                <number>5</number>
+               </property>
+               <item>
+                <widget class="TextBrowser" name="textBrowser"/>
+               </item>
+              </layout>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QWidget" name="widget_3" native="true">
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <item>
+             <layout class="QGridLayout" name="gridLayout_4" rowstretch="1,5" columnstretch="0,0">
+              <item row="0" column="0">
+               <widget class="QGroupBox" name="groupBox">
+                <property name="styleSheet">
+                 <string notr="true">
+QGroupBox::indicator:checked {
+    background-color: #28afe9; /* 选中时的背景颜色 */
+}
+QGroupBox::indicator:unchecked {
+    background-color: #e74c3c; /* 未选中时的背景颜色 */
+}</string>
+                </property>
+                <property name="inputMethodHints">
+                 <set>Qt::ImhNone</set>
+                </property>
+                <property name="title">
+                 <string>启用自定义</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                </property>
+                <property name="flat">
+                 <bool>true</bool>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+                <property name="checked">
+                 <bool>false</bool>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_2">
+                 <property name="spacing">
+                  <number>7</number>
+                 </property>
+                 <property name="sizeConstraint">
+                  <enum>QLayout::SetMaximumSize</enum>
+                 </property>
+                 <property name="leftMargin">
+                  <number>11</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>11</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>11</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>11</number>
+                 </property>
+                 <item>
+                  <layout class="QGridLayout" name="gridLayout_2">
+                   <item row="0" column="1" colspan="2">
+                    <widget class="QLabel" name="label_4">
+                     <property name="text">
+                      <string>起始单元格</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="0">
+                    <widget class="QLabel" name="label">
+                     <property name="text">
+                      <string>姓名</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="1" colspan="2">
+                    <widget class="LineEdit" name="lineEdit">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="0">
+                    <widget class="QLabel" name="label_2">
+                     <property name="text">
+                      <string>学号</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="1" colspan="2">
+                    <widget class="LineEdit" name="lineEdit_2"/>
+                   </item>
+                   <item row="3" column="0">
+                    <widget class="QLabel" name="label_3">
+                     <property name="text">
+                      <string>操行</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="3" column="1" colspan="2">
+                    <widget class="LineEdit" name="lineEdit_3"/>
+                   </item>
+                   <item row="4" column="0" colspan="2">
+                    <widget class="PrimaryPushButton" name="pushButton_2">
+                     <property name="text">
+                      <string>默认</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="4" column="2">
+                    <widget class="TransparentPushButton" name="pushButton_3">
+                     <property name="text">
+                      <string>查找</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <layout class="QVBoxLayout" name="verticalLayout_2">
+                <item>
+                 <widget class="TransparentToolButton" name="toolButton">
+                  <property name="text">
+                   <string>支持作者</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="PrimaryPushButton" name="pushButton_7">
+                  <property name="text">
+                   <string>导入文件</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="PrimaryPushButton" name="pushButton_4">
+                  <property name="text">
+                   <string>开始</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="verticalSpacer_2">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>18</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="TransparentPushButton" name="pushButton">
+                  <property name="text">
+                   <string>重置</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="PrimaryPushButton" name="pushButton_5">
+                  <property name="text">
+                   <string>插入</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="TransparentPushButton" name="pushButton_6">
+                  <property name="text">
+                   <string>删除</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item row="1" column="0" colspan="2">
+               <widget class="TableWidget" name="tableWidget_2"/>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PrimaryPushButton</class>
+   <extends>QPushButton</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>TransparentPushButton</class>
+   <extends>QPushButton</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>TransparentToolButton</class>
+   <extends>QToolButton</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>TableWidget</class>
+   <extends>QTableWidget</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>TextBrowser</class>
+   <extends>QTextBrowser</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>LineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
