@@ -1,22 +1,18 @@
+import os
+
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
 
 from siui.components import SiPixLabel
-from siui.components.option_card import SiOptionCardLinear, SiOptionCardPlane
+from siui.components.option_card import SiOptionCardLinear
 from siui.components.page import SiPage
-from siui.components.slider import SiSliderH
 from siui.components.titled_widget_group import SiTitledWidgetGroup
 from siui.components.widgets import (
     SiDenseHContainer,
     SiDenseVContainer,
     SiLabel,
-    SiLineEdit,
-    SiLongPressButton,
     SiPushButton,
-    SiSimpleButton,
-    SiSwitch,
 )
-from siui.core import GlobalFont, Si, SiColor, SiGlobal, SiQuickEffect, GlobalFontSize
+from siui.core import GlobalFont, Si, SiColor, SiGlobal
 from siui.gui import SiFont
 
 from patrs.themed_option_card import ThemedOptionCardPlane
@@ -34,7 +30,8 @@ class Homepage(SiPage):
         self.background_image = SiPixLabel(self.head_area)
         self.background_image.setFixedSize(1366, 300)
         self.background_image.setBorderRadius(6)
-        self.background_image.load("../pic/ccc.jpg")
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        self.background_image.load(os.path.join(base_dir, "pic/back.jpg"))
 
         self.background_fading_transition = SiLabel(self.head_area)
         self.background_fading_transition.setGeometry(0, 100, 0, 200)
@@ -124,9 +121,9 @@ class OptionCardsPanel(SiDenseVContainer):
         self.setSpacing(12)
 
         attached_button_a = SiPushButton(self)
+
         attached_button_a.resize(128, 32)
         attached_button_a.attachment().setText("Attachment")
-
         attached_button_b = SiPushButton(self)
         attached_button_b.resize(32, 32)
         attached_button_b.attachment().load(SiGlobal.siui.iconpack.get("ic_fluent_attach_regular"))

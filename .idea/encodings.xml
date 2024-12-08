@@ -1,10 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/.idea/httpRequests/2024-12-03T235015.200.json" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/.idea/httpRequests/2024-12-04T114056.200.json" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/config/user_repo_info_login.json" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/icons" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/login_form/3dtest.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/network/download_png.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/network/load_github_repo.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/network/load_user_info.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/network/login_github.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/network/news_api.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/news.http" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/patrs/page_Autoexcalpage.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/patrs/page_homepage.py" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/patrs/page_login_for_github.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/patrs/themed_option_card.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/start.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/start.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ui.py" charset="UTF-8" />
     <file url="PROJECT" charset="GBK" />
