@@ -7,8 +7,8 @@ from ui import MySiliconApp
 
 def show_version_message(window):
     window.LayerRightMessageSidebar().send(
-        title="Welcome to Silicon UI Gallery",
-        text="You are currently running v1.14.514\n"
+        title="Welcome to this",
+        text="You are currently running v0.0.1\n"
              "Click this message box to check out what's new.",
         msg_type=1,
         icon=SiGlobal.siui.iconpack.get("ic_fluent_hand_wave_regular"),
@@ -21,8 +21,11 @@ def show_version_message(window):
 
 def test_main():
     app = QApplication(sys.argv)
+
     window = MySiliconApp()
+
     window.show()
+    show_version_message(window)
     sys.exit(app.exec_())
 
 

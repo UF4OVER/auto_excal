@@ -11,16 +11,23 @@ from siui.components.widgets import (
     SiDenseHContainer, SiDenseVContainer, SiLabel, )
 from siui.core import Si, SiColor
 from network.load_user_info import load_user_info
-from network import download_png, login_github
+from network import login_github
+
+BASE_PATH = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(BASE_PATH)
+user_info_path = os.path.join(project_root, 'config', 'user_info.json')
 
 try:
-    if os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'config', 'user_info.json')):
-        # download_png.download_png()
+    if os.path.exists(user_info_path):
         USER_INFO = load_user_info(1)
+
     else:
         USER_INFO = load_user_info(0)
+
 except Exception as e:
+    USER_INFO = load_user_info(0)
     print(e)
+print(USER_INFO.ini())
 
 
 class Label(SiLabel):
@@ -53,23 +60,27 @@ class login_for_github(SiPage):
         # 创建控件组
         self.titled_widgets_group = SiTitledWidgetGroup(self)
         self.titled_widgets_group.setSiliconWidgetFlag(Si.EnableAnimationSignals)
-        if USER_INFO.ini == 0:
+        if USER_INFO.ini() == 0:
             self.setup_login_groups(True)
         else:
             self.setup_user_groups()
         self.update()
+        # self.titled_widgets_group.show()
         self.titled_widgets_group.addPlaceholder(64)
         # 设置控件组为页面对象
         self.setAttachment(self.titled_widgets_group)
 
     def login_page(self):
-        # 假设这里是你登录验证的逻辑
         if login_github.main():
             self.setup_login_groups(False)  # 登录成功后移除登录页面
             self.setup_user_groups()
-            self.finish_init()
+            self.titled_widgets_group.update()
+
         else:
-            self.setup_login_groups(True)  # 登录失败或未登录时显示登录页面
+            self.setup_login_groups(True)
+            # 登录失败或未登录时显示登录页面
+            self.titled_widgets_group.update()
+        self.titled_widgets_group.update()
         self.update()
 
     def setup_login_groups(self, bool_):
@@ -84,7 +95,6 @@ class login_for_github(SiPage):
                 self.login_top = SiOptionCardLinear(self)
                 self.login_top.adjustSize()
                 self.login_top.setTitle("登录您的GitHub账号", "点击按钮来登录到github账户")
-
                 login_btu = SiPushButtonRefactor(self)
                 login_btu.setText("登录")
                 login_btu.setFixedSize(120, 40)
@@ -105,7 +115,7 @@ class login_for_github(SiPage):
             user_pix.adjustSize()
             user_pix.setTitle("您的基本信息")
             user_pix.setFixedHeight(190)
-            user_pix.header().setFixedHeight(50)
+            user_pix.header().setFixedHeight(70)
             user_pix.header().addPlaceholder(12)
             user_pix.body().setFixedHeight(110)
             user_pix.body().adjustSize()
@@ -151,7 +161,7 @@ class login_for_github(SiPage):
             user_info_card.header().addPlaceholder(6)
 
             user_info_card.body().setFixedHeight(180)
-            # user_info_card.body().adjustSize()
+            user_info_card.body().adjustSize()
 
             user_info_card.footer().setFixedHeight(30)
             user_info_card.footer().adjustSize()
@@ -166,6 +176,7 @@ class login_for_github(SiPage):
             district_label = Label(self, "地区")
             # 创建三个垂直容器
             temp_vbox1 = SiDenseVContainer(self)
+            temp_vbox1.setFixedWidth(130)
             temp_vbox1.addWidget(commany_label)
             temp_vbox1.addWidget(nationality_label)
             temp_vbox1.addWidget(language_label)
@@ -177,7 +188,7 @@ class login_for_github(SiPage):
             district_label_1 = Label(self, USER_INFO.get_user_location())
 
             temp_vbox2 = SiDenseVContainer(self)
-
+            temp_vbox2.setFixedWidth(130)
             temp_vbox2.addWidget(commany_label_1)
             temp_vbox2.addWidget(nationality_label_1)
             temp_vbox2.addWidget(language_label_1)
@@ -226,11 +237,10 @@ class login_for_github(SiPage):
             account_blog_label = Label(self, USER_INFO.get_user_blog())
             account_blog_label_1 = Label(self, "您的博客")
             account_bio_label = Label(self, "")
-            print(type(USER_INFO.get_user_bio()))
             account_bio_label_1 = Label(self, "您的个人简介")
 
             temp_vbox1 = SiDenseVContainer(self)
-
+            temp_vbox1.setFixedWidth(130)
             temp_vbox1.addWidget(account_email_label)
             temp_vbox1.addWidget(account_login_label)
             temp_vbox1.addWidget(account_id_label)
@@ -238,7 +248,7 @@ class login_for_github(SiPage):
             temp_vbox1.addWidget(account_bio_label)
 
             temp_vbox2 = SiDenseVContainer(self)
-
+            temp_vbox2.setFixedWidth(130)
             temp_vbox2.addWidget(account_email_label_1)
             temp_vbox2.addWidget(account_login_label_1)
             temp_vbox2.addWidget(account_id_label_1)
@@ -269,6 +279,3 @@ class login_for_github(SiPage):
             account_card.header().addWidget(change_account_btu, side="right")
             group.addWidget(account_card)
         print("setup_user_groups_finished")
-
-
-

@@ -18,7 +18,7 @@ def get_png_urls() -> str:
     try:
         with open(user_info_folder_path, "r") as f:
             content = f.read()
-        # 解析JSON数据
+            print(json.loads(content).get("avatar_url"))
         return json.loads(content).get("avatar_url")
     except FileNotFoundError:
         print(f"Error: The file {user_info_folder_path} was not found.")
@@ -28,7 +28,7 @@ def get_png_urls() -> str:
         return ""
 
 
-def download_png(path=png_folder_path, url=get_png_urls()) -> None:
+def download_png_for_pic(path=png_folder_path) -> None:
     """
     并发起请求，获得头像后保存到pic文件夹中
     若url为空，则不写入文件，其他函数中会判断是否存在用户头像
@@ -37,6 +37,7 @@ def download_png(path=png_folder_path, url=get_png_urls()) -> None:
     :param url: png_folder_path中获取用户配置信息中的头像网址
     :return: 不返回，直接写入图片
     """
+    url = get_png_urls()
     if url == "" or url is None:
         print("没有找到头像的地址")
         return
@@ -54,4 +55,4 @@ def download_png(path=png_folder_path, url=get_png_urls()) -> None:
 
 
 if __name__ == "__main__":
-    download_png()
+    download_png_for_pic()

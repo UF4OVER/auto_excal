@@ -7,7 +7,7 @@ from siui.templates.application.application import SiliconApplication
 
 import icons
 from patrs.page_homepage import Homepage
-from patrs.page_Autoexcalpage import Autoexcal
+from patrs.page_autoexcalpage import Autoexcal
 from patrs.page_login_for_github import login_for_github
 from patrs.page_repopage import repopage
 
