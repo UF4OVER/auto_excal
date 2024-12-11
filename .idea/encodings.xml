@@ -12,11 +12,13 @@
     <file url="file://$PROJECT_DIR$/network/login_github.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/network/news_api.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/news.http" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/patrs/close_event.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/patrs/page_autoexcalpage.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/patrs/page_homepage.py" charset="GBK" />
     <file url="file://$PROJECT_DIR$/patrs/page_login_for_github.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/patrs/themed_option_card.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/start.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/temp.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ui.py" charset="UTF-8" />
     <file url="PROJECT" charset="GBK" />
   </component>

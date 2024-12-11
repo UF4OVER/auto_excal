@@ -93,6 +93,7 @@ class login_for_github(SiPage):
             if bool_:
                 # 添加登录窗口
                 self.login_top = SiOptionCardLinear(self)
+                self.login_top.load("ic_fluent_globe_star_regular")
                 self.login_top.adjustSize()
                 self.login_top.setTitle("登录您的GitHub账号", "点击按钮来登录到github账户")
                 login_btu = SiPushButtonRefactor(self)

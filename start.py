@@ -19,15 +19,9 @@ def show_version_message(window):
     )
 
 
-def test_main():
+if __name__ == "__main__":
     app = QApplication(sys.argv)
-
     window = MySiliconApp()
-
     window.show()
     show_version_message(window)
     sys.exit(app.exec_())
-
-
-if __name__ == "__main__":
-    test_main()

@@ -24,7 +24,7 @@ USER_API_URL = "https://api.github.com/user"
 auth_code = None
 
 
-def send_custom_message(type_, png_path: str, name: str, auto_close_duration=3000):
+def send_custom_message(type_, png_path: str, name: str, url :str, auto_close_duration=5000):
     fold_after = auto_close_duration
     container = SiDenseHContainer()
     container.setAdjustWidgetsSize(True)
@@ -63,13 +63,15 @@ def send_custom_message(type_, png_path: str, name: str, auto_close_duration=300
     button_1.colorGroup().assign(SiColor.TEXT_B, button_1.getColor(SiColor.TITLE_INDICATOR))
     button_1.adjustSize()
     button_1.reloadStyleSheet()
+    button_1.clicked.connect(lambda: webbrowser.open(url))
 
     button_2 = SiSimpleButton()
     button_2.setFixedHeight(22)
-    button_2.attachment().setText("退出账号")
+    button_2.attachment().setText("退出应用")
     button_2.colorGroup().assign(SiColor.TEXT_B, button_2.getColor(SiColor.TITLE_INDICATOR))
     button_2.adjustSize()
     button_2.reloadStyleSheet()
+    button_2.clicked.connect(lambda: SiGlobal.siui.windows["MAIN_WINDOW"].close())
 
     container_v.addWidget(name_label)
     container_v.addPlaceholder(8)
@@ -214,9 +216,9 @@ def main():
                 download_png.download_png_for_pic()
                 base_dir = os.path.dirname(os.path.abspath(__file__))
                 png_dir = os.path.join(os.path.dirname(base_dir), 'pic')
-                pic_path = os.path.join(png_dir, 'avatar.jpg')
+                pic_path = os.path.join(png_dir, 'avatar.png')
                 print(pic_path)
-                send_custom_message(0, pic_path, user_data['login'])
+                send_custom_message(1, pic_path, user_data['login'], user_data['html_url'])
             except Exception as e:
                 show_message("成矣", "可关否？在启？", "ic_fluent_checkmark_filled")
 

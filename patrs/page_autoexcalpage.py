@@ -101,53 +101,46 @@ class Autoexcal(SiPage):
             self.data_stream_container = SiDenseHContainer(self)
             self.data_stream_container_v1 = SiDenseVContainer(self)
             self.data_stream_container_v2 = SiDenseVContainer(self)
+
+            start_input = SiLineEditWithItemName(self)
+            start_input.setName("数据1起始")
+            start_input.lineEdit().setText("(0,0)")
+            start_input.resize(350, 32)
+
+            finish_input = SiLineEditWithItemName(self)
+            finish_input.setName("数据1结束")
+            finish_input.lineEdit().setText("(0,0)")
+            finish_input.resize(350, 32)
+
+            start_input1 = SiLineEditWithItemName(self)
+            start_input1.setName("数据1起始")
+            start_input1.lineEdit().setText("(0,0)")
+            start_input1.resize(350, 32)
+
+            finish_input1 = SiLineEditWithItemName(self)
+            finish_input1.setName("数据1结束")
+            finish_input1.lineEdit().setText("(0,0)")
+            finish_input1.resize(350, 32)
+
+            start_input2 = SiLineEditWithItemName(self)
+            start_input2.setName("数据1起始")
+            start_input2.lineEdit().setText("(0,0)")
+            start_input2.resize(350, 32)
+
+            finish_input2 = SiLineEditWithItemName(self)
+            finish_input2.setName("数据1结束")
+            finish_input2.lineEdit().setText("(0,0)")
+            finish_input2.resize(350, 32)
+
+            self.data_stream_container_v1.addWidget(start_input)
+            self.data_stream_container_v2.addWidget(finish_input)
+            self.data_stream_container_v1.addWidget(start_input1)
+            self.data_stream_container_v2.addWidget(finish_input1)
+            self.data_stream_container_v1.addWidget(start_input2)
+            self.data_stream_container_v2.addWidget(finish_input2)
+
             self.data_stream_container.addWidget(self.data_stream_container_v1)
             self.data_stream_container.addWidget(self.data_stream_container_v2)
-
-            def add_weights_btu_clicked():
-                self.data_stream_num += 1
-                print(self.data_stream_num)
-
-                data_stream1 = SiLineEditWithItemName(self)
-                data_stream1.setName(f"数据{self.data_stream_num}起始")
-                data_stream1.lineEdit().setText("(0,0)")
-
-                self.data_stream_container_v1.addWidget(data_stream1)
-                self.data_stream_container_v1.update()
-
-                data_stream2 = SiLineEditWithItemName(self)
-                data_stream2.setName(f"数据{self.data_stream_num}结束")
-                data_stream2.lineEdit().setText("(0,0)")
-
-                self.data_stream_container_v2.addWidget(data_stream2)
-                self.data_stream_container_v2.update()
-
-                self.data_stream_list.append((data_stream1, data_stream2))
-                group.show()
-
-            def remove_weights_btu_clicked():
-                if self.data_stream_num > 1:
-                    print(self.data_stream_num)
-                    self.data_stream_num -= 1
-                    data_stream1, data_stream2 = self.data_stream_list.pop()
-                    data_stream1.deleteLater()
-                    data_stream2.deleteLater()
-                    self.data_stream_container_v1.removeWidget(data_stream1)
-                    self.data_stream_container_v2.removeWidget(data_stream2)
-
-                    group.show()
-
-            add_weights_btu.clicked.connect(add_weights_btu_clicked)
-            remove_weights_btu.clicked.connect(remove_weights_btu_clicked)
-            # start_input = SiLineEditWithItemName(self)
-            # start_input.setName("数据1起始")
-            # start_input.lineEdit().setText("(0,0)")
-            # start_input.resize(350, 32)
-            #
-            # finish_input = SiLineEditWithItemName(self)
-            # finish_input.setName("数据1结束")
-            # finish_input.lineEdit().setText("(0,0)")
-            # finish_input.resize(350, 32)
 
             info_ = Label(self, "启用以自定义添加数据")
 

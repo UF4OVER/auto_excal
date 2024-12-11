@@ -6,6 +6,7 @@ from siui.core import SiColor, SiGlobal
 from siui.templates.application.application import SiliconApplication
 
 import icons
+from patrs.close_event import CloseModalDialog
 from patrs.page_homepage import Homepage
 from patrs.page_autoexcalpage import Autoexcal
 from patrs.page_login_for_github import login_for_github
@@ -22,6 +23,7 @@ class MySiliconApp(SiliconApplication):
         super().__init__(*args, **kwargs)
 
         screen_geo = QDesktopWidget().screenGeometry()
+        self.stu = False
         self.setMinimumSize(1024, 380)
         self.resize(1366, 916)
         self.move((screen_geo.width() - self.width()) // 2, (screen_geo.height() - self.height()) // 2)
@@ -45,3 +47,18 @@ class MySiliconApp(SiliconApplication):
         self.layerMain().setPage(0)
 
         SiGlobal.siui.reloadAllWindowsStyleSheet()
+
+    def closeEvent(self, event):
+        self.event = event
+        if self.stu:
+            event.accept()
+            return
+        else:
+            self.event.ignore()
+            temp_widget = CloseModalDialog(self)
+            SiGlobal.siui.windows["MAIN_WINDOW"].layerModalDialog().setDialog(temp_widget)
+            temp_widget.user_decision.connect(self._sw_stu)  # 连接信号到槽
+
+    def _sw_stu(self):
+        self.stu = not self.stu
+        SiGlobal.siui.windows["MAIN_WINDOW"].close()
