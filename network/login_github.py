@@ -1,6 +1,8 @@
 import json
 import os
 import threading
+import time
+
 import requests
 import webbrowser
 from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -102,11 +104,11 @@ def send_custom_message(type_, png_path: str, name: str, url :str, auto_close_du
     SiGlobal.siui.windows["MAIN_WINDOW"].LayerRightMessageSidebar().sendMessageBox(new_message_box)
 
 
-def show_message(title: str, text: str, icon: str):
+def show_message(_type:int,title: str, text: str, icon: str):
     SiGlobal.siui.windows["MAIN_WINDOW"].LayerRightMessageSidebar().send(
         title=title,
         text=text,
-        msg_type=1,
+        msg_type=_type,
         icon=SiGlobal.siui.iconpack.get(f"{icon}"),
         fold_after=5000)
 
@@ -158,18 +160,19 @@ def main():
 
         # 3. 创建一个 HTTP 服务器以捕获 GitHub 的回调
         server = HTTPServer(("localhost", 8080), OAuthHandler)
+        server.socket.settimeout(10)
         print("Waiting for authorization response...")
         try:
             server.handle_request()
             server.server_close()
         except Exception as e:
-            show_message("Error", "Error: No authorization code received.", "ic_fluent_error_circle_regular")
+            show_message(4,"Error", "错误：未收到授权码或登陆失败！！请重试", "ic_fluent_error_circle_regular")
             print(e)
             return False
 
         if not auth_code:
-            show_message("Error", "Error: No authorization code received.", "ic_fluent_error_circle_regular")
-            print("Error: No authorization code received.")
+            show_message(4,"Error", "错误：未收到授权码或登陆失败！！请重试", "ic_fluent_error_circle_regular")
+            print("错误：未收到授权码或登陆失败！！请重试")
             return False
 
         # 4. 用授权码交换访问令牌
@@ -188,7 +191,7 @@ def main():
 
         if "access_token" not in token_data:
             print(f"Error fetching access token: {token_data.get('error_description')}")
-            show_message("Error", f"Error: {token_data.get('error_description')}", "ic_fluent_error_circle_regular")
+            show_message(4,"Error", f"Error: {token_data.get('error_description')}", "ic_fluent_error_circle_regular")
             return False
 
         access_token = token_data["access_token"]
@@ -220,17 +223,17 @@ def main():
                 print(pic_path)
                 send_custom_message(1, pic_path, user_data['login'], user_data['html_url'])
             except Exception as e:
-                show_message("成矣", "可关否？在启？", "ic_fluent_checkmark_filled")
+                show_message(1,"成矣", "可关否？在启？", "ic_fluent_checkmark_filled")
 
                 print(e)
 
             return True
         else:
-            show_message("Error", "Error: No authorization code received.", "ic_fluent_error_circle_regular")
+            show_message(4,"Error", "错误：未收到授权码或登陆失败！！请重试", "ic_fluent_error_circle_regular")
             print(f"Error fetching user info: {user_response.text}")
             return False
     except Exception as E:
-        show_message("Error", "Error: No authorization code received.", "ic_fluent_error_circle_regular")
+        show_message(4,"Error", "错误：未收到授权码或登陆失败！！请重试", "ic_fluent_error_circle_regular")
         print(E)
         return False
 

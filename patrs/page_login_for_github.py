@@ -9,7 +9,7 @@ from siui.components.page import SiPage
 from siui.components.titled_widget_group import SiTitledWidgetGroup
 from siui.components.widgets import (
     SiDenseHContainer, SiDenseVContainer, SiLabel, )
-from siui.core import Si, SiColor
+from siui.core import Si, SiColor, SiGlobal
 from network.load_user_info import load_user_info
 from network import login_github
 
@@ -78,7 +78,6 @@ class login_for_github(SiPage):
 
         else:
             self.setup_login_groups(True)
-            # 登录失败或未登录时显示登录页面
             self.titled_widgets_group.update()
         self.titled_widgets_group.update()
         self.update()
@@ -93,7 +92,8 @@ class login_for_github(SiPage):
             if bool_:
                 # 添加登录窗口
                 self.login_top = SiOptionCardLinear(self)
-                self.login_top.load("ic_fluent_globe_star_regular")
+                self.login_top.load(SiGlobal.siui.iconpack.get("ic_fluent_globe_star_regular"))
+
                 self.login_top.adjustSize()
                 self.login_top.setTitle("登录您的GitHub账号", "点击按钮来登录到github账户")
                 login_btu = SiPushButtonRefactor(self)
@@ -110,7 +110,6 @@ class login_for_github(SiPage):
                     self.login_top.deleteLater()  # 删除不再使用的部件以释放资源
 
     def setup_user_groups(self):
-        print("setup_user_groups")
         with self.titled_widgets_group as group:
             user_pix = SiOptionCardPlane(self)
             user_pix.adjustSize()
@@ -279,4 +278,3 @@ class login_for_github(SiPage):
             account_card.body().addWidget(temp_hbox)
             account_card.header().addWidget(change_account_btu, side="right")
             group.addWidget(account_card)
-        print("setup_user_groups_finished")

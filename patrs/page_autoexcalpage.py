@@ -1,14 +1,14 @@
 from PyQt5.QtCore import Qt
-from siui.components import SiLineEditWithItemName, SiDenseVContainer, SiOptionCardPlane, SiDenseHContainer
+from qfluentwidgets import TableWidget, FluentStyleSheet
+from siui.components import SiLineEditWithItemName, SiDenseVContainer, SiOptionCardPlane, SiDenseHContainer, \
+    SiPushButton
 from siui.components.button import SiSwitchRefactor, SiPushButtonRefactor
+from siui.components.combobox import SiComboBox
 from siui.components.option_card import SiOptionCardLinear
 from siui.components.page import SiPage
 from siui.components.spinbox.spinbox import SiIntSpinBox
 from siui.components.titled_widget_group import SiTitledWidgetGroup
-from siui.components.widgets import (
-    SiLabel,
-    SiLongPressButton,
-)
+from siui.components.widgets import SiLabel, SiLongPressButton
 from siui.core import Si, SiColor, SiGlobal
 
 
@@ -44,6 +44,7 @@ class Autoexcal(SiPage):
         self.titled_widgets_group.setSiliconWidgetFlag(Si.EnableAnimationSignals)
         self.setup_set_widgets()
         self.setup_function_widgets()
+        SiGlobal.siui.reloadStyleSheetRecursively(self)
 
         # 添加页脚的空白以增加美观性
         self.titled_widgets_group.addPlaceholder(64)
@@ -82,8 +83,16 @@ class Autoexcal(SiPage):
             self.choose_port_card.load(SiGlobal.siui.iconpack.get("ic_fluent_plug_connected_filled"))
             self.choose_port_card.addWidget(choose_port_sw)
             self.choose_port_card.addWidget(self.port_int_spin_box)
+
+            duplicate_filter_btu = SiSwitchRefactor(self)
+            self.duplicate_filter_card = SiOptionCardLinear(self)
+            self.duplicate_filter_card.setTitle("去重", "启用以数据去重")
+            self.duplicate_filter_card.load(SiGlobal.siui.iconpack.get("ic_fluent_poll_off_filled"))
+            self.duplicate_filter_card.addWidget(duplicate_filter_btu)
+
         group.addWidget(self.boswer_filter)
         group.addWidget(self.choose_port_card)
+        group.addWidget(self.duplicate_filter_card)
 
     def setup_function_widgets(self):
         with self.titled_widgets_group as group:
@@ -113,22 +122,22 @@ class Autoexcal(SiPage):
             finish_input.resize(350, 32)
 
             start_input1 = SiLineEditWithItemName(self)
-            start_input1.setName("数据1起始")
+            start_input1.setName("数据2起始")
             start_input1.lineEdit().setText("(0,0)")
             start_input1.resize(350, 32)
 
             finish_input1 = SiLineEditWithItemName(self)
-            finish_input1.setName("数据1结束")
+            finish_input1.setName("数据2结束")
             finish_input1.lineEdit().setText("(0,0)")
             finish_input1.resize(350, 32)
 
             start_input2 = SiLineEditWithItemName(self)
-            start_input2.setName("数据1起始")
+            start_input2.setName("数据3起始")
             start_input2.lineEdit().setText("(0,0)")
             start_input2.resize(350, 32)
 
             finish_input2 = SiLineEditWithItemName(self)
-            finish_input2.setName("数据1结束")
+            finish_input2.setName("数据3结束")
             finish_input2.lineEdit().setText("(0,0)")
             finish_input2.resize(350, 32)
 
@@ -160,3 +169,184 @@ class Autoexcal(SiPage):
             choose_switch.toggled.connect(lambda checked: customize_the_input_box.body().setEnabled(checked))
             choose_switch.toggled.connect(lambda checked: customize_the_input_box.footer().setEnabled(checked))
             group.addWidget(customize_the_input_box)
+
+
+        with self.titled_widgets_group as group:
+            group.addTitle("规则")
+            self.rule_card = SiOptionCardPlane(self)
+            self.rule_card.setTitle("规则")
+            self.rule_card.adjustSize()
+            self.rule_card.body().setFixedSize(440, 270)
+            self.rule_card.footer().setFixedHeight(40)
+
+
+
+            self.add_rule_btu = SiPushButtonRefactor(self)
+            self.add_rule_btu.setText("添加规则")
+            self.add_rule_btu.resize(128, 32)
+            self.rule_card.header().addWidget(self.add_rule_btu, "right")
+
+
+
+            self.data_choose_edit = SiComboBox(self)
+            self.data_choose_edit.resize(128, 32)
+            self.data_choose_edit.addOption("数据1")
+            self.data_choose_edit.addOption("数据2")
+            self.data_choose_edit.addOption("数据3")
+            self.data_choose_edit.menu().setIndex(0)
+            self.data_choose_edit.menu().setShowIcon(False)
+
+
+            self.horizontal_rules_add_container = SiDenseHContainer(self)
+            self.horizontal_rules_add_container.setFixedHeight(400)
+            self.horizontal_rules_add_container.addWidget(Label(self, "选择数据流"))
+            self.horizontal_rules_add_container.addWidget(self.data_choose_edit)
+            self.horizontal_rules_add_container.addWidget(Label(self, "定义到--->"))
+            self.rule_card.body().addWidget(self.horizontal_rules_add_container)
+            self.rule_card.footer().addWidget(Label(self, "用来自定义添加规则"))
+
+            group.addWidget(self.rule_card)
+
+        with self.titled_widgets_group as group:
+            table_widget_height = 900
+            table_widget_width = 500
+            group.addTitle("表格数据")
+
+            self.auto_input_widget_box = SiOptionCardPlane(self)
+            self.auto_input_widget_box.adjustSize()
+            self.auto_input_widget_box.setTitle("原始表格数据")
+            self.auto_input_widget_box.body().setFixedSize(table_widget_height + 40, table_widget_width + 40)
+            self.auto_input_widget_box.footer().setFixedHeight(40)
+
+            self.table_widget = TableWidget(self)
+            # self.table_widget.setStyleSheet("""
+            #                                     QTableWidget::item {
+            #                                     color: white;
+            #                                     background-color: transparent;}""")
+            self.table_widget.setFixedSize(table_widget_height, table_widget_width)
+            self.table_widget.setColumnCount(40)
+            self.table_widget.setRowCount(140)
+
+            clear_data_btu = SiLongPressButton(self)
+            clear_data_btu.setFixedHeight(32)
+            clear_data_btu.attachment().setText("清除数据")
+            clear_data_btu.longPressed.connect(lambda: print("clear_data"))
+            clear_data_btu.setFixedHeight(32)
+
+            choose_file_btu = SiPushButtonRefactor(self)
+            choose_file_btu.setText("选择文件")
+
+            self.auto_input_widget_box.header().addWidget(choose_file_btu, "right")
+            self.auto_input_widget_box.body().addWidget(self.table_widget)
+            self.auto_input_widget_box.footer().addWidget(Label(self, "使用表格数据时，请确保表格数据与输入框对应"))
+            self.auto_input_widget_box.footer().addWidget(clear_data_btu, "right")
+
+            self.new_input_widget_box = SiOptionCardPlane(self)
+            self.new_input_widget_box.adjustSize()
+            self.new_input_widget_box.setTitle("自定义表格数据")
+            self.new_input_widget_box.body().setFixedSize(table_widget_height + 40, table_widget_width + 70)
+            self.new_input_widget_box.footer().setFixedHeight(40)
+
+            self.new_table_widget = TableWidget(self)
+            # self.new_table_widget.setStyleSheet("""
+            #                                     QTableWidget::item {
+            #                                     color: white;
+            #                                     background-color: transparent;}""")
+            self.new_table_widget.setFixedSize(int(table_widget_height*0.7), table_widget_width)
+            self.new_table_widget.setColumnCount(40)
+            self.new_table_widget.setRowCount(140)
+
+            # 此容器左侧用于放置表格数据，右侧放置按钮
+            self.operate_the_container_h = SiDenseHContainer(self)
+            # 此容器用于放置表格数据
+            self.vertical_container_for_tabular_data = SiDenseVContainer(self)
+
+            self.vertical_container_for_tabular_data.addWidget(self.new_table_widget)
+            # 此容器用于放置按钮
+            self.btu_container_for_vertical_container = SiDenseVContainer(self)
+
+            open_web_btu = SiPushButton(self)
+            open_web_btu.setUseTransition(True)
+            open_web_btu.attachment().setText("打开浏览器")
+            open_web_btu.setFixedSize(128, 32)
+
+            start_btu = SiPushButton(self)
+            start_btu.setUseTransition(True)
+            start_btu.attachment().setText("开始")
+            start_btu.setFixedSize(128, 32)
+
+            restart_btu = SiLongPressButton(self)
+            # restart_btu.setUseTransition(True)
+            restart_btu.attachment().setText("清除数据")
+            restart_btu.setFixedSize(128, 32)
+
+            delete_btu = SiPushButton(self)
+            delete_btu.attachment().setText("删除")
+            delete_btu.setFixedSize(128, 32)
+
+            insert_btu = SiPushButton(self)
+            insert_btu.attachment().setText("插入")
+            insert_btu.setFixedSize(128, 32)
+
+            # 创建控件组
+            # self.named_input_box_group = SiTitledWidgetGroup(self)
+            # self.named_input_box_group.setSiliconWidgetFlag(Si.EnableAnimationSignals)
+
+            data1_input = SiLineEditWithItemName(self)
+            data1_input.setName("数据1")
+            data1_input.lineEdit().setText("(0,0)")
+            data1_input.resize(210, 32)
+
+            data2_input = SiLineEditWithItemName(self)
+            data2_input.setName("数据2")
+            data2_input.lineEdit().setText("(0,0)")
+            data2_input.resize(210, 32)
+
+            data3_input = SiLineEditWithItemName(self)
+            data3_input.setName("数据3")
+            data3_input.lineEdit().setText("(0,0)")
+            data3_input.resize(210, 32)
+            self.btu_container_for_vertical_container.addWidget(data1_input)
+            self.btu_container_for_vertical_container.addWidget(data2_input)
+            self.btu_container_for_vertical_container.addWidget(data3_input)
+            # self.named_input_box_group.addWidget(data1_input)
+            # self.named_input_box_group.addWidget(data2_input)
+            # self.named_input_box_group.addWidget(data3_input)
+
+            # SiGlobal.siui.reloadStyleSheetRecursively(self)
+            # self.named_input_box_group.addPlaceholder(64)
+            # self.setAttachment(self.named_input_box_group)
+
+            temp_h = SiDenseHContainer(self)
+
+            temp_h.addWidget(open_web_btu)
+            temp_h.addWidget(start_btu)
+            temp_h.addWidget(restart_btu)
+            temp_h.addWidget(delete_btu)
+            temp_h.addWidget(insert_btu)
+
+            # self.btu_container_for_vertical_container.addWidget(self.named_input_box_group)
+            self.vertical_container_for_tabular_data.addWidget(temp_h)
+
+            self.operate_the_container_h.addWidget(self.vertical_container_for_tabular_data)
+            self.operate_the_container_h.addWidget(self.btu_container_for_vertical_container)
+
+
+            self.new_input_widget_box.body().addWidget(self.operate_the_container_h)
+            self.new_input_widget_box.footer().addWidget(Label(self, "使用表格数据时，请确保表格数据与输入框对应"))
+
+
+            group.addWidget(self.auto_input_widget_box)
+            group.addWidget(self.new_input_widget_box)
+
+            # 确保所有部件都可见
+            self.table_widget.setVisible(True)
+            self.new_table_widget.setVisible(True)
+            clear_data_btu.setVisible(True)
+            choose_file_btu.setVisible(True)
+
+            # 调整父部件大小
+            self.auto_input_widget_box.adjustSize()
+            self.new_input_widget_box.adjustSize()
+            group.adjustSize()
+            self.adjustSize()

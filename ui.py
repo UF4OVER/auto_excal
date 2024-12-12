@@ -52,7 +52,6 @@ class MySiliconApp(SiliconApplication):
         self.event = event
         if self.stu:
             event.accept()
-            return
         else:
             self.event.ignore()
             temp_widget = CloseModalDialog(self)
