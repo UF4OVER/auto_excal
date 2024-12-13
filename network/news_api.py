@@ -1,5 +1,4 @@
 import requests
-import json
 
 def get_news(limit=1):
     url = f'https://api.thenewsapi.com/v1/news/top?api_token=kMhHXojE5ApSocUeSmpMGZblAi9g8gkkfmPd2FoT&locale=cn&limit={limit}'

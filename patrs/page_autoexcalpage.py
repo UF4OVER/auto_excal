@@ -1,6 +1,7 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QLabel
-from qfluentwidgets import TableWidget, FluentStyleSheet
+from PyQt5.QtWidgets import QLabel, QFileDialog, QTableWidgetItem
+from openpyxl.reader.excel import load_workbook
+from qfluentwidgets import TableWidget
 from siui.components import SiLineEditWithItemName, SiDenseVContainer, SiOptionCardPlane, SiDenseHContainer, \
     SiPushButton
 from siui.components.button import SiSwitchRefactor, SiPushButtonRefactor
@@ -21,26 +22,15 @@ class Label(SiLabel):
         self.setAlignment(Qt.AlignCenter)
         self.setFixedHeight(32)
 
-        # self.setFixedStyleSheet("border-radius: 4px")
         self.setText(text)
         self.adjustSize()
         self.resize(self.width() + 24, self.height())
         self.setVisible(True)
         self.update()
 
-#
-# class testLabel(QLabel):
-#     def __init__(self, parent, text):
-#         super().__init__(parent)
-#         # self.setAlignment(Qt.AlignCenter)
-#         self.setFixedHeight(32)
-#         self.setText(text)
-#         self.setVisible(True)
-#         self.update()
-
     def reloadStyleSheet(self):
         self.setStyleSheet(f"color: {self.getColor(SiColor.TEXT_B)};")
-        # f"background-color: {self.getColor(SiColor.INTERFACE_BG_D)}")
+
 
 
 class Autoexcal(SiPage):
@@ -217,6 +207,7 @@ class Autoexcal(SiPage):
 
             choose_file_btu = SiPushButtonRefactor(self)
             choose_file_btu.setText("选择文件")
+            choose_file_btu.clicked.connect(self.import_file_for_table_widget)
 
             self.auto_input_widget_box.header().addWidget(choose_file_btu, "right")
             self.auto_input_widget_box.body().addWidget(self.table_widget)
@@ -229,11 +220,12 @@ class Autoexcal(SiPage):
             self.new_input_widget_box.body().setFixedSize(table_widget_height + 40, table_widget_width + 70)
             self.new_input_widget_box.footer().setFixedHeight(40)
 
+            reload_the_data_btu = SiPushButtonRefactor(self)
+            reload_the_data_btu.setText("加载数据")
+            reload_the_data_btu.clicked.connect(self.reload_data_for_new_table_widget)
+            self.new_input_widget_box.header().addWidget(reload_the_data_btu, "right")
+
             self.new_table_widget = TableWidget(self)
-            # self.new_table_widget.setStyleSheet("""
-            #                                     QTableWidget::item {
-            #                                     color: white;
-            #                                     background-color: transparent;}""")
             self.new_table_widget.setFixedSize(int(table_widget_height * 0.7), table_widget_width)
             self.new_table_widget.setColumnCount(40)
             self.new_table_widget.setRowCount(140)
@@ -270,10 +262,6 @@ class Autoexcal(SiPage):
             insert_btu.attachment().setText("插入")
             insert_btu.setFixedSize(128, 32)
 
-            # 创建控件组
-            # self.named_input_box_group = SiTitledWidgetGroup(self)
-            # self.named_input_box_group.setSiliconWidgetFlag(Si.EnableAnimationSignals)
-
             data1_input = SiLineEditWithItemName(self)
             data1_input.setName("数据1")
             data1_input.lineEdit().setText("(0,0)")
@@ -288,16 +276,10 @@ class Autoexcal(SiPage):
             data3_input.setName("数据3")
             data3_input.lineEdit().setText("(0,0)")
             data3_input.resize(210, 32)
+
             self.btu_container_for_vertical_container.addWidget(data1_input)
             self.btu_container_for_vertical_container.addWidget(data2_input)
             self.btu_container_for_vertical_container.addWidget(data3_input)
-            # self.named_input_box_group.addWidget(data1_input)
-            # self.named_input_box_group.addWidget(data2_input)
-            # self.named_input_box_group.addWidget(data3_input)
-
-            # SiGlobal.siui.reloadStyleSheetRecursively(self)
-            # self.named_input_box_group.addPlaceholder(64)
-            # self.setAttachment(self.named_input_box_group)
 
             temp_h = SiDenseHContainer(self)
 
@@ -307,7 +289,6 @@ class Autoexcal(SiPage):
             temp_h.addWidget(delete_btu)
             temp_h.addWidget(insert_btu)
 
-            # self.btu_container_for_vertical_container.addWidget(self.named_input_box_group)
             self.vertical_container_for_tabular_data.addWidget(temp_h)
 
             self.operate_the_container_h.addWidget(self.vertical_container_for_tabular_data)
@@ -337,7 +318,7 @@ class Autoexcal(SiPage):
 
         def add_rule_card_plane_body_widget():
             info_label = Label(self,
-                                   f"{self.data_for_combox}添加到-->{self.ele_name_for_combox}的{self.ele_name_input.getText()}元素")
+                               f"{self.data_for_combox}添加到-->{self.ele_name_for_combox}的{self.ele_name_input.getText()}元素")
             info_label.setVisible(True)
             print(f"{self.data_for_combox}添加到-->{self.ele_name_for_combox}的{self.ele_name_input.getText()}元素")
             rule_card_plane.body().addWidget(info_label)
@@ -363,8 +344,8 @@ class Autoexcal(SiPage):
             self.rule_card_plane_h = SiDenseHContainer(self)
 
             self.custom_rule_tu = SiSwitchRefactor(self)
-            self.custom_rule_tu.toggled.connect(lambda :rule_card_plane.body().setEnabled(False))
-            self.custom_rule_tu.toggled.connect(lambda :rule_card_plane.footer().setEnabled(False))
+            self.custom_rule_tu.toggled.connect(lambda: rule_card_plane.body().setEnabled(False))
+            self.custom_rule_tu.toggled.connect(lambda: rule_card_plane.footer().setEnabled(False))
 
             self.choose_data_flu = SiComboBox(self)
             self.choose_data_flu.resize(128, 32)
@@ -373,7 +354,7 @@ class Autoexcal(SiPage):
             self.choose_data_flu.addOption("数据3", value="数据3")
             self.choose_data_flu.menu().setShowIcon(False)
             self.choose_data_flu.menu().setIndex(0)
-            self.choose_data_flu.menu().valueChanged.connect(self.get_ele_name_for_combox)
+            self.choose_data_flu.menu().valueChanged.connect(self.get_data_for_combox)
 
             self.choose_ele = SiComboBox(self)
             self.choose_ele.resize(128, 32)
@@ -382,7 +363,7 @@ class Autoexcal(SiPage):
             self.choose_ele.addOption("@text()=", value="@text()=")
             self.choose_ele.menu().setShowIcon(False)
             self.choose_ele.menu().setIndex(0)
-            self.choose_data_flu.menu().valueChanged.connect(self.get_data_for_combox)
+            self.choose_ele.menu().valueChanged.connect(self.get_ele_name_for_combox)
 
             self.ele_name_input = SiLineEditWithItemName(self)
             self.ele_name_input.setName("元素名称")
@@ -415,10 +396,38 @@ class Autoexcal(SiPage):
             rule_card_plane.body().addPlaceholder(12)
             rule_card_plane.adjustSize()
 
-            # group.addWidget(customize_the_input_box)
-
             group.addWidget(rule_card_plane)
 
+    def import_file_for_table_widget(self):
+        file_path = QFileDialog.getOpenFileName(self, "选择文件", "", "Excel Files (*.xlsx)")[0]
+        if file_path:
+            self.load_data_for_table_widget(file_path)
+
+    def load_data_for_table_widget(self, file_path):
+        try:
+            workbook = load_workbook(file_path)
+            self.sheet = workbook.active
+            rows = self.sheet.max_row
+            cols = self.sheet.max_column
+
+            self.table_widget.setRowCount(rows)
+            self.table_widget.setColumnCount(cols)
+            for row in range(rows):
+                for col in range(cols):
+                    cell_value = self.sheet.cell(row=row + 1, column=col + 1).value
+                    item = QTableWidgetItem(str(cell_value))
+                    self.table_widget.setItem(row, col, item)
+        except Exception as e:
+            print(e)
+
+    def reload_data_for_new_table_widget(self):
+        self.new_table_widget.clear()
+        self.search_data_in_table_to_table2([(0, 0), (0, 23)])
+
+    def search_data_in_table_to_table2(self, *args):
+        print(args)
+
+    # --------------------------inside method---------------------------#
     def get_data_for_combox(self, data_name):
         self.data_for_combox = data_name
 
