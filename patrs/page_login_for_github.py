@@ -176,7 +176,7 @@ class login_for_github(SiPage):
             district_label = Label(self, "地区")
             # 创建三个垂直容器
             temp_vbox1 = SiDenseVContainer(self)
-            temp_vbox1.setFixedWidth(130)
+            temp_vbox1.setFixedWidth(150)
             temp_vbox1.addWidget(commany_label)
             temp_vbox1.addWidget(nationality_label)
             temp_vbox1.addWidget(language_label)
@@ -188,7 +188,7 @@ class login_for_github(SiPage):
             district_label_1 = Label(self, USER_INFO.get_user_location())
 
             temp_vbox2 = SiDenseVContainer(self)
-            temp_vbox2.setFixedWidth(130)
+            temp_vbox2.setFixedWidth(150)
             temp_vbox2.addWidget(commany_label_1)
             temp_vbox2.addWidget(nationality_label_1)
             temp_vbox2.addWidget(language_label_1)
@@ -218,10 +218,10 @@ class login_for_github(SiPage):
             group.addTitle("账户信息")
             account_card = SiOptionCardPlane(self)
             account_card.adjustSize()
-            account_card.setFixedHeight(300)
+            account_card.setFixedHeight(350)
             account_card.header().setFixedHeight(50)
             account_card.header().addPlaceholder(6)
-            account_card.body().setFixedHeight(220)
+            account_card.body().setFixedHeight(270)
             account_card.body().adjustSize()
             account_card.footer().setFixedHeight(30)
             account_card.footer().adjustSize()
@@ -240,7 +240,7 @@ class login_for_github(SiPage):
             account_bio_label_1 = Label(self, "您的个人简介")
 
             temp_vbox1 = SiDenseVContainer(self)
-            temp_vbox1.setFixedWidth(130)
+            temp_vbox1.setFixedWidth(150)
             temp_vbox1.addWidget(account_email_label)
             temp_vbox1.addWidget(account_login_label)
             temp_vbox1.addWidget(account_id_label)
@@ -248,7 +248,7 @@ class login_for_github(SiPage):
             temp_vbox1.addWidget(account_bio_label)
 
             temp_vbox2 = SiDenseVContainer(self)
-            temp_vbox2.setFixedWidth(130)
+            temp_vbox2.setFixedWidth(150)
             temp_vbox2.addWidget(account_email_label_1)
             temp_vbox2.addWidget(account_login_label_1)
             temp_vbox2.addWidget(account_id_label_1)
