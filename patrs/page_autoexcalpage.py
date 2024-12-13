@@ -1,4 +1,5 @@
 from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QLabel
 from qfluentwidgets import TableWidget, FluentStyleSheet
 from siui.components import SiLineEditWithItemName, SiDenseVContainer, SiOptionCardPlane, SiDenseHContainer, \
     SiPushButton
@@ -24,6 +25,18 @@ class Label(SiLabel):
         self.setText(text)
         self.adjustSize()
         self.resize(self.width() + 24, self.height())
+        self.setVisible(True)
+        self.update()
+
+#
+# class testLabel(QLabel):
+#     def __init__(self, parent, text):
+#         super().__init__(parent)
+#         # self.setAlignment(Qt.AlignCenter)
+#         self.setFixedHeight(32)
+#         self.setText(text)
+#         self.setVisible(True)
+#         self.update()
 
     def reloadStyleSheet(self):
         self.setStyleSheet(f"color: {self.getColor(SiColor.TEXT_B)};")
@@ -39,11 +52,17 @@ class Autoexcal(SiPage):
         self.setScrollAlignment(Qt.AlignLeft)
         self.setTitle("AUTOEXCAL")
 
+        self.data_for_combox: str = "数据1"
+        self.ele_name_for_combox: str = "@id="
+        self.info_labels = []  # 存储添加的标签
+
         # 创建控件组
         self.titled_widgets_group = SiTitledWidgetGroup(self)
         self.titled_widgets_group.setSiliconWidgetFlag(Si.EnableAnimationSignals)
         self.setup_set_widgets()
+        self.setup_rules_groups()
         self.setup_function_widgets()
+
         SiGlobal.siui.reloadStyleSheetRecursively(self)
 
         # 添加页脚的空白以增加美观性
@@ -170,43 +189,6 @@ class Autoexcal(SiPage):
             choose_switch.toggled.connect(lambda checked: customize_the_input_box.footer().setEnabled(checked))
             group.addWidget(customize_the_input_box)
 
-
-        with self.titled_widgets_group as group:
-            group.addTitle("规则")
-            self.rule_card = SiOptionCardPlane(self)
-            self.rule_card.setTitle("规则")
-            self.rule_card.adjustSize()
-            self.rule_card.body().setFixedSize(440, 270)
-            self.rule_card.footer().setFixedHeight(40)
-
-
-
-            self.add_rule_btu = SiPushButtonRefactor(self)
-            self.add_rule_btu.setText("添加规则")
-            self.add_rule_btu.resize(128, 32)
-            self.rule_card.header().addWidget(self.add_rule_btu, "right")
-
-
-
-            self.data_choose_edit = SiComboBox(self)
-            self.data_choose_edit.resize(128, 32)
-            self.data_choose_edit.addOption("数据1")
-            self.data_choose_edit.addOption("数据2")
-            self.data_choose_edit.addOption("数据3")
-            self.data_choose_edit.menu().setIndex(0)
-            self.data_choose_edit.menu().setShowIcon(False)
-
-
-            self.horizontal_rules_add_container = SiDenseHContainer(self)
-            self.horizontal_rules_add_container.setFixedHeight(400)
-            self.horizontal_rules_add_container.addWidget(Label(self, "选择数据流"))
-            self.horizontal_rules_add_container.addWidget(self.data_choose_edit)
-            self.horizontal_rules_add_container.addWidget(Label(self, "定义到--->"))
-            self.rule_card.body().addWidget(self.horizontal_rules_add_container)
-            self.rule_card.footer().addWidget(Label(self, "用来自定义添加规则"))
-
-            group.addWidget(self.rule_card)
-
         with self.titled_widgets_group as group:
             table_widget_height = 900
             table_widget_width = 500
@@ -252,7 +234,7 @@ class Autoexcal(SiPage):
             #                                     QTableWidget::item {
             #                                     color: white;
             #                                     background-color: transparent;}""")
-            self.new_table_widget.setFixedSize(int(table_widget_height*0.7), table_widget_width)
+            self.new_table_widget.setFixedSize(int(table_widget_height * 0.7), table_widget_width)
             self.new_table_widget.setColumnCount(40)
             self.new_table_widget.setRowCount(140)
 
@@ -331,10 +313,8 @@ class Autoexcal(SiPage):
             self.operate_the_container_h.addWidget(self.vertical_container_for_tabular_data)
             self.operate_the_container_h.addWidget(self.btu_container_for_vertical_container)
 
-
             self.new_input_widget_box.body().addWidget(self.operate_the_container_h)
             self.new_input_widget_box.footer().addWidget(Label(self, "使用表格数据时，请确保表格数据与输入框对应"))
-
 
             group.addWidget(self.auto_input_widget_box)
             group.addWidget(self.new_input_widget_box)
@@ -350,3 +330,97 @@ class Autoexcal(SiPage):
             self.new_input_widget_box.adjustSize()
             group.adjustSize()
             self.adjustSize()
+
+    def setup_rules_groups(self):
+        rule_card_plane = SiOptionCardPlane(self)
+        rule_card_plane.setTitle("自定义规则")
+
+        def add_rule_card_plane_body_widget():
+            info_label = Label(self,
+                                   f"{self.data_for_combox}添加到-->{self.ele_name_for_combox}的{self.ele_name_input.getText()}元素")
+            info_label.setVisible(True)
+            print(f"{self.data_for_combox}添加到-->{self.ele_name_for_combox}的{self.ele_name_input.getText()}元素")
+            rule_card_plane.body().addWidget(info_label)
+            rule_card_plane.body().adjustSize()
+            rule_card_plane.body().update()
+            rule_card_plane.adjustSize()
+            self.info_labels.append(info_label)  # 存储标签引用
+            group.adjustSize()
+            group.update()
+
+        def remove_rule_card_plane_body_widget():
+            if self.info_labels:
+                label_to_remove = self.info_labels.pop()  # 获取并移除最后一个标签
+                rule_card_plane.body().removeWidget(label_to_remove)
+                label_to_remove.deleteLater()  # 删除标签实例
+                rule_card_plane.body().adjustSize()
+                rule_card_plane.body().update()
+                rule_card_plane.adjustSize()
+                group.adjustSize()
+
+        with self.titled_widgets_group as group:
+            group.addTitle("规则")
+            self.rule_card_plane_h = SiDenseHContainer(self)
+
+            self.custom_rule_tu = SiSwitchRefactor(self)
+            self.custom_rule_tu.toggled.connect(lambda :rule_card_plane.body().setEnabled(False))
+            self.custom_rule_tu.toggled.connect(lambda :rule_card_plane.footer().setEnabled(False))
+
+            self.choose_data_flu = SiComboBox(self)
+            self.choose_data_flu.resize(128, 32)
+            self.choose_data_flu.addOption("数据1", value="数据1")
+            self.choose_data_flu.addOption("数据2", value="数据2")
+            self.choose_data_flu.addOption("数据3", value="数据3")
+            self.choose_data_flu.menu().setShowIcon(False)
+            self.choose_data_flu.menu().setIndex(0)
+            self.choose_data_flu.menu().valueChanged.connect(self.get_ele_name_for_combox)
+
+            self.choose_ele = SiComboBox(self)
+            self.choose_ele.resize(128, 32)
+            self.choose_ele.addOption("@id=", value="@id=")
+            self.choose_ele.addOption("@tag()=", value="@tag()=")
+            self.choose_ele.addOption("@text()=", value="@text()=")
+            self.choose_ele.menu().setShowIcon(False)
+            self.choose_ele.menu().setIndex(0)
+            self.choose_data_flu.menu().valueChanged.connect(self.get_data_for_combox)
+
+            self.ele_name_input = SiLineEditWithItemName(self)
+            self.ele_name_input.setName("元素名称")
+            self.ele_name_input.lineEdit().setText("txtpoint")
+            self.ele_name_input.resize(350, 32)
+
+            self.addrule_btu = SiPushButton(self)
+            self.addrule_btu.attachment().setText("添加规则")
+            self.addrule_btu.setFixedSize(128, 32)
+            self.addrule_btu.clicked.connect(add_rule_card_plane_body_widget)
+
+            self.remove_rule_btu = SiPushButton(self)
+            self.remove_rule_btu.attachment().setText("删除规则")
+            self.remove_rule_btu.setFixedSize(128, 32)
+            self.remove_rule_btu.clicked.connect(remove_rule_card_plane_body_widget)
+
+            self.rule_card_plane_h.addWidget(self.choose_data_flu)
+            self.rule_card_plane_h.addWidget(Label(self, "定义到---->"))
+            self.rule_card_plane_h.addWidget(self.choose_ele)
+            self.rule_card_plane_h.addWidget(self.ele_name_input)
+
+            info_ = Label(self, "元素默认后缀自增")
+
+            rule_card_plane.header().addWidget(self.custom_rule_tu, "right")
+            rule_card_plane.body().addWidget(self.rule_card_plane_h)
+            rule_card_plane.footer().addWidget(info_)
+            rule_card_plane.footer().addWidget(self.addrule_btu, "right")
+            rule_card_plane.footer().addWidget(self.remove_rule_btu, "right")
+            rule_card_plane.footer().setFixedHeight(40)
+            rule_card_plane.body().addPlaceholder(12)
+            rule_card_plane.adjustSize()
+
+            # group.addWidget(customize_the_input_box)
+
+            group.addWidget(rule_card_plane)
+
+    def get_data_for_combox(self, data_name):
+        self.data_for_combox = data_name
+
+    def get_ele_name_for_combox(self, data_name):
+        self.ele_name_for_combox = data_name

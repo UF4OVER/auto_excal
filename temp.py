@@ -1,102 +1,54 @@
 import os
 import sys
+
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QDesktopWidget, QApplication, QVBoxLayout
-from siui.components import SiLineEditWithItemName, SiDenseVContainer, SiOptionCardPlane, SiDenseHContainer, \
-    SiSimpleButton, SiPixLabel
-from siui.components.button import SiSwitchRefactor, SiPushButtonRefactor
-from siui.components.option_card import SiOptionCardLinear
+from PyQt5.QtWidgets import QDesktopWidget, QApplication
+from siui.components import SiLineEditWithItemName, SiOptionCardPlane, SiDenseHContainer, SiPushButton
+from siui.components.button import SiSwitchRefactor
+from siui.components.combobox import SiComboBox
 from siui.components.page import SiPage
-from siui.components.spinbox.spinbox import SiIntSpinBox
 from siui.components.titled_widget_group import SiTitledWidgetGroup
 from siui.components.widgets import (
     SiLabel,
-    SiLongPressButton,
 )
-from siui.core import Si, SiColor, SiGlobal, GlobalFont
-from siui.gui import SiFont
+from siui.core import Si, SiColor, SiGlobal
 from siui.templates.application.application import SiliconApplication
-from siui.templates.application.components.message.box import SiSideMessageBox
 
 
-def send_custom_message(type_, png_path: str, name: str, auto_close_duration=3000):
-    fold_after = auto_close_duration
-    container = SiDenseHContainer()
-    container.setAdjustWidgetsSize(True)
-    container.setFixedHeight(80)
-    container.setSpacing(0)
+class Label(SiLabel):
+    def __init__(self, parent, text):
+        super().__init__(parent)
 
-    info_label = SiLabel()
-    info_label.setFont(SiFont.tokenized(GlobalFont.S_NORMAL))
-    info_label.setStyleSheet(f"color: {info_label.getColor(SiColor.TEXT_D)}; padding-left: 16px")
-    info_label.setText("以下账号已成功登录")
-    info_label.adjustSize()
+        self.setSiliconWidgetFlag(Si.AdjustSizeOnTextChanged)
+        self.setAlignment(Qt.AlignCenter)
+        self.setFixedHeight(32)
 
-    split_line = SiLabel()
-    split_line.resize(300, 1)
-    split_line.setFixedStyleSheet("margin-left: 20px")
-    split_line.setColor(SiColor.trans(split_line.getColor(SiColor.TEXT_D), 0.3))
+        # self.setFixedStyleSheet("border-radius: 4px")
+        self.setText(text)
+        self.adjustSize()
+        self.resize(self.width() + 24, self.height())
+        self.setVisible(True)
+        self.update()
 
-    avatar = SiPixLabel(container)
-    avatar.resize(80, 80)
-    avatar.setBorderRadius(40)
-    avatar.load(png_path)
+    #
+    # class testLabel(QLabel):
+    #     def __init__(self, parent, text):
+    #         super().__init__(parent)
+    #         # self.setAlignment(Qt.AlignCenter)
+    #         self.setFixedHeight(32)
+    #         self.setText(text)
+    #         self.setVisible(True)
+    #         self.update()
 
-    container_v = SiDenseVContainer(container)
-    container_v.setFixedWidth(200)
-    container_v.setSpacing(0)
+    def reloadStyleSheet(self):
+        self.setStyleSheet(f"color: {self.getColor(SiColor.TEXT_B)};")
+        # f"background-color: {self.getColor(SiColor.INTERFACE_BG_D)}")
 
-    name_label = SiLabel()
-    name_label.setFont(SiFont.tokenized(GlobalFont.M_BOLD))
-    name_label.setStyleSheet(f"color: {name_label.getColor(SiColor.TEXT_B)}; padding-left:8px")
-    name_label.setText(f"{name}")
-    name_label.adjustSize()
 
-    button_1 = SiSimpleButton()
-    button_1.setFixedHeight(22)
-    button_1.attachment().setText("打开我的主页")
-    button_1.colorGroup().assign(SiColor.TEXT_B, button_1.getColor(SiColor.TITLE_INDICATOR))
-    button_1.adjustSize()
-    button_1.reloadStyleSheet()
-
-    button_2 = SiSimpleButton()
-    button_2.setFixedHeight(22)
-    button_2.attachment().setText("退出账号")
-    button_2.colorGroup().assign(SiColor.TEXT_B, button_2.getColor(SiColor.TITLE_INDICATOR))
-    button_2.adjustSize()
-    button_2.reloadStyleSheet()
-
-    container_v.addWidget(name_label)
-    container_v.addPlaceholder(8)
-    container_v.addWidget(button_1)
-    container_v.addWidget(button_2)
-    container_v.adjustSize()
-
-    container.addPlaceholder(24)
-    container.addWidget(avatar)
-    container.addPlaceholder(8)
-    container.addWidget(container_v)
-    container.adjustSize()
-
-    new_message_box = SiSideMessageBox()
-    new_message_box.setMessageType(type_)
-    new_message_box.content().container().setSpacing(0)
-    new_message_box.content().container().addPlaceholder(16)
-    new_message_box.content().container().addWidget(info_label)
-    new_message_box.content().container().addPlaceholder(8)
-    new_message_box.content().container().addWidget(split_line)
-    new_message_box.content().container().addPlaceholder(24)
-    new_message_box.content().container().addWidget(container)
-    new_message_box.content().container().addPlaceholder(32)
-    new_message_box.adjustSize()
-
-    new_message_box.setFoldAfter(fold_after)
-
-    SiGlobal.siui.windows["MAIN_WINDOW"].LayerRightMessageSidebar().sendMessageBox(new_message_box)
 class Autoexcal(SiPage):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
+        # -------------------------------start------------------------------------- #
         self.setPadding(64)
         self.setScrollMaximumWidth(1000)
         self.setScrollAlignment(Qt.AlignLeft)
@@ -104,6 +56,109 @@ class Autoexcal(SiPage):
         # 创建控件组
         self.titled_widgets_group = SiTitledWidgetGroup(self)
         self.titled_widgets_group.setSiliconWidgetFlag(Si.EnableAnimationSignals)
+        # -------------------------------const------------------------------------- #
+        self.info_labels = []
+        # -------------------------------widget------------------------------------ #
+        self.setup_rules_groups()
+        # -------------------------------finish------------------------------------ #
+        SiGlobal.siui.reloadStyleSheetRecursively(self)
+        # 添加页脚的空白以增加美观性
+        self.titled_widgets_group.addPlaceholder(64)
+        # 设置控件组为页面对象
+        self.setAttachment(self.titled_widgets_group)
+
+    def setup_rules_groups(self):
+        rule_card_plane = SiOptionCardPlane(self)  # 创建选项卡
+        rule_card_plane.setTitle("自定义规则")
+
+        def add_rule_card_plane_body_widget():
+            # 获取下拉框与具名输入框中的数据
+            info_label = Label(self,
+                               f"{self.get_data_for_combox}添加到-->{self.get_ele_name_for_combox}的{self.ele_name_input.getText()}元素")
+            print(info_label)  # 打印正常
+            info_label.setVisible(True)  # 确保可视，似乎没什么用
+            rule_card_plane.body().addWidget(info_label)  # 添加
+            rule_card_plane.body().adjustSize()  # 更新控件大小
+            rule_card_plane.body().update()
+            rule_card_plane.adjustSize()
+            self.info_labels.append(info_label)  # 存储标签引用
+            group.adjustSize()  # 更新控件组大小
+            group.update()
+        def remove_rule_card_plane_body_widget():
+            if self.info_labels:
+                label_to_remove = self.info_labels.pop()  # 获取并移除最后一个标签
+                rule_card_plane.body().removeWidget(label_to_remove)
+                label_to_remove.deleteLater()  # 删除标签实例
+                rule_card_plane.body().adjustSize()
+                rule_card_plane.body().update()
+                rule_card_plane.adjustSize()
+                group.adjustSize()  # 更新控件组大小
+
+        with self.titled_widgets_group as group:
+            group.addTitle("规则")
+            self.rule_card_plane_h = SiDenseHContainer(self)
+
+            self.custom_rule_tu = SiSwitchRefactor(self)
+            self.custom_rule_tu.toggled.connect(lambda: rule_card_plane.body().setEnabled(False))
+            self.custom_rule_tu.toggled.connect(lambda: rule_card_plane.footer().setEnabled(False))
+
+            self.choose_data_flu = SiComboBox(self)
+            self.choose_data_flu.resize(128, 32)
+            self.choose_data_flu.addOption("数据1", value="数据1")
+            self.choose_data_flu.addOption("数据2", value="数据2")
+            self.choose_data_flu.addOption("数据3", value="数据3")
+            self.choose_data_flu.menu().setShowIcon(False)
+            self.choose_data_flu.menu().setIndex(0)
+            self.choose_data_flu.menu().valueChanged.connect(self.get_ele_name_for_combox)
+
+            self.choose_ele = SiComboBox(self)
+            self.choose_ele.resize(128, 32)
+            self.choose_ele.addOption("@id=", value="@id=")
+            self.choose_ele.addOption("@tag()=", value="@tag()=")
+            self.choose_ele.addOption("@text()=", value="@text()=")
+            self.choose_ele.menu().setShowIcon(False)
+            self.choose_ele.menu().setIndex(0)
+            self.choose_data_flu.menu().valueChanged.connect(self.get_data_for_combox)
+
+            self.ele_name_input = SiLineEditWithItemName(self)
+            self.ele_name_input.setName("元素名称")
+            self.ele_name_input.lineEdit().setText("txtpoint")
+            self.ele_name_input.resize(350, 32)
+
+            self.addrule_btu = SiPushButton(self)
+            self.addrule_btu.attachment().setText("添加规则")
+            self.addrule_btu.setFixedSize(128, 32)
+            self.addrule_btu.clicked.connect(add_rule_card_plane_body_widget)
+
+            self.remove_rule_btu = SiPushButton(self)
+            self.remove_rule_btu.attachment().setText("删除规则")
+            self.remove_rule_btu.setFixedSize(128, 32)
+            self.remove_rule_btu.clicked.connect(remove_rule_card_plane_body_widget)
+
+            self.rule_card_plane_h.addWidget(self.choose_data_flu)
+            self.rule_card_plane_h.addWidget(Label(self, "定义到---->"))
+            self.rule_card_plane_h.addWidget(self.choose_ele)
+            self.rule_card_plane_h.addWidget(self.ele_name_input)
+
+            info_ = Label(self, "元素默认后缀自增")
+
+            rule_card_plane.header().addWidget(self.custom_rule_tu, "right")
+            rule_card_plane.body().addWidget(self.rule_card_plane_h)
+            rule_card_plane.footer().addWidget(info_)
+            rule_card_plane.footer().addWidget(self.addrule_btu, "right")
+            rule_card_plane.footer().addWidget(self.remove_rule_btu, "right")
+            rule_card_plane.footer().setFixedHeight(40)
+            rule_card_plane.body().addPlaceholder(12)
+            rule_card_plane.adjustSize()
+
+
+            group.addWidget(rule_card_plane)
+
+    def get_data_for_combox(self, data_name):  # 获取下拉框数据
+        self.data_for_combox = data_name
+
+    def get_ele_name_for_combox(self, data_name):  # 获取下拉框数据
+        self.ele_name_for_combox = data_name
 
 
 class MySiliconApp(SiliconApplication):
@@ -114,8 +169,6 @@ class MySiliconApp(SiliconApplication):
         self.setMinimumSize(1024, 380)
         self.resize(1366, 916)
         self.move((screen_geo.width() - self.width()) // 2, (screen_geo.height() - self.height()) // 2)
-        self.layerMain().setTitle("111")
-        self.setWindowTitle("111")
 
         self.layerMain().addPage(Autoexcal(self),
                                  icon=SiGlobal.siui.iconpack.get("ic_fluent_home_filled"),
@@ -129,12 +182,4 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MySiliconApp()
     window.show()
-    png_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'pic', 'avatar.jpg')
-    print(png_dir)
-    # E:\python\upper_computer\pic\avatar.jpg
-    # E:\python\upper_computer\pic\avatar.png
-    # send_custom_message(1, rf"{png_dir}", "user_data['login']")有问题
-    send_custom_message(1, r"E:\python\upper_computer\pic\avatar.jpg","user_data['login']")
-    # 路径必须是 r"E:\python\upper_computer\pic\avatar.jpg"格式
-
     sys.exit(app.exec_())
