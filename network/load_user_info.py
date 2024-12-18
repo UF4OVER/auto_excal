@@ -13,7 +13,7 @@ class load_user_info:
             # 使用默认配置
             self.user_info = {
                 "name": "默认",
-                "email": "默认",
+                "Email": "默认",
                 "login": "默认",
                 "id": 10086,
                 "company": "默认",
@@ -44,7 +44,7 @@ class load_user_info:
         """
         :return: 邮箱
         """
-        return str(self.user_info.get("email"))
+        return str(self.user_info.get("Email"))
 
     def get_user_login(self):
         """

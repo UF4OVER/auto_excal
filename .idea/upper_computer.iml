@@ -4,5 +4,7 @@
     <content url="file://$MODULE_DIR$" />
     <orderEntry type="jdk" jdkName="PyQt5" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="babylon" level="application" />
+    <orderEntry type="library" name="babylonjs.loaders" level="application" />
   </component>
 </module>

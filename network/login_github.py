@@ -12,14 +12,27 @@ from siui.gui import SiFont
 from siui.templates.application.components.message.box import SiSideMessageBox
 
 from network import download_png
+import configparser
+
+import config.CONFIG
+PATH_CONFIG = config.CONFIG.CONFIG_PATH
 
 # GitHub OAuth 应用的配置
 CLIENT_ID = "Ov23liihJAbtWX6zyXr9"
 CLIENT_SECRET = "22c66bfe6d83d341c787eadc5ca0a0218b3b6a75"
-REDIRECT_URI = "http://localhost:8080/callback"
-AUTH_URL = "https://github.com/login/oauth/authorize"
-TOKEN_URL = "https://github.com/login/oauth/access_token"
-USER_API_URL = "https://api.github.com/user"
+try:
+    config = configparser.ConfigParser()
+    config.read(PATH_CONFIG)
+    if 'Login' not in config:
+        raise ValueError("config.ini 中缺少 [Login] 部分")
+    config = config["Login"]
+
+    REDIRECT_URI = config["REDIRECT_URI"]
+    AUTH_URL = config["AUTH_URL"]
+    TOKEN_URL = config["TOKEN_URL"]
+    USER_API_URL = config["USER_API_URL"]
+except Exception as e:
+    raise ValueError("config.ini 配置文件错误")
 
 # 全局变量存储授权码
 auth_code = None
@@ -238,4 +251,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    print(CLIENT_ID)

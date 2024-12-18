@@ -1,9 +1,5 @@
 import sys
 from cx_Freeze import setup, Executable
-from PyQt5.QtCore import QLibraryInfo
-
-qml_dir = QLibraryInfo.location(QLibraryInfo.Qml2ImportsPath)
-print(qml_dir)
 
 resource_path = "E:\\python\\upper_computer\\config"
 # 定义构建选项
@@ -16,7 +12,7 @@ build_exe_options = {
     "siui",
     "qfluentwidgets",
     "icons",
-    "patrs",
+    "parts",
     "network",
     "sys",
     "openpyxl",
@@ -26,9 +22,22 @@ build_exe_options = {
     ],
     "include_files": [
         (resource_path, "config"),
-        (qml_dir, "qml")
+
     ],
     "excludes": [
+    "scipy",
+    "scipy.libs",
+    "lxml",
+    "PIL",
+    "setuptools",
+
+    "sqlite3.dll",
+    "tcl86t.dll",
+    "tk86k.dll",
+    "libcrypto-3-x64.dll",
+    "libssl-3-x64.dll",
+
+
     ]
 }
 

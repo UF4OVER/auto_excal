@@ -18,25 +18,33 @@ def get_repo_list():
     未成功则写入默认配置
     :return:
     """
-    with open(user_config_info_path, "r") as f:
-        try:
-            content = json.load(f)["repos_url"]
-            response = requests.get(content)
-            response.raise_for_status()  # 检查请求是否成功
-            repo_data = response.json()  # 提取JSON数据
-            with open(user_repo_info_login_path, "w") as f:
-                json.dump(repo_data, f, indent=4)  # 写入成功时的JSON数据
-        except requests.exceptions.RequestException as e:
-            print(f"HTTP Request failed: {e}")
-        except Exception as e:
-            with open(user_repo_info_unlogin_path, "w") as f:
-                json.dump(repo_data, f, indent=4)  # 写入失败时的JSON数据
-            print(f"Error: {e}")
+    try:
+        with open(user_config_info_path, "r") as f:
+            try:
+                content = json.load(f)["repos_url"]
+                response = requests.get(content)
+                response.raise_for_status()  # 检查请求是否成功
+                repo_data = response.json()  # 提取JSON数据
+                with open(user_repo_info_login_path, "w") as f:
+                    json.dump(repo_data, f, indent=4)  # 写入成功时的JSON数据
+            except requests.exceptions.RequestException as e:
+                print(f"HTTP Request failed: {e}")
+            except Exception as e:
+                with open(user_repo_info_unlogin_path, "w") as f:
+                    json.dump(repo_data, f, indent=4)  # 写入失败时的JSON数据
+                print(f"Error: {e}")
+    except FileNotFoundError:
+        print("File not found.")
+
+
+def get_repo_sum() -> int: return len(json.load(open(user_repo_info_login_path, "r"))) - 1
 
 
 class load_github_repo:
     def __init__(self, num):
         self.number = num
+        if self.number > get_repo_sum():
+            self.number = 0
         with open(user_repo_info_login_path, "r") as f:
             self.repo_data = json.load(f)[self.number]
 
@@ -48,6 +56,13 @@ class load_github_repo:
 
     def get_repo_description(self):
         return self.repo_data["description"]
+
+
+def try_to_get_repo_list():
+    try:
+        get_repo_sum()
+    except Exception as e:
+        print(e)
 
 
 if __name__ == "__main__":
