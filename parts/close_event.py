@@ -1,3 +1,6 @@
+#  Copyright (c) 2025 UF4OVER
+#   All rights reserved.
+
 from PyQt5.QtCore import pyqtSignal
 from siui.components import SiLabel, SiLongPressButton, SiPushButton
 from siui.core import SiColor, SiGlobal

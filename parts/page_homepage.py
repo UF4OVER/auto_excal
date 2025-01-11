@@ -1,18 +1,18 @@
+#  Copyright (c) 2025 UF4OVER
+#   All rights reserved.
+
 import os
 
 from PyQt5.QtCore import Qt
-
 from siui.components import SiPixLabel
-from siui.components.option_card import SiOptionCardLinear
 from siui.components.page import SiPage
 from siui.components.titled_widget_group import SiTitledWidgetGroup
 from siui.components.widgets import (
     SiDenseHContainer,
     SiDenseVContainer,
     SiLabel,
-    SiPushButton,
 )
-from siui.core import GlobalFont, Si, SiColor, SiGlobal
+from siui.core import GlobalFont, SiColor, SiGlobal
 from siui.gui import SiFont
 
 from parts.themed_option_card import ThemedOptionCardPlane
@@ -45,7 +45,7 @@ class Homepage(SiPage):
         self.title = SiLabel(self.head_area)
         self.title.setGeometry(64, 0, 500, 128)
         self.title.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
-        self.title.setText("Silicon UI")
+        self.title.setText("Wedding Invitation")
         self.title.setStyleSheet("color: {}".format(SiGlobal.siui.colors["TEXT_A"]))
         self.title.setFont(SiFont.tokenized(GlobalFont.XL_MEDIUM))
 
@@ -67,16 +67,20 @@ class Homepage(SiPage):
         self.option_card_project.setFixedSize(218, 270)
         self.option_card_project.setThemeColor("#855198")
         self.option_card_project.setDescription(
-            "check PyQt-SiliconUI Repository on GitHub to get the latest release, report errors, provide suggestions and more.")  # noqa: E501
-        self.option_card_project.setURL("https://github.com/ChinaIceF/PyQt-SiliconUI")
+            "connect to my github"
+            "homepage.you can click"
+            "btu to mypage")
+        self.option_card_project.setURL("https://github.com/UF4OVER")
 
         self.option_card_example = ThemedOptionCardPlane(self)
-        self.option_card_example.setTitle("Examples")
+        self.option_card_example.setTitle("Bilibili")
         self.option_card_example.setFixedSize(218, 270)
-        self.option_card_example.setThemeColor("#3423aa")
+        self.option_card_example.setThemeColor("#FB7299")
         self.option_card_example.setDescription(
-            "Check examples to understand how to use PyQt-SiliconUI to develop your first work.")  # noqa: E501
-        self.option_card_example.setURL("Examples are Coming soon...")
+            "connect to my bilibili"
+            "homepage.you can click"
+            "btu to mypage .")  # noqa: E501
+        self.option_card_example.setURL("https://space.bilibili.com/1000215778?spm_id_from=333.1007.0.0")
         # 添加到水平容器
         self.container_for_cards.addPlaceholder(64 - 32)
         self.container_for_cards.addWidget(self.option_card_project)
@@ -87,18 +91,18 @@ class Homepage(SiPage):
         self.body.setFixedHeight(400)
         self.body.setAlignment(Qt.AlignCenter)
         self.body.setSpacing(24)
+        #
+        # self.titled_widget_group = SiTitledWidgetGroup(self.body)
+        # self.titled_widget_group.setSiliconWidgetFlag(Si.EnableAnimationSignals)
+        # self.titled_widget_group.resized.connect(lambda size: self.body.setFixedHeight(size[1]))
+        # self.titled_widget_group.move(64, 0)
 
-        self.titled_widget_group = SiTitledWidgetGroup(self.body)
-        self.titled_widget_group.setSiliconWidgetFlag(Si.EnableAnimationSignals)
-        self.titled_widget_group.resized.connect(lambda size: self.body.setFixedHeight(size[1]))
-        self.titled_widget_group.move(64, 0)
-
-        self.titled_widget_group.setSpacing(16)
-        self.titled_widget_group.addTitle("新闻")
-        self.titled_widget_group.addWidget(OptionCardsPanel(self))
+        # self.titled_widget_group.setSpacing(16)
+        # self.titled_widget_group.addTitle("新闻")
+        # self.titled_widget_group.addWidget(OptionCardsPanel(self))
 
         self.scroll_container.addWidget(self.head_area)
-        self.body.setFixedHeight(self.titled_widget_group.height())
+        # self.body.setFixedHeight(self.titled_widget_group.height())
         self.scroll_container.addWidget(self.body)
         # 添加到滚动区域容器
 
@@ -109,31 +113,31 @@ class Homepage(SiPage):
         w = event.size().width()
         self.body.setFixedWidth(w)
         self.background_image.setFixedWidth(w)
-        self.titled_widget_group.setFixedWidth(min(w - 128, 900))
+        # self.titled_widget_group.setFixedWidth(min(w - 128, 900))
         self.background_fading_transition.setFixedWidth(w)
 
 
-class OptionCardsPanel(SiDenseVContainer):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.setAdjustWidgetsSize(True)
-        self.setSpacing(12)
-
-        attached_button_a = SiPushButton(self)
-
-        attached_button_a.resize(128, 32)
-        attached_button_a.attachment().setText("Attachment")
-        attached_button_b = SiPushButton(self)
-        attached_button_b.resize(32, 32)
-        attached_button_b.attachment().load(SiGlobal.siui.iconpack.get("ic_fluent_attach_regular"))
-
-        self.option_card_linear_attaching = SiOptionCardLinear(self)
-        self.option_card_linear_attaching.setTitle("Attach Widgets",
-                                                   "The linear option card provides a horizontal container where any control can be added,\nwith no limit on the number")
-        self.option_card_linear_attaching.load(SiGlobal.siui.iconpack.get("ic_fluent_attach_regular"))
-        self.option_card_linear_attaching.addWidget(attached_button_a)
-        self.option_card_linear_attaching.addWidget(attached_button_b)
-
-        # <- ADD
-        self.addWidget(self.option_card_linear_attaching)
+# class OptionCardsPanel(SiDenseVContainer):
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+#
+#         self.setAdjustWidgetsSize(True)
+#         self.setSpacing(12)
+#
+#         attached_button_a = SiPushButton(self)
+#
+#         attached_button_a.resize(128, 32)
+#         attached_button_a.attachment().setText("Attachment")
+#         attached_button_b = SiPushButton(self)
+#         attached_button_b.resize(32, 32)
+#         attached_button_b.attachment().load(SiGlobal.siui.iconpack.get("ic_fluent_attach_regular"))
+#
+#         self.option_card_linear_attaching = SiOptionCardLinear(self)
+#         self.option_card_linear_attaching.setTitle("Attach Widgets",
+#                                                    "The linear option card provides a horizontal container where any control can be added,\nwith no limit on the number")
+#         self.option_card_linear_attaching.load(SiGlobal.siui.iconpack.get("ic_fluent_attach_regular"))
+#         self.option_card_linear_attaching.addWidget(attached_button_a)
+#         self.option_card_linear_attaching.addWidget(attached_button_b)
+#
+#         # <- ADD
+#         self.addWidget(self.option_card_linear_attaching)
