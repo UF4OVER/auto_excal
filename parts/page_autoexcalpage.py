@@ -710,33 +710,36 @@ class Autoexcal(SiPage):
         """
         主循环，从当前索引位置开始输入49个数据
         """
-        self.last_tab = self.browser.latest_tab
-        self.data = self.read_to_json()
-        try:
-            start_index = self.index_current_data
-            end_index = min(start_index + 49, len(self.data))
-            print(f": e1{start_index + 49},{len(self.data)}")
-            if start_index >= len(self.data):
-                show_message(3, "提示", "数据已全部输入完毕", "ic_fluent_checkmark_starburst_filled")
-                return
-            self.start_btu.attachment().setText(f"继续{(end_index % 49) + 1}")
+        if self.browser:
+            self.last_tab = self.browser.latest_tab
+            self.data = self.read_to_json()
+            try:
+                start_index = self.index_current_data
+                end_index = min(start_index + 49, len(self.data))
+                print(f": e1{start_index + 49},{len(self.data)}")
+                if start_index >= len(self.data):
+                    show_message(3, "提示", "数据已全部输入完毕", "ic_fluent_checkmark_starburst_filled")
+                    return
+                self.start_btu.attachment().setText(f"继续{(end_index % 49) + 1}")
 
-            for i in range(start_index, end_index):
-                xuehao = self.last_tab.ele(f"@id=txtstu{(i % 49) + 1}")
-                score = self.last_tab.ele(f"@id=txtpoint{(i % 49) + 1}")
+                for i in range(start_index, end_index):
+                    xuehao = self.last_tab.ele(f"@id=txtstu{(i % 49) + 1}")
+                    score = self.last_tab.ele(f"@id=txtpoint{(i % 49) + 1}")
 
-                print((i % 49) + 1)
-                xuehao.input(self.get_data_by_order(self.data, i)[0]['stu_id'])
-                score.input(self.get_data_by_order(self.data, i)[0]['score'])
+                    print((i % 49) + 1)
+                    xuehao.input(self.get_data_by_order(self.data, i)[0]['stu_id'])
+                    score.input(self.get_data_by_order(self.data, i)[0]['score'])
 
-            btus = self.last_tab.eles("@value=查询")
-            for btu in btus:
-                btu.click()
+                btus = self.last_tab.eles("@value=查询")
+                for btu in btus:
+                    btu.click()
 
-            self.index_current_data = end_index  # 更新当前索引位置
-        except Exception as e:
-            print(f"发生错误: {e}")
-            show_message(1, "错误", f"发生错误: {e}", "ic_fluent_error_circle_filled")
+                self.index_current_data = end_index  # 更新当前索引位置
+            except Exception as e:
+                print(f"发生错误: {e}")
+                show_message(1, "错误", f"发生错误: {e}", "ic_fluent_error_circle_filled")
+        else:
+            show_message(3, "提示", "请先打开浏览器", "ic_fluent_error_circle_filled")
 
     @limit_for_table
     def start_main_loop_in_thread(self):
