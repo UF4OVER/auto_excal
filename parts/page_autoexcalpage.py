@@ -1,11 +1,8 @@
-#  Copyright (c) 2025 UF4OVER
-#   All rights reserved.
-
 import configparser
 import json
 import os
 
-from DrissionPage._base.chromium import Chromium
+from DrissionPage import ChromiumOptions, Chromium
 from PyQt5.QtCore import QThread, pyqtSignal, Qt
 from PyQt5.QtWidgets import QTableWidget, QFileDialog, QTableWidgetItem, QAbstractItemView
 from openpyxl.reader.excel import load_workbook
@@ -23,21 +20,22 @@ PATH_CONFIG = config.CONFIG.CONFIG_PATH
 
 config = configparser.ConfigParser()
 config.read(PATH_CONFIG)
-# if 'Broswer' not in config:
-#     raise ValueError("config.ini 中缺少 [Broswer] 部分")
+
+co = ChromiumOptions(read_file=True, ini_path=PATH_CONFIG)
+
 try:
-    config = config["Broswer"]
+    config = config["chromium_options"]
 
-    BROSWER_PATH = config["BROSWER_PATH"]
-    BROSWER_PORT = int(config["BROSWER_PORT"])
-
-    print(f"BROSWER_PATH{BROSWER_PATH}")
-    print(f"BROSWER_PORT{BROSWER_PORT}")
+    browser_path = config["browser_path"]
+    broswer_address = config["address"]
 
 except Exception as e:
     print(f"config.ini 配置文件读取失败: {e}")
-    BROSWER_PATH = ""
-    BROSWER_PORT = 9222
+    browser_path = "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
+    broswer_address = "127.0.0.1:9222"
+finally:
+    print(f"browser_path:{browser_path}")
+    print(f"broswer_address:{broswer_address}")
 
 
 def show_message(_type: int, title: str, text: str, icon: str):
@@ -147,6 +145,7 @@ class Autoexcal(SiPage):
             self.choose_boswer_btu.setHint("长按选择文件夹")
             self.choose_boswer_btu.attachment().setText("选择文件夹")
             self.choose_boswer_btu.setEnabled(False)
+            self.choose_boswer_btu.longPressed.connect(self.change_web_path)
 
             self.choose_boswer_sw = SiSwitchRefactor(self)
             self.choose_boswer_sw.toggled.connect(lambda checked: self.choose_boswer_btu.setEnabled(checked))
@@ -161,8 +160,9 @@ class Autoexcal(SiPage):
             self.port_int_spin_box.resize(128, 32)
             self.port_int_spin_box.setMaximum(65535)
             self.port_int_spin_box.setMinimum(1024)
-            self.port_int_spin_box.setValue(9002)
+            self.port_int_spin_box.setValue(9222)
             self.port_int_spin_box.setEnabled(False)
+            self.port_int_spin_box.lineEdit().editingFinished.connect(self.change_web_port)
 
             choose_port_sw = SiSwitchRefactor(self)
             choose_port_sw.toggled.connect(lambda checked: self.port_int_spin_box.setEnabled(checked))
@@ -449,129 +449,121 @@ class Autoexcal(SiPage):
     @limit_for_table
     def reload_data_for_new_table_widget(self):
         self.new_table_widget.clear()
+        try:
+            if self.choose_switch.isChecked():
+                self.name_start_strtuple = self.start_input.text()  # "(0,3)"
+                self.name_end_strtuple = self.finish_input.text()
 
-        if self.choose_switch.isChecked():
-            self.name_start_strtuple = self.start_input.text()  # "(0,3)"
-            self.name_end_strtuple = self.finish_input.text()
+                self.xuehao_start_strtuple = self.start_input1.text()
+                self.xuehao_end_strtuple = self.finish_input1.text()
 
-            self.xuehao_start_strtuple = self.start_input1.text()
-            self.xuehao_end_strtuple = self.finish_input1.text()
+                self.score_start_strtuple = self.start_input2.text()
+                self.score_end_strtuple = self.finish_input2.text()
 
-            self.score_start_strtuple = self.start_input2.text()
-            self.score_end_strtuple = self.finish_input2.text()
+                self.name_start_int_row, self.name_start_int_col = self.name_start_strtuple.strip("()").split(',')
+                self.name_end_int_row, self.name_end_int_col = self.name_end_strtuple.strip("()").split(',')
+                self.xuehao_start_int_row, self.xuehao_start_int_col = self.xuehao_start_strtuple.strip("()").split(',')
+                self.xuehao_end_int_row, self.xuehao_end_int_col = self.xuehao_end_strtuple.strip("()").split(',')
+                self.score_start_int_row, self.score_start_int_col = self.score_start_strtuple.strip("()").split(',')
+                self.score_end_int_row, self.score_end_int_col = self.score_end_strtuple.strip("()").split(',')
 
-            self.name_start_int_row, self.name_start_int_col = self.name_start_strtuple.strip("()").split(',')
-            self.name_end_int_row, self.name_end_int_col = self.name_end_strtuple.strip("()").split(',')
-            self.xuehao_start_int_row, self.xuehao_start_int_col = self.xuehao_start_strtuple.strip("()").split(',')
-            self.xuehao_end_int_row, self.xuehao_end_int_col = self.xuehao_end_strtuple.strip("()").split(',')
-            self.score_start_int_row, self.score_start_int_col = self.score_start_strtuple.strip("()").split(',')
-            self.score_end_int_row, self.score_end_int_col = self.score_end_strtuple.strip("()").split(',')
+                # 在table_widget中加载上面的数据到new_table_widget
+                # 清空 new_table_widget
+                self.new_table_widget.clear()
+                self.new_table_widget.setRowCount(0)
+                self.new_table_widget.setColumnCount(0)
 
-            # 在table_widget中加载上面的数据到new_table_widget
-            # 清空 new_table_widget
-            self.new_table_widget.clear()
-            self.new_table_widget.setRowCount(0)
-            self.new_table_widget.setColumnCount(0)
+                # 获取 table_widget 的行数和列数
+                table_widget_row_count = self.table_widget.rowCount()
+                table_widget_col_count = self.table_widget.columnCount()
 
-            # 获取 table_widget 的行数和列数
-            table_widget_row_count = self.table_widget.rowCount()
-            table_widget_col_count = self.table_widget.columnCount()
+                # 获取起始和结束的行和列索引
+                name_start_row = int(self.name_start_int_row) - 1
+                name_end_row = int(self.name_end_int_row) - 1
+                name_start_col = int(self.name_start_int_col) - 1
+                name_end_col = int(self.name_end_int_col) - 1
 
-            # 获取起始和结束的行和列索引
-            name_start_row = int(self.name_start_int_row) - 1
-            name_end_row = int(self.name_end_int_row) - 1
-            name_start_col = int(self.name_start_int_col) - 1
-            name_end_col = int(self.name_end_int_col) - 1
+                xuehao_start_row = int(self.xuehao_start_int_row) - 1
+                xuehao_end_row = int(self.xuehao_end_int_row) - 1
+                xuehao_start_col = int(self.xuehao_start_int_col) - 1
+                xuehao_end_col = int(self.xuehao_end_int_col) - 1
 
-            xuehao_start_row = int(self.xuehao_start_int_row) - 1
-            xuehao_end_row = int(self.xuehao_end_int_row) - 1
-            xuehao_start_col = int(self.xuehao_start_int_col) - 1
-            xuehao_end_col = int(self.xuehao_end_int_col) - 1
+                score_start_row = int(self.score_start_int_row) - 1
+                score_end_row = int(self.score_end_int_row) - 1
+                score_start_col = int(self.score_start_int_col) - 1
+                score_end_col = int(self.score_end_int_col) - 1
 
-            score_start_row = int(self.score_start_int_row) - 1
-            score_end_row = int(self.score_end_int_row) - 1
-            score_start_col = int(self.score_start_int_col) - 1
-            score_end_col = int(self.score_end_int_col) - 1
+                # 确保索引在有效范围内
+                print(f"name_start_row:{name_start_row},name_end_row:{name_end_row}")
+                print(f"name_start_col:{name_start_col},name_end_col:{name_end_col}")
+                print(f"xuehao_start_row:{xuehao_start_row},xuehao_end_row:{xuehao_end_row}")
+                print(f"xuehao_start_col:{xuehao_start_col},xuehao_end_col:{xuehao_end_col}")
+                print(f"score_start_row:{score_start_row},score_end_row:{score_end_row}")
+                print(f"score_start_col:{score_start_col},score_end_col:{score_end_col}")
 
-            # 确保索引在有效范围内
-            print(f"name_start_row:{name_start_row},name_end_row:{name_end_row}")
-            print(f"name_start_col:{name_start_col},name_end_col:{name_end_col}")
-            print(f"xuehao_start_row:{xuehao_start_row},xuehao_end_row:{xuehao_end_row}")
-            print(f"xuehao_start_col:{xuehao_start_col},xuehao_end_col:{xuehao_end_col}")
-            print(f"score_start_row:{score_start_row},score_end_row:{score_end_row}")
-            print(f"score_start_col:{score_start_col},score_end_col:{score_end_col}")
+                # 计算 new_table_widget 的行数和列数
+                new_row_count = max(name_end_row - name_start_row + 1,
+                                    xuehao_end_row - xuehao_start_row + 1,
+                                    score_end_row - score_start_row + 1)
+                new_col_count = 3  # 假设有三列：姓名、学号、分数
 
-            # if (name_start_row < 0 or name_end_row >= table_widget_row_count or
-            #         name_start_col < 0 or name_end_col >= table_widget_col_count or
-            #         xuehao_start_row < 0 or xuehao_end_row >= table_widget_row_count or
-            #         xuehao_start_col < 0 or xuehao_end_col >= table_widget_col_count or
-            #         score_start_row < 0 or score_end_row >= table_widget_row_count or
-            #         score_start_col < 0 or score_end_col >= table_widget_col_count):
-            #     print("索引超出范围")
-            #     return
+                # 设置 new_table_widget 的行数和列数
+                self.new_table_widget.setRowCount(new_row_count)
+                self.new_table_widget.setColumnCount(new_col_count)
 
-            # 计算 new_table_widget 的行数和列数
-            new_row_count = max(name_end_row - name_start_row + 1,
-                                xuehao_end_row - xuehao_start_row + 1,
-                                score_end_row - score_start_row + 1)
-            new_col_count = 3  # 假设有三列：姓名、学号、分数
+                # 设置列标题
+                self.new_table_widget.setHorizontalHeaderLabels(["姓名", "学号", "分数"])  # 复制数据到 new_table_widget
+                for i in range(new_row_count):
+                    # 复制姓名
+                    if name_start_row + i <= name_end_row:
+                        item = self.table_widget.item(name_start_row + i, name_start_col)
+                        if item:
+                            self.new_table_widget.setItem(i, 0, QTableWidgetItem(item.text()))
 
-            # 设置 new_table_widget 的行数和列数
-            self.new_table_widget.setRowCount(new_row_count)
-            self.new_table_widget.setColumnCount(new_col_count)
+                    # 复制学号
+                    if xuehao_start_row + i <= xuehao_end_row:
+                        item = self.table_widget.item(xuehao_start_row + i, xuehao_start_col)
+                        if item:
+                            self.new_table_widget.setItem(i, 1, QTableWidgetItem(item.text()))
 
-            # 设置列标题
-            self.new_table_widget.setHorizontalHeaderLabels(["姓名", "学号", "分数"])  # 复制数据到 new_table_widget
-            for i in range(new_row_count):
-                # 复制姓名
-                if name_start_row + i <= name_end_row:
-                    item = self.table_widget.item(name_start_row + i, name_start_col)
+                    # 复制分数
+                    if score_start_row + i <= score_end_row:
+                        item = self.table_widget.item(score_start_row + i, score_start_col)
+                        if item:
+                            self.new_table_widget.setItem(i, 2, QTableWidgetItem(item.text()))
+
+                show_message(1, "自定义", "数据复制成功", "ic_fluent_emoji_edit_filled")
+            else:
+                self.new_table_widget.clear()
+                self.new_table_widget.setRowCount(self.table_widget.rowCount())
+                self.new_table_widget.setColumnCount(3)
+                self.new_table_widget.setHorizontalHeaderLabels(["姓名", "学号", "分数"])
+                # 第5列是姓名
+                for i in range(8, self.table_widget.rowCount()):
+                    item = self.table_widget.item(i, 4)
                     if item:
-                        self.new_table_widget.setItem(i, 0, QTableWidgetItem(item.text()))
-
-                # 复制学号
-                if xuehao_start_row + i <= xuehao_end_row:
-                    item = self.table_widget.item(xuehao_start_row + i, xuehao_start_col)
+                        self.new_table_widget.setItem(i - 8, 0, QTableWidgetItem(item.text()))
+                # 第6列是学号
+                for i in range(8, self.table_widget.rowCount()):
+                    item = self.table_widget.item(i, 5)
                     if item:
-                        self.new_table_widget.setItem(i, 1, QTableWidgetItem(item.text()))
-
-                # 复制分数
-                if score_start_row + i <= score_end_row:
-                    item = self.table_widget.item(score_start_row + i, score_start_col)
+                        self.new_table_widget.setItem(i - 8, 1, QTableWidgetItem(item.text()))
+                # 第7列是分数
+                for i in range(8, self.table_widget.rowCount()):
+                    item = self.table_widget.item(i, 6)
                     if item:
-                        self.new_table_widget.setItem(i, 2, QTableWidgetItem(item.text()))
+                        self.new_table_widget.setItem(i - 8, 2, QTableWidgetItem(item.text()))
 
-            show_message(1, "自定义", "数据复制成功", "ic_fluent_emoji_edit_filled")
-        else:
-            self.new_table_widget.clear()
-            self.new_table_widget.setRowCount(self.table_widget.rowCount())
-            self.new_table_widget.setColumnCount(3)
-            self.new_table_widget.setHorizontalHeaderLabels(["姓名", "学号", "分数"])
-            # 第5列是姓名
-            for i in range(8, self.table_widget.rowCount()):
-                item = self.table_widget.item(i, 4)
-                if item:
-                    self.new_table_widget.setItem(i - 8, 0, QTableWidgetItem(item.text()))
-            # 第6列是学号
-            for i in range(8, self.table_widget.rowCount()):
-                item = self.table_widget.item(i, 5)
-                if item:
-                    self.new_table_widget.setItem(i - 8, 1, QTableWidgetItem(item.text()))
-            # 第7列是分数
-            for i in range(8, self.table_widget.rowCount()):
-                item = self.table_widget.item(i, 6)
-                if item:
-                    self.new_table_widget.setItem(i - 8, 2, QTableWidgetItem(item.text()))
+            for i in range(self.new_table_widget.rowCount() - 1, -1, -1):
+                if self.new_table_widget.item(i, 0) is None and self.new_table_widget.item(i,
+                                                                                           1) is None and self.new_table_widget.item(
+                    i, 2) is None:
+                    self.new_table_widget.removeRow(i)
 
-        # 倒数检查一下表格中有没有空行，有的话直接删掉
-        for i in range(self.new_table_widget.rowCount() - 1, -1, -1):
-            if self.new_table_widget.item(i, 0) is None and self.new_table_widget.item(i,
-                                                                                       1) is None and self.new_table_widget.item(
-                i, 2) is None:
-                self.new_table_widget.removeRow(i)
-
-        self.save_to_json()
-        show_message(1, "默认数据", "数据复制成功", "ic_fluent_emoji_edit_filled")
+            self.save_to_json()
+            show_message(1, "默认数据", "数据复制成功", "ic_fluent_emoji_edit_filled")
+        except Exception as e:
+            show_message(3, "默认数据", f"数据复制失败{e}", "ic_fluent_emoji_edit_filled")
 
     def save_to_json(self):
         data_list = []
@@ -625,7 +617,6 @@ class Autoexcal(SiPage):
             data['unique_id'] = idx
 
         # 保存数据到 JSON 文件
-        # 在当前目录下创建一个名为 data.json 的文件
         data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data.json')
         print(f"数据已保存到 {data_path}")
         with open(data_path, 'w') as f:
@@ -671,19 +662,22 @@ class Autoexcal(SiPage):
 
     @limit_for_table
     def open_broswer(self):
-        print(type(self.port_int_spin_box.value()))
-        if self.choose_boswer_sw.isChecked():
-            self.browser = Chromium(self.port_int_spin_box.value())
-
-        else:
-            self.browser = Chromium(BROSWER_PORT)
+        try:
+            if self.choose_boswer_sw.isChecked():
+                self.browser = Chromium(int(self.port_int_spin_box.value()))
+            else:
+                self.browser = Chromium(broswer_address)
+        except Exception as e:
+            print(f"无法启动浏览器: {e}")
+            show_message(3, "提示", f"无法启动浏览器: {e}", "ic_fluent_task_list_ltr_filled")
+            return
 
     def read_to_json(self) -> list:
         """
         从指定的JSON文件中读取数据并返回一个列表
         :return: 包含JSON数据的列表
         """
-        file_path = "config/data.json"
+        file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data.json')
         try:
             with open(file_path, 'r') as file:
                 data = json.load(file)
@@ -757,3 +751,33 @@ class Autoexcal(SiPage):
         self.start_btu.attachment().setText("开始")
         show_message(3, "提示", "数据已全部输入完毕", "ic_fluent_checkmark_starburst_filled")
         self.start_btu.setEnabled(True)
+
+    def change_web_path(self):
+        try:
+            file_path = QFileDialog.getOpenFileName(self, "选择浏览器路径", "", "Executable Files (*.exe)")[0]
+            if file_path:
+                config2 = configparser.ConfigParser()
+                config2.read(PATH_CONFIG)
+                config = config2["chromium_options"]
+                config["browser_path"] = file_path
+                with open(PATH_CONFIG, 'w') as configfile:
+                    config2.write(configfile)
+                show_message(1, "提示", "浏览器路径已更改", "ic_fluent_wrench_settings_filled")
+            print(file_path)
+        except Exception as e:
+            print(f"发生错误: {e}")
+            show_message(1, "错误", f"发生错误: {e}", "ic_fluent_error_circle_filled")
+
+    def change_web_port(self):
+        try:
+            port = self.port_int_spin_box.value()
+            config1 = configparser.ConfigParser()
+            config1.read(PATH_CONFIG)
+            config = config1["chromium_options"]
+            config["address"] = f"127.0.0.1:{port}"
+            with open(PATH_CONFIG, 'w') as configfile:
+                config1.write(configfile)
+            show_message(1, "提示", "端口已更改", "ic_fluent_wrench_settings_filled")
+        except Exception as e:
+            print(f"发生错误: {e}")
+            show_message(1, "错误", f"发生错误: {e}", "ic_fluent_error_circle_filled")

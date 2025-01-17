@@ -45,7 +45,7 @@ class ThemedOptionCardPlane(SiOptionCardPlane):
         self.footer().addWidget(link_button_container)
 
     def setDescription(self, text):
-        self.description.setText(f"<p style='line-height: 23px'>{text}</p>")
+        self.description.setText(f"<p style='line-height: 30px'>{text}</p>")
 
     def setThemeColor(self, color_code):
         self.my_theme_color = color_code

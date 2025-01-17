@@ -5,11 +5,12 @@ import configparser
 import webbrowser
 
 from PyQt5.QtCore import Qt
-from siui.components import SiDenseHContainer, SiLabel, SiDenseVContainer, SiOptionCardPlane, SiTitledWidgetGroup
+from siui.components import SiDenseHContainer, SiLabel, SiDenseVContainer, SiOptionCardPlane, SiTitledWidgetGroup, \
+    SiOptionCardLinear
 from siui.components.button import SiRadioButtonRefactor, SiPushButtonRefactor, SiSwitchRefactor
 from siui.components.page import SiPage
 from siui.core import SiGlobal, Si, SiColor
-
+from page_autoexcalpage import show_message
 import config.CONFIG
 
 PATH_CONFIG = config.CONFIG.CONFIG_PATH
@@ -78,19 +79,20 @@ class PageSettingPage(SiPage):
     def enable_dpi_sw(self):
         print(self.enable_dpi_staus)
         self.enable_dpi_staus = not self.enable_dpi_staus
+
     def setupUi(self):
         """
         设置界面
         """
 
         with self.titled_widgets_group as group:
-            group.addTitle("DPI Setting")
+            group.addTitle("DPI 设置")
 
             self.refactor_radiobuttons = SiOptionCardPlane(self)
-            self.refactor_radiobuttons.setTitle("DPI Policy:")
+            self.refactor_radiobuttons.setTitle("DPI 策略:")
 
             self.enable_dpi_scaling = SiSwitchRefactor(self)
-            enable_dpi_scaling_label = Label(self, "Enable DPI Scaling")
+            enable_dpi_scaling_label = Label(self, "打开DPI缩放")
 
             self.refactor_radiobuttons.header().addWidget(self.enable_dpi_scaling, "right")
             self.refactor_radiobuttons.header().addWidget(enable_dpi_scaling_label, "right")
@@ -107,7 +109,7 @@ class PageSettingPage(SiPage):
             self.enable_dpi_scaling.toggled.connect(self.enable_dpi_sw)
 
             check_dpi_btu = SiPushButtonRefactor(self)
-            check_dpi_btu.setText("Check DPI")
+            check_dpi_btu.setText("关于 DPI")
             check_dpi_btu.setSvgIcon(SiGlobal.siui.iconpack.get("ic_fluent_tap_single_filled"))
 
             check_dpi_btu.clicked.connect(lambda: webbrowser.open("https://www.google.com/"))
@@ -151,9 +153,10 @@ class PageSettingPage(SiPage):
 
             # 保存设置按钮
             save_button = SiPushButtonRefactor(self)
-            save_button.setText("Save")
+            save_button.setText("保存")
             save_button.clicked.connect(self.save_settings)
-
+            save_button.clicked.connect(
+                lambda: show_message(1, "设置已保存", "下次重启生效", "ic_fluent_emoji_hand_filled"))
             check_dpi_btu.adjustSize()
 
             radio_button_container.adjustSize()
@@ -179,27 +182,32 @@ class PageSettingPage(SiPage):
             self.load_settings()
 
             group.addWidget(self.refactor_radiobuttons)
+        with self.titled_widgets_group as group:
+            group.addTitle("关闭")
+            close_options = SiOptionCardLinear(self)
+            close_options.setTitle("关闭应用时询问", "启用后关闭应用时会询问")
+            self.close_options_toggle = SiSwitchRefactor(self)
+            # 确保读取的值被正确转换为布尔类型
+            self.close_options_toggle.setChecked(True)
+            self.close_options_toggle.setChecked(self.read_close_options())
+            print(f"read_setting_enable_switch:{self.read_close_options()}")
+            self.close_options_toggle.toggled.connect(lambda b_: self.save_close_options(b_))
+            close_options.load(SiGlobal.siui.iconpack.get("ic_fluent_closed_caption_off_filled"))
+            close_options.addWidget(self.close_options_toggle)
+            group.addWidget(close_options)
 
+    def read_close_options(self) -> bool:
+        config = configparser.ConfigParser()
+        config.read(PATH_CONFIG)
+        return config.getboolean('switch_options', 'enable_switch')
 
-        # with self.titled_widgets_group as group:
-        #     group.addTitle("全局侧边抽屉")
-        #
-        #     # 子页面
-        #     self.global_drawer_left = SiOptionCardPlane(self)
-        #     self.global_drawer_left.setTitle("全局左侧抽屉")
-        #     self.global_drawer_left.setFixedWidth(800)
-        #
-        #     self.ctrl_show_global_drawer_left = SiPushButtonRefactor(self)
-        #     self.ctrl_show_global_drawer_left.resize(128, 32)
-        #     self.ctrl_show_global_drawer_left.setText("打开")
-        #     self.ctrl_show_global_drawer_left.clicked.connect(
-        #         lambda: SiGlobal.siui.windows["MAIN_WINDOW"].layerLeftGlobalDrawer().showLayer())
-        #     self.ctrl_show_global_drawer_left.setShortcut("A")
-        #     self.global_drawer_left.body().addWidget(self.ctrl_show_global_drawer_left)
-        #     self.global_drawer_left.body().addPlaceholder(12)
-        #     self.global_drawer_left.adjustSize()
-        #
-        #     group.addWidget(self.global_drawer_left)
+    def save_close_options(self, b_: bool):
+        config = configparser.ConfigParser()
+        config.read(PATH_CONFIG)
+        config1 = config["switch_options"]
+        config1['enable_switch'] = str(b_)
+        with open(PATH_CONFIG, 'w') as configfile:
+            config.write(configfile)
 
     def load_settings(self):
         dpi_policy, enable_hdpi_scaling, use_hdpi_pixmaps = read_config()
@@ -223,5 +231,3 @@ class PageSettingPage(SiPage):
         use_hdpi_pixmaps = True  # todo
 
         save_config(dpi_policy, self.enable_dpi_staus, use_hdpi_pixmaps)
-
-

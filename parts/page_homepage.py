@@ -2,9 +2,10 @@
 #   All rights reserved.
 
 import os
+import time
 
 from PyQt5.QtCore import Qt
-from siui.components import SiPixLabel
+from siui.components import SiPixLabel, Si
 from siui.components.page import SiPage
 from siui.components.titled_widget_group import SiTitledWidgetGroup
 from siui.components.widgets import (
@@ -16,6 +17,7 @@ from siui.core import GlobalFont, SiColor, SiGlobal
 from siui.gui import SiFont
 
 from parts.themed_option_card import ThemedOptionCardPlane
+from task import TaskCardLinear, Task
 
 
 class Homepage(SiPage):
@@ -31,7 +33,7 @@ class Homepage(SiPage):
         self.background_image.setFixedSize(1366, 300)
         self.background_image.setBorderRadius(6)
         base_dir = os.path.dirname(os.path.abspath(__file__))
-        self.background_image.load("./pic/back.jpg")
+        self.background_image.load("./pic/ccc.jpg")
 
         self.background_fading_transition = SiLabel(self.head_area)
         self.background_fading_transition.setGeometry(0, 100, 0, 200)
@@ -67,18 +69,18 @@ class Homepage(SiPage):
         self.option_card_project.setFixedSize(218, 270)
         self.option_card_project.setThemeColor("#855198")
         self.option_card_project.setDescription(
-            "connect to my github"
-            "homepage.you can click"
+            "connect to my github\r\n"
+            "home page.you can click\r\n"
             "btu to mypage")
-        self.option_card_project.setURL("https://github.com/UF4OVER")
+        self.option_card_project.setURL("https://github.com/UF4OVER/auto_excal")
 
         self.option_card_example = ThemedOptionCardPlane(self)
         self.option_card_example.setTitle("Bilibili")
         self.option_card_example.setFixedSize(218, 270)
         self.option_card_example.setThemeColor("#FB7299")
         self.option_card_example.setDescription(
-            "connect to my bilibili"
-            "homepage.you can click"
+            "connect to my bilibili\r\n"
+            "home page.you can click\r\n"
             "btu to mypage .")  # noqa: E501
         self.option_card_example.setURL("https://space.bilibili.com/1000215778?spm_id_from=333.1007.0.0")
         # 添加到水平容器
@@ -86,58 +88,70 @@ class Homepage(SiPage):
         self.container_for_cards.addWidget(self.option_card_project)
         self.container_for_cards.addWidget(self.option_card_example)
 
-        # self.body
-        self.body = SiDenseVContainer(self)
-        self.body.setFixedHeight(400)
-        self.body.setAlignment(Qt.AlignCenter)
-        self.body.setSpacing(24)
-        #
-        # self.titled_widget_group = SiTitledWidgetGroup(self.body)
-        # self.titled_widget_group.setSiliconWidgetFlag(Si.EnableAnimationSignals)
-        # self.titled_widget_group.resized.connect(lambda size: self.body.setFixedHeight(size[1]))
-        # self.titled_widget_group.move(64, 0)
-
-        # self.titled_widget_group.setSpacing(16)
-        # self.titled_widget_group.addTitle("新闻")
-        # self.titled_widget_group.addWidget(OptionCardsPanel(self))
-
-        self.scroll_container.addWidget(self.head_area)
-        # self.body.setFixedHeight(self.titled_widget_group.height())
-        self.scroll_container.addWidget(self.body)
         # 添加到滚动区域容器
+        self.scroll_container.addWidget(self.head_area)
+
+        self.body_area = SiLabel(self)
+        self.body_area.setSiliconWidgetFlag(Si.EnableAnimationSignals)
+        self.body_area.resized.connect(lambda _: self.scroll_container.adjustSize())
+
+        # 下面的 titledWidgetGroups
+        self.titled_widget_group = SiTitledWidgetGroup(self.body_area)
+        self.titled_widget_group.setSiliconWidgetFlag(Si.EnableAnimationSignals)
+        self.titled_widget_group.resized.connect(lambda size: self.body_area.setFixedHeight(size[1]))
+        self.titled_widget_group.move(64, 0)
+
+        # 开始搭建界面
+        # 控件的线性选项卡
+
+        self.titled_widget_group.setSpacing(16)
+        self.titled_widget_group.addTitle("说明")
+        self.titled_widget_group.addWidget(WidgetsPanel(self))
+
+        self.titled_widget_group.addPlaceholder(64)
+
+        # 添加到滚动区域容器
+        self.body_area.setFixedHeight(self.titled_widget_group.height())
+        self.scroll_container.addWidget(self.body_area)
+
+        # 添加到页面
 
         self.setAttachment(self.scroll_container)
+        self.scroll_container.adjustSize()
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
         w = event.size().width()
-        self.body.setFixedWidth(w)
+        self.body_area.setFixedWidth(w)
         self.background_image.setFixedWidth(w)
-        # self.titled_widget_group.setFixedWidth(min(w - 128, 900))
+        self.titled_widget_group.setFixedWidth(min(w - 128, 900))
         self.background_fading_transition.setFixedWidth(w)
 
 
-# class OptionCardsPanel(SiDenseVContainer):
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(*args, **kwargs)
-#
-#         self.setAdjustWidgetsSize(True)
-#         self.setSpacing(12)
-#
-#         attached_button_a = SiPushButton(self)
-#
-#         attached_button_a.resize(128, 32)
-#         attached_button_a.attachment().setText("Attachment")
-#         attached_button_b = SiPushButton(self)
-#         attached_button_b.resize(32, 32)
-#         attached_button_b.attachment().load(SiGlobal.siui.iconpack.get("ic_fluent_attach_regular"))
-#
-#         self.option_card_linear_attaching = SiOptionCardLinear(self)
-#         self.option_card_linear_attaching.setTitle("Attach Widgets",
-#                                                    "The linear option card provides a horizontal container where any control can be added,\nwith no limit on the number")
-#         self.option_card_linear_attaching.load(SiGlobal.siui.iconpack.get("ic_fluent_attach_regular"))
-#         self.option_card_linear_attaching.addWidget(attached_button_a)
-#         self.option_card_linear_attaching.addWidget(attached_button_b)
-#
-#         # <- ADD
-#         self.addWidget(self.option_card_linear_attaching)
+class WidgetsPanel(SiDenseVContainer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.setAdjustWidgetsSize(True)
+        self.setSpacing(12)
+
+        container_h_a = SiDenseVContainer(self)
+        container_h_a.setSpacing(12)
+
+        self.test_task_card = TaskCardLinear(
+            Task("语言详情", "全局语言：python，基本框架：PyQt5，UI框架：siui", "环境开发详情","IDE:Pycharm 24.1.6(pro)，python：3.10，siui：1.0.1",time.time(), self.getColor(SiColor.PROGRESS_BAR_COMPLETING)),
+            parent=self)
+        self.test_task_card.resize(SiGlobal.siui.windows["MAIN_WINDOW"].height(), 80)
+
+        self.test_task_card2 = TaskCardLinear(
+            Task("架构详情", "parts：页面组件，config：注册文件，pic：全局图片", "应用组成架构","parts：页面代码，config：配置文件，pic：页面图片",time.time(), self.getColor(SiColor.PROGRESS_BAR_PROCESSING)),
+            parent=self)
+        self.test_task_card2.resize(SiGlobal.siui.windows["MAIN_WINDOW"].height(), 80)
+
+        container_h_a.addWidget(self.test_task_card)
+        container_h_a.addWidget(self.test_task_card2)
+        # 添加两个水平容器到自己
+        self.addWidget(container_h_a)
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)

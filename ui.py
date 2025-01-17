@@ -1,9 +1,4 @@
-#  Copyright (c) 2025. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-#  Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
-#  Etiam sed turpis ac ipsum condimentum fringilla. Maecenas magna.
-#  Proin dapibus sapien vel ante. Aliquam erat volutpat. Pellentesque sagittis ligula eget metus.
-#  Vestibulum commodo. Ut rhoncus gravida arcu.
-
+import configparser
 import webbrowser
 
 from PyQt5.QtCore import Qt
@@ -18,6 +13,8 @@ from siui.templates.application.application import SiliconApplication
 from siui.templates.application.components.message.box import SiSideMessageBox
 
 import icons
+from layer_left_global import LayerLeftGlobalDrawer
+from page_musicpage import PageMusicPage
 from parts.close_event import CloseModalDialog
 from parts.page_homepage import Homepage
 from parts.page_autoexcalpage import Autoexcal
@@ -27,6 +24,10 @@ from parts.page_settingpage import PageSettingPage
 siui.core.globals.SiGlobal.siui.loadIcons(
     icons.IconDictionary(color=SiGlobal.siui.colors.fromToken(SiColor.SVG_NORMAL)).icons
 )
+
+import config.CONFIG
+
+PATH_CONFIG = config.CONFIG.CONFIG_PATH
 
 
 def send_custom_message():
@@ -90,7 +91,7 @@ def send_custom_message():
     container.adjustSize()
 
     new_message_box = SiSideMessageBox()
-    new_message_box.setMessageType(2)
+    new_message_box.setMessageType(1)
     new_message_box.content().container().setSpacing(0)
     new_message_box.content().container().addPlaceholder(16)
     new_message_box.content().container().addWidget(info_label)
@@ -106,14 +107,21 @@ def send_custom_message():
     SiGlobal.siui.windows["MAIN_WINDOW"].LayerRightMessageSidebar().sendMessageBox(new_message_box)
 
 
-class MySiliconApp(SiliconApplication):
+class My_SiliconApplication(SiliconApplication):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.layer_left_global_drawer = LayerLeftGlobalDrawer(self)
+
+
+class MySiliconApp(My_SiliconApplication):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         screen_geo = QDesktopWidget().screenGeometry()
         self.stu = False
-        self.setMinimumSize(1024, 380)
-        self.resize(1366, 916)
+        self.setMinimumSize(1200, 500)
+        self.resize(1350, 900)
+        self.setMaximumSize(1500, 1200)
         self.move((screen_geo.width() - self.width()) // 2, (screen_geo.height() - self.height()) // 2)
         self.layerMain().setTitle("Wedding Invitation")
         self.setWindowTitle("Wedding Invitation")
@@ -126,6 +134,9 @@ class MySiliconApp(SiliconApplication):
         self.layerMain().addPage(Autoexcal(self),
                                  icon=SiGlobal.siui.iconpack.get("ic_fluent_table_stack_right_filled"),
                                  hint="表单", side="top")
+        self.layerMain().addPage(PageMusicPage(self),
+                                 icon=SiGlobal.siui.iconpack.get("ic_fluent_music_note_2_play_filled"),
+                                 hint="音乐", side="top")
         self.layerMain().addPage(PageSettingPage(self),
                                  icon=SiGlobal.siui.iconpack.get("ic_fluent_settings_filled"),
                                  hint="设置", side="bottom")
@@ -136,20 +147,31 @@ class MySiliconApp(SiliconApplication):
 
     def GlobalLeft(self):
         SiGlobal.siui.windows["MAIN_WINDOW"].layerLeftGlobalDrawer().showLayer()
+
     def ShortcutKey(self):
         shortcut_show = QShortcut(QKeySequence(Qt.CTRL + Qt.Key_A), self)
         shortcut_show.setContext(Qt.ApplicationShortcut)  # 设置为全局快捷键
         shortcut_show.activated.connect(self.GlobalLeft)  # 连接 GlobalLeft 方法
 
     def closeEvent(self, event):
-        self.event = event
-        if self.stu:
-            event.accept()
+        config = configparser.ConfigParser()
+        config.read(PATH_CONFIG)
+        config = config["switch_options"]
+        config_content = config.getboolean("enable_switch")
+        print(f"read_ui_enable_switch:{config_content}")
+
+        if config_content:
+            self.event = event
+            if self.stu:
+                event.accept()
+            else:
+                self.event.ignore()
+                temp_widget = CloseModalDialog(self)
+                SiGlobal.siui.windows["MAIN_WINDOW"].layerModalDialog().setDialog(temp_widget)
+                temp_widget.user_decision.connect(self._sw_stu)  # 连接信号到槽
         else:
-            self.event.ignore()
-            temp_widget = CloseModalDialog(self)
-            SiGlobal.siui.windows["MAIN_WINDOW"].layerModalDialog().setDialog(temp_widget)
-            temp_widget.user_decision.connect(self._sw_stu)  # 连接信号到槽
+            SiGlobal.siui.windows["MAIN_WINDOW"].close()
+            event.accept()
 
     def _sw_stu(self):
         self.stu = not self.stu

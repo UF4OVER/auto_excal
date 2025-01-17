@@ -2,6 +2,7 @@ import sys
 from cx_Freeze import setup, Executable
 
 pic_path = "E:\\python\\auto_excal_new\\siui\\pic"
+music_path = "E:\\python\\auto_excal_new\\siui\\music"
 # 定义构建选项
 # 添加依赖包
 
@@ -10,13 +11,16 @@ build_exe_options = {
         "PyQt5.QtCore",
         "PyQt5.QtGui",
         "PyQt5.QtWidgets",
-        # "siui",
-        # "icons",
+        "siui",
+        "icons",
         "parts",
-        # "config",
+        "config",
         "openpyxl",
-        # "ui",
-        "DrissionPage"
+        "ui",
+        "DrissionPage",
+        "pygame.mixer",
+        "mutagen.mp3",
+        "music"
     ],
     "include_files": [
         (pic_path, "pic"),
@@ -34,28 +38,28 @@ build_exe_options = {
         "email",            # 排除 email 模块
         "pydoc",            # 排除文档模块
     ],
-    "optimize": 1,
-    "zip_include_packages": ["*"],
-
-    "zip_exclude_packages": ["siui",
-                             "ui",
-                             "icons",
-                             "config"]
+    # "zip_include_packages": ["*"],
+    # #
+    # "zip_exclude_packages": ["siui",
+    #                          "ui",
+    #                          "icons",
+    #                          "config",
+    #                          "music"
+    #                          ]
 }
 
 # 设置 GUI 基础
-base = "Win32GUI"
+base = None
 
 setup(
     name='Wedding Invitation',
-    version='1.0.2',
+    version='1.0.3',
     url='https://github.com/UF4OVER',
     license='MIT',
     author='UF4',
     author_email='uf4hp@foxmail.com',
-    description='app',
-    options={"build_exe": build_exe_options
-             },
+    description='Wedding Invitation 系列',
+    options={"build_exe": build_exe_options},
     executables=[
         Executable(
             script="start.py",

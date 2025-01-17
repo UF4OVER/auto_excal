@@ -1,6 +1,23 @@
+# -*- coding: utf-8 -*-
+
+#  Copyright (c) 2025 UF4OVER
+#   All rights reserved.
+
+# -------------------------------
+#  @Project : siui
+#  @Time    : 2025 - 01-17 18:44
+#  @FileName: music_player.py
+#  @Software: PyCharm 2024.1.6 (Professional Edition)
+#  @System  : Windows 11 23H2
+#  @Author  : 33974
+#  @Contact : 
+#  @Python  : 
+# -------------------------------
+
 from pygame import mixer
 import time
 from mutagen.mp3 import MP3
+
 
 class MP3Player:
     def __init__(self, file_path):
@@ -47,9 +64,9 @@ class MP3Player:
         print(f"当前播放位置: {current_pos:.2f} 秒")
         return current_pos
 
+
 # 示例用法
 if __name__ == "__main__":
-
     player = MP3Player("music/mp3/Cyberpunk - I Really Want to Stay at Your House.mp3")  # 替换为你的 MP3 文件路径
     player.play()
 
