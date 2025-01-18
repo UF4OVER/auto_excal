@@ -67,7 +67,7 @@ class MP3Player:
 
 # 示例用法
 if __name__ == "__main__":
-    player = MP3Player("music/mp3/Cyberpunk - I Really Want to Stay at Your House.mp3")  # 替换为你的 MP3 文件路径
+    player = MP3Player("music/mp3/001.mp3")  # 替换为你的 MP3 文件路径
     player.play()
 
     time.sleep(5)  # 播放 5 秒

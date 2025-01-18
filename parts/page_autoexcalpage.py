@@ -1,7 +1,7 @@
 import configparser
 import json
 import os
-
+import time
 from DrissionPage import ChromiumOptions, Chromium
 from PyQt5.QtCore import QThread, pyqtSignal, Qt
 from PyQt5.QtWidgets import QTableWidget, QFileDialog, QTableWidgetItem, QAbstractItemView
@@ -160,7 +160,7 @@ class Autoexcal(SiPage):
             self.port_int_spin_box.resize(128, 32)
             self.port_int_spin_box.setMaximum(65535)
             self.port_int_spin_box.setMinimum(1024)
-            self.port_int_spin_box.setValue(9222)
+            self.load_web_port()
             self.port_int_spin_box.setEnabled(False)
             self.port_int_spin_box.lineEdit().editingFinished.connect(self.change_web_port)
 
@@ -282,10 +282,10 @@ class Autoexcal(SiPage):
             self.table_widget.setFixedSize(table_widget_height, table_widget_width)
 
             self.clear_data_btu = SiLongPressButton(self)
-            self.clear_data_btu.setFixedHeight(32)
+            self.clear_data_btu.resize(80,32)
             self.clear_data_btu.attachment().setText("清除数据")
             self.clear_data_btu.longPressed.connect(self.delete_data_for_table_widget)
-            self.clear_data_btu.setFixedHeight(32)
+
 
             choose_file_btu = SiPushButtonRefactor(self)
             choose_file_btu.setText("选择文件")
@@ -421,6 +421,11 @@ class Autoexcal(SiPage):
         self.new_table_widget.clear()
         self.new_table_widget.setRowCount(0)
         self.new_table_widget.setColumnCount(0)
+        self.index_current_data = 0
+        os.remove(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data.json'))
+        # 去实例化线程
+        self.main_loop_thread = None
+
         show_message(2, "成功", "表格数据已清空", "ic_fluent_eraser_medium_filled")
 
     def import_file_for_table_widget(self):
@@ -722,10 +727,12 @@ class Autoexcal(SiPage):
 
                     print((i % 49) + 1)
                     xuehao.input(self.get_data_by_order(self.data, i)[0]['stu_id'])
+                    time.sleep(0.1)
                     score.input(self.get_data_by_order(self.data, i)[0]['score'])
-
+                    time.sleep(0.1)
                 btus = self.last_tab.eles("@value=查询")
                 for btu in btus:
+                    time.sleep(0.1)
                     btu.click()
 
                 self.index_current_data = end_index  # 更新当前索引位置
@@ -746,6 +753,7 @@ class Autoexcal(SiPage):
     def stop_main_loop_in_thread(self):
         if self.main_loop_thread.isRunning():
             self.main_loop_thread.stop()
+
 
     def on_main_loop_finished(self):
         self.start_btu.attachment().setText("开始")
@@ -781,3 +789,14 @@ class Autoexcal(SiPage):
         except Exception as e:
             print(f"发生错误: {e}")
             show_message(1, "错误", f"发生错误: {e}", "ic_fluent_error_circle_filled")
+
+    def load_web_port(self):
+        try:
+            config1 = configparser.ConfigParser()
+            config1.read(PATH_CONFIG)
+            config = config1["chromium_options"]
+            port = config["address"].split(":")[1]
+            self.port_int_spin_box.setValue(int(port))
+        except Exception as e:
+            print(f"发生错误: {e}")
+            self.port_int_spin_box.setValue(9222)

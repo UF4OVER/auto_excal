@@ -13,8 +13,8 @@ from siui.templates.application.application import SiliconApplication
 from siui.templates.application.components.message.box import SiSideMessageBox
 
 import icons
-from layer_left_global import LayerLeftGlobalDrawer
-from page_musicpage import PageMusicPage
+from parts.layer_left_global import LayerLeftGlobalDrawer
+from parts.page_musicpage import PageMusicPage # 平台差异？
 from parts.close_event import CloseModalDialog
 from parts.page_homepage import Homepage
 from parts.page_autoexcalpage import Autoexcal

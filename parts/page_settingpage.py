@@ -56,6 +56,21 @@ def save_config(dpi_policy, enable_hdpi_scaling, use_hdpi_pixmaps):
         config.write(configfile)
 
 
+def save_close_options(b_: bool):
+    config = configparser.ConfigParser()
+    config.read(PATH_CONFIG)
+    config1 = config["switch_options"]
+    config1['enable_switch'] = str(b_)
+    with open(PATH_CONFIG, 'w') as configfile:
+        config.write(configfile)
+
+
+def read_close_options() -> bool:
+    config = configparser.ConfigParser()
+    config.read(PATH_CONFIG)
+    return config.getboolean('switch_options', 'enable_switch')
+
+
 class PageSettingPage(SiPage):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -189,25 +204,12 @@ class PageSettingPage(SiPage):
             self.close_options_toggle = SiSwitchRefactor(self)
             # 确保读取的值被正确转换为布尔类型
             self.close_options_toggle.setChecked(True)
-            self.close_options_toggle.setChecked(self.read_close_options())
-            print(f"read_setting_enable_switch:{self.read_close_options()}")
-            self.close_options_toggle.toggled.connect(lambda b_: self.save_close_options(b_))
+            self.close_options_toggle.setChecked(read_close_options())
+            print(f"read_setting_enable_switch:{read_close_options()}")
+            self.close_options_toggle.toggled.connect(lambda b_: save_close_options(b_))
             close_options.load(SiGlobal.siui.iconpack.get("ic_fluent_closed_caption_off_filled"))
             close_options.addWidget(self.close_options_toggle)
             group.addWidget(close_options)
-
-    def read_close_options(self) -> bool:
-        config = configparser.ConfigParser()
-        config.read(PATH_CONFIG)
-        return config.getboolean('switch_options', 'enable_switch')
-
-    def save_close_options(self, b_: bool):
-        config = configparser.ConfigParser()
-        config.read(PATH_CONFIG)
-        config1 = config["switch_options"]
-        config1['enable_switch'] = str(b_)
-        with open(PATH_CONFIG, 'w') as configfile:
-            config.write(configfile)
 
     def load_settings(self):
         dpi_policy, enable_hdpi_scaling, use_hdpi_pixmaps = read_config()
@@ -229,5 +231,4 @@ class PageSettingPage(SiPage):
             dpi_policy = 'PassThrough'
 
         use_hdpi_pixmaps = True  # todo
-
         save_config(dpi_policy, self.enable_dpi_staus, use_hdpi_pixmaps)

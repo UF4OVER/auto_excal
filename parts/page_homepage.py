@@ -17,7 +17,7 @@ from siui.core import GlobalFont, SiColor, SiGlobal
 from siui.gui import SiFont
 
 from parts.themed_option_card import ThemedOptionCardPlane
-from task import TaskCardLinear, Task
+from parts.task import TaskCardLinear, Task
 
 
 class Homepage(SiPage):
@@ -32,7 +32,6 @@ class Homepage(SiPage):
         self.background_image = SiPixLabel(self.head_area)
         self.background_image.setFixedSize(1366, 300)
         self.background_image.setBorderRadius(6)
-        base_dir = os.path.dirname(os.path.abspath(__file__))
         self.background_image.load("./pic/ccc.jpg")
 
         self.background_fading_transition = SiLabel(self.head_area)
@@ -54,7 +53,7 @@ class Homepage(SiPage):
         self.subtitle = SiLabel(self.head_area)
         self.subtitle.setGeometry(64, 72, 500, 48)
         self.subtitle.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
-        self.subtitle.setText("A powerful and artistic UI library based on PyQt5")
+        self.subtitle.setText("THE_AUTHOR_IS_A_GOOD_LOOKING_PYQT5_PROJECT_BY_UF4")
         self.subtitle.setStyleSheet("color: {}".format(SiColor.trans(SiGlobal.siui.colors["TEXT_A"], 0.9)))
         self.subtitle.setFont(SiFont.tokenized(GlobalFont.S_MEDIUM))
 

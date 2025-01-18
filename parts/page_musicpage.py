@@ -1,21 +1,18 @@
 ﻿import configparser
 import os
 
-from PyQt5.QtWidgets import QBoxLayout
-from siui.components.button import SiPushButtonRefactor
-from siui.components.container import SiDenseContainer
-from siui.components.slider_ import SiSlider
-
-from music_player import MP3Player
 from PyQt5.QtCore import Qt
+from siui.components import SiTitledWidgetGroup, SiMasonryContainer
 from siui.components.page import SiPage
-from siui.components import SiTitledWidgetGroup, SiMasonryContainer, SiOptionCardPlane
 from siui.components.widgets import (
     SiDenseVContainer,
     SiSimpleButton,
     SiLineEdit)
 from siui.core import Si, SiGlobal
-from music_displayer import SiMusicDisplayer
+
+from parts.MusicPlaybackBoxer import MusicPlay, MusicPlaybackBoxer
+from parts.music_displayer import SiMusicDisplayer
+from parts.music_player import MP3Player
 
 music_info_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "music\\info\\music.ini")
 music_png_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "music\\png")
@@ -42,6 +39,11 @@ mp3_title, mp3_artist, mp3_album = load_music_info(3)
 mp4_title, mp4_artist, mp4_album = load_music_info(4)
 mp5_title, mp5_artist, mp5_album = load_music_info(5)
 mp6_title, mp6_artist, mp6_album = load_music_info(6)
+
+
+def read_config():  # 读取配置文件
+    config = configparser.ConfigParser()
+    config.read(music_info_path)
 
 
 class search_box(SiLineEdit):
@@ -91,6 +93,8 @@ class PageMusicPage(SiPage):
 
         SiGlobal.siui.reloadStyleSheetRecursively(self)
         self.titled_widgets_group.adjustSize()
+        # 添加页脚的空白以增加美观性
+        self.titled_widgets_group.addPlaceholder(64)
         self.setAttachment(self.titled_widgets_group)
 
     def setupUi(self):
@@ -104,34 +108,44 @@ class PageMusicPage(SiPage):
             self.displayer_1 = SiMusicDisplayer(self)
             self.displayer_1.resize(512, 128)
             self.displayer_1.loadInfo(f"{music_png_path}/I Really Want to Stay at Your House.png",
-                                      mp1_title, mp1_artist,
-                                      mp1_album)  # noqa: E501
-            self.displayer_1.played.connect(self.start_music)
-            self.displayer_1.stopped.connect(self.end_music)
+                                      mp1_title, mp1_artist,mp1_album)  # noqa: E501
+
+            self.player_1 = MP3Player(f"{music_mp3_path}/001.mp3")
 
             self.displayer_2 = SiMusicDisplayer(self)
             self.displayer_2.resize(512, 128)
-            self.displayer_2.loadInfo(f"{music_png_path}/002.jpg", mp2_title, mp2_artist,
-                                      mp2_album)  # noqa: E501
+            self.displayer_2.loadInfo(f"{music_png_path}/002.jpg", mp2_title,
+                                      mp2_artist,mp2_album)  # noqa: E501
+
+            self.player_2 = MP3Player(f"{music_mp3_path}/002.mp3")
 
             self.displayer_3 = SiMusicDisplayer(self)
             self.displayer_3.resize(512, 128)
-            self.displayer_3.loadInfo(f"{music_png_path}/003.jpg", mp3_title, mp3_artist,
-                                      mp3_album)  # noqa: E501
+            self.displayer_3.loadInfo(f"{music_png_path}/003.jpg", mp3_title,
+                                      mp3_artist,mp3_album)  # noqa: E501
+
+            self.player_3 = MP3Player(f"{music_mp3_path}/003.mp3")
 
             self.displayer_4 = SiMusicDisplayer(self)
             self.displayer_4.resize(512, 128)
-            self.displayer_4.loadInfo(f"{music_png_path}/004.jpg", "雨中的重逢", "Parion圆周率",
-                                      "Reunion In The Rain")  # noqa: E501
+            self.displayer_4.loadInfo(f"{music_png_path}/004.jpg", mp4_title,
+                                      mp4_artist,mp4_album)  # noqa: E501
+
+            self.player_4 = MP3Player(f"{music_mp3_path}/004.mp3")
 
             self.displayer_5 = SiMusicDisplayer(self)
             self.displayer_5.resize(512, 128)
-            self.displayer_5.loadInfo(f"{music_png_path}/005.jpg", "Melting White",
-                                      "塞壬唱片-MSR / Cubes Collective", "Melting White")  # noqa: E501
+            self.displayer_5.loadInfo(f"{music_png_path}/005.jpg", mp5_title,
+                                      mp5_artist, mp5_album)  # noqa: E501
+
+            self.player_5 = MP3Player(f"{music_mp3_path}/005.mp3")
 
             self.displayer_6 = SiMusicDisplayer(self)
             self.displayer_6.resize(512, 128)
-            self.displayer_6.loadInfo(f"{music_png_path}/006.jpg", "Axolotl", "C418", "Axolotl")  # noqa: E501
+            self.displayer_6.loadInfo(f"{music_png_path}/006.jpg", mp6_title,
+                                      mp6_artist, mp6_album)  # noqa: E501
+
+
 
             self.displayer_container.addWidget(self.displayer_1)
             self.displayer_container.addWidget(self.displayer_2)
@@ -142,50 +156,8 @@ class PageMusicPage(SiPage):
 
             group.addWidget(self.displayer_container)
             group.adjustSize()
+
+    def load_music(self,path):
         with self.titled_widgets_group as group:
-            # group.addTitle("容器")
-
-            self.containers = SiOptionCardPlane(self)
-            self.containers.setFixedWidth(512 + 512 + 16)
-            # self.containers.setTitle("密堆积容器")
-
-            self.container_v = SiDenseContainer(self, QBoxLayout.TopToBottom)
-            self.container_h = SiDenseContainer(self, QBoxLayout.LeftToRight)
-            # self.container_h.setFixedHeight(300)
-
-            button1 = SiPushButtonRefactor.withText("按钮1", parent=self)
-            button2 = SiPushButtonRefactor.withText("按钮2", parent=self)
-            button3 = SiPushButtonRefactor.withText("按钮3", parent=self)
-
-            self.container_h.addWidget(button1)
-            self.container_h.addWidget(button2)
-            self.container_h.addWidget(button3)
-
-            slider1 = SiSlider(self)
-            # slider1.setMaximumWidth(600)
-
-            self.container_v.addWidget(slider1)
-            self.container_v.addWidget(self.container_h)
-            self.container_v.layout().setAlignment(self.container_h, Qt.AlignHCenter)
-            self.container_v.adjustSize()
-
-            self.containers.body().setAdjustWidgetsSize(True)
-            self.containers.body().addWidget(self.container_v)
-            self.containers.body().addPlaceholder(12)
-            self.containers.adjustSize()
-
-            group.addWidget(self.containers)
-
-    def load_music_mp3(self):
-        self.mp3_1 = MP3Player(f"{music_mp3_path}/001.mp3")
-
-    def start_music(self):
-        print("start")
-
-    def end_music(self):
-        print("end")
-
-
-def read_config():  # 读取配置文件
-    config = configparser.ConfigParser()
-    config.read(music_info_path)
+            self.music_mp3 = MusicPlaybackBoxer(self, path)
+            group.addWidget(self.music_mp3)
