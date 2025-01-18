@@ -18,7 +18,6 @@ from pygame import mixer
 import time
 from mutagen.mp3 import MP3
 
-
 class MP3Player:
     def __init__(self, file_path):
         # 初始化播放器
@@ -27,7 +26,6 @@ class MP3Player:
         self.audio = MP3(file_path)
         self.is_paused = False
         self.total_length = self.audio.info.length  # 获取音频总时长（秒）
-
     def play(self):
         """播放音频"""
         mixer.music.load(self.file_path)
