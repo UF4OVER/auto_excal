@@ -111,6 +111,8 @@ class PageMusicPage(SiPage):
                                       mp1_title, mp1_artist,mp1_album)  # noqa: E501
 
             self.player_1 = MP3Player(f"{music_mp3_path}/001.mp3")
+            self.displayer_1.played.connect(self.player_1.play)
+            self.displayer_1.stopped.connect(self.player_1.stop)
 
             self.displayer_2 = SiMusicDisplayer(self)
             self.displayer_2.resize(512, 128)
@@ -118,6 +120,8 @@ class PageMusicPage(SiPage):
                                       mp2_artist,mp2_album)  # noqa: E501
 
             self.player_2 = MP3Player(f"{music_mp3_path}/002.mp3")
+            self.displayer_2.played.connect(self.player_2.play)
+            self.displayer_2.stopped.connect(self.player_2.stop)
 
             self.displayer_3 = SiMusicDisplayer(self)
             self.displayer_3.resize(512, 128)
@@ -125,6 +129,8 @@ class PageMusicPage(SiPage):
                                       mp3_artist,mp3_album)  # noqa: E501
 
             self.player_3 = MP3Player(f"{music_mp3_path}/003.mp3")
+            self.displayer_3.played.connect(self.player_3.play)
+            self.displayer_3.stopped.connect(self.player_3.stop)
 
             self.displayer_4 = SiMusicDisplayer(self)
             self.displayer_4.resize(512, 128)
@@ -132,6 +138,8 @@ class PageMusicPage(SiPage):
                                       mp4_artist,mp4_album)  # noqa: E501
 
             self.player_4 = MP3Player(f"{music_mp3_path}/004.mp3")
+            self.displayer_4.played.connect(self.player_4.play)
+            self.displayer_4.stopped.connect(self.player_4.stop)
 
             self.displayer_5 = SiMusicDisplayer(self)
             self.displayer_5.resize(512, 128)
@@ -139,13 +147,17 @@ class PageMusicPage(SiPage):
                                       mp5_artist, mp5_album)  # noqa: E501
 
             self.player_5 = MP3Player(f"{music_mp3_path}/005.mp3")
+            self.displayer_5.played.connect(self.player_5.play)
+            self.displayer_5.stopped.connect(self.player_5.stop)
 
             self.displayer_6 = SiMusicDisplayer(self)
             self.displayer_6.resize(512, 128)
             self.displayer_6.loadInfo(f"{music_png_path}/006.jpg", mp6_title,
                                       mp6_artist, mp6_album)  # noqa: E501
 
-
+            self.player_6 = MP3Player(f"{music_mp3_path}/006.mp3")
+            self.displayer_6.played.connect(self.player_6.play)
+            self.displayer_6.stopped.connect(self.player_6.stop)
 
             self.displayer_container.addWidget(self.displayer_1)
             self.displayer_container.addWidget(self.displayer_2)
@@ -157,7 +169,7 @@ class PageMusicPage(SiPage):
             group.addWidget(self.displayer_container)
             group.adjustSize()
 
-    def load_music(self,path):
-        with self.titled_widgets_group as group:
-            self.music_mp3 = MusicPlaybackBoxer(self, path)
-            group.addWidget(self.music_mp3)
+    # def load_music(self,path):
+    #     with self.titled_widgets_group as group:
+    #         self.music_mp3 = MusicPlaybackBoxer(self, path)
+    #         group.addWidget(self.music_mp3)

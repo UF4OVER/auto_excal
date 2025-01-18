@@ -49,11 +49,11 @@ build_exe_options = {
 }
 
 # 设置 GUI 基础
-base = None
+base = "Win32GUI"
 
 setup(
     name='Wedding Invitation',
-    version='1.0.3',
+    version='1.1.0',
     url='https://github.com/UF4OVER',
     license='MIT',
     author='UF4',

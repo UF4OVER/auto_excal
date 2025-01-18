@@ -8,15 +8,97 @@
 #  @Software: PyCharm 2024.1.6 (Professional Edition)
 #  @System  : Windows 11 23H2
 #  @Author  : 33974
-#  @Contact : 
-#  @Python  : 
+#  @Contact :
+#  @Python  :
 # -------------------------------
-from PyQt5.QtCore import *
-from PyQt5.QtGui import QFont
 
-from siui.components import SiDenseVContainer, SiLabel, SiPixLabel, SiSimpleButton, SiWidget
-from siui.core import Si, SiColor, SiGlobal, SiQuickEffect
+import webbrowser
+from PyQt5.QtCore import *
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QFont
+from siui.components import SiSimpleButton, SiDenseVContainer, SiPixLabel, SiLabel, SiDenseHContainer
+from siui.components import SiWidget
+from siui.core import Si, SiQuickEffect
+from siui.core import SiColor, SiGlobal, GlobalFont
 from siui.gui import SiFont
+from siui.templates.application.components.message.box import SiSideMessageBox
+
+
+def send_music_message(png_path: str, music_name: str, music_artist: str, music_album: str):
+    container = SiDenseHContainer()
+    container.setAdjustWidgetsSize(True)
+    container.setFixedHeight(80)
+    container.setSpacing(0)
+
+    info_label = SiLabel()
+    info_label.setFont(SiFont.tokenized(GlobalFont.S_NORMAL))
+    info_label.setStyleSheet(f"color: {info_label.getColor(SiColor.TEXT_D)}; padding-left: 16px")
+    info_label.setText(f"正在播放歌曲:{music_name}")
+    info_label.adjustSize()
+
+    split_line = SiLabel()
+    split_line.resize(300, 1)
+    split_line.setFixedStyleSheet("margin-left: 20px")
+    split_line.setColor(SiColor.trans(split_line.getColor(SiColor.TEXT_D), 0.3))
+
+    avatar = SiPixLabel(container)
+    avatar.resize(80, 120)
+    avatar.setBorderRadius(20)
+    avatar.load(f"{png_path}")
+
+    container_v = SiDenseVContainer(container)
+    container_v.setFixedWidth(200)
+    container_v.setSpacing(0)
+
+    name_label = SiLabel()
+    name_label.setFont(SiFont.tokenized(GlobalFont.M_BOLD))
+    name_label.setStyleSheet(f"color: white; padding-left:8px")
+    name_label.setText(f"{music_name}")
+    name_label.adjustSize()
+
+    button_1 = SiLabel()
+    button_1.setFixedHeight(26)
+    button_1.setText(f"作者:{music_artist}")
+    button_1.setFont(SiFont.tokenized(GlobalFont.L_LIGHT))
+    button_1.setStyleSheet(f"color: white; padding-left:8px")
+    button_1.adjustSize()
+    button_1.reloadStyleSheet()
+
+    button_2 = SiLabel()
+    button_2.setFixedHeight(22)
+    button_2.setText(f"专辑:{music_album}")
+    button_2.setFont(SiFont.tokenized(GlobalFont.S_NORMAL))
+    button_2.setStyleSheet(f"color: white; padding-left:8px")
+    button_2.adjustSize()
+    button_2.reloadStyleSheet()
+
+    container_v.addWidget(name_label)
+    container_v.addPlaceholder(8)
+    container_v.addWidget(button_1)
+    container_v.addWidget(button_2)
+    container_v.adjustSize()
+
+    container.addPlaceholder(24)
+    container.addWidget(avatar)
+    container.addPlaceholder(8)
+    container.addWidget(container_v)
+    container.adjustSize()
+
+    new_message_box = SiSideMessageBox()
+    new_message_box.setMessageType(3)
+    new_message_box.content().container().setSpacing(0)
+    new_message_box.content().container().addPlaceholder(16)
+    new_message_box.content().container().addWidget(info_label)
+    new_message_box.content().container().addPlaceholder(8)
+    new_message_box.content().container().addWidget(split_line)
+    new_message_box.content().container().addPlaceholder(24)
+    new_message_box.content().container().addWidget(container)
+    new_message_box.content().container().addPlaceholder(32)
+    new_message_box.adjustSize()
+
+    # new_message_box.setFoldAfter(fold_after)
+
+    SiGlobal.siui.windows["MAIN_WINDOW"].LayerRightMessageSidebar().sendMessageBox(new_message_box)
 
 
 class InfoPanel(SiWidget):
@@ -206,6 +288,11 @@ class SiMusicDisplayer(SiWidget):
         self.info_panel.loadAchievement("OVER 10K PLAYS")
 
     def loadInfo(self, cover_path, title, artist, album):
+        self.png_path = cover_path
+        self.title = title
+        self.artist = artist
+        self.album = album
+
         self.info_panel.loadInfo(cover_path, title, artist, album)
         self.cover_label.load(cover_path)
         self.cover_lower_fix_label.load(cover_path)
@@ -227,5 +314,7 @@ class SiMusicDisplayer(SiWidget):
     def on_quick_play_panel_triggered(self):
         if self.quick_play_panel.is_playing:
             self.stopped.emit()
+
         else:
             self.played.emit()
+            send_music_message(self.png_path, self.title, self.artist, self.album)
