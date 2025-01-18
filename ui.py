@@ -13,6 +13,7 @@ from siui.templates.application.application import SiliconApplication
 from siui.templates.application.components.message.box import SiSideMessageBox
 
 import icons
+from page_aboutpage import About
 from parts.layer_left_global import LayerLeftGlobalDrawer
 from parts.page_musicpage import PageMusicPage # 平台差异？
 from parts.close_event import CloseModalDialog
@@ -137,9 +138,13 @@ class MySiliconApp(My_SiliconApplication):
         self.layerMain().addPage(PageMusicPage(self),
                                  icon=SiGlobal.siui.iconpack.get("ic_fluent_music_note_2_play_filled"),
                                  hint="音乐", side="top")
+        self.layerMain().addPage(About(self),
+                                 icon=SiGlobal.siui.iconpack.get("ic_fluent_info_filled"),
+                                 hint="关于", side="bottom")
         self.layerMain().addPage(PageSettingPage(self),
                                  icon=SiGlobal.siui.iconpack.get("ic_fluent_settings_filled"),
                                  hint="设置", side="bottom")
+
 
         self.layerMain().setPage(0)
 
