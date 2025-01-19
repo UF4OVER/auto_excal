@@ -5,7 +5,8 @@ import os
 import time
 
 from PyQt5.QtCore import Qt
-from siui.components import SiPixLabel, Si
+from siui.components import SiPixLabel, Si, SiOptionCardLinear, SiPushButton
+from siui.components.button import SiPushButtonRefactor
 from siui.components.page import SiPage
 from siui.components.titled_widget_group import SiTitledWidgetGroup
 from siui.components.widgets import (
@@ -106,6 +107,20 @@ class Homepage(SiPage):
         self.titled_widget_group.setSpacing(16)
         self.titled_widget_group.addTitle("说明")
         self.titled_widget_group.addWidget(WidgetsPanel(self))
+
+        with self.titled_widget_group as group:
+            group.addTitle("快捷键")
+            shortcut_tab = SiOptionCardLinear(self)
+            shortcut_tab.setTitle("快捷键", "任意位置按下-> KEY_CTRL + KEY_A")
+            shortcut_tab.load(SiGlobal.siui.iconpack.get("ic_fluent_keyboard_layout_float_regular"))
+
+            open_left_layer_btu = SiPushButtonRefactor(self)
+            open_left_layer_btu.setText("打开左侧")
+            open_left_layer_btu.clicked.connect(lambda:SiGlobal.siui.windows["MAIN_WINDOW"].layerLeftGlobalDrawer().showLayer())
+
+            shortcut_tab.addWidget(open_left_layer_btu)
+
+            group.addWidget(shortcut_tab)
 
         self.titled_widget_group.addPlaceholder(64)
 

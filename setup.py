@@ -20,7 +20,10 @@ build_exe_options = {
         "DrissionPage",
         "pygame.mixer",
         "mutagen.mp3",
-        "music"
+        "music",
+        "pycaw",
+        "wmi",
+        "comtypes"
     ],
     "include_files": [
         (pic_path, "pic"),
@@ -49,11 +52,11 @@ build_exe_options = {
 }
 
 # 设置 GUI 基础
-base = None
+base = "Win32GUI"
 
 setup(
     name='Wedding Invitation',
-    version='1.1.0',
+    version='1.1.2',
     url='https://github.com/UF4OVER',
     license='MIT',
     author='UF4',

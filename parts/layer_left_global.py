@@ -7,6 +7,7 @@ from siui.core import SiGlobal
 from siui.templates.application.components.layer.global_drawer import SiLayerDrawer
 from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
 from comtypes import CLSCTX_ALL
+import wmi
 
 # 获取系统的音频设备
 devices = AudioUtilities.GetAllDevices()
@@ -16,8 +17,6 @@ interface = device.Activate(
     IAudioEndpointVolume._iid_, CLSCTX_ALL, None
 )
 volume = interface.QueryInterface(IAudioEndpointVolume)
-
-import wmi
 
 
 def set_brightness(brightness_level):  # 屏幕亮度设置
