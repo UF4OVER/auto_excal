@@ -15,22 +15,29 @@
 # -------------------------------
 
 from pygame import mixer
-import time
 from mutagen.mp3 import MP3
+from PyQt5.QtCore import pyqtSignal, QObject, QTimer
 
-class MP3Player:
+
+class MP3Player(QObject):
+    finished = pyqtSignal()
+
     def __init__(self, file_path):
+        super().__init__()
         # 初始化播放器
         mixer.init()
         self.file_path = file_path
         self.audio = MP3(file_path)
         self.is_paused = False
         self.total_length = self.audio.info.length  # 获取音频总时长（秒）
+
     def play(self):
         """播放音频"""
         mixer.music.load(self.file_path)
         mixer.music.play()
         print(f"正在播放: {self.file_path}, 总时长: {self.total_length:.2f} 秒")
+        # 使用 singleShot 在总时长后发射 finished 信号
+        QTimer.singleShot(int(self.total_length * 1000), self.on_finished)
 
     def pause(self):
         """暂停或继续播放"""
@@ -62,22 +69,22 @@ class MP3Player:
         print(f"当前播放位置: {current_pos:.2f} 秒")
         return current_pos
 
+    def on_finished(self):
+        """音乐播放结束时的回调函数"""
+        self.finished.emit()
+        print("音乐播放结束")
+
 
 # 示例用法
 if __name__ == "__main__":
+    from PyQt5.QtWidgets import QApplication
+    import sys
+
+    app = QApplication(sys.argv)
+
     player = MP3Player("music/mp3/001.mp3")  # 替换为你的 MP3 文件路径
+    player.finished.connect(lambda: print("finished信号已发射"))
+
     player.play()
 
-    time.sleep(5)  # 播放 5 秒
-    player.get_position()
-
-    player.pause()
-    time.sleep(2)  # 暂停 2 秒
-
-    player.pause()  # 恢复播放
-    time.sleep(5)  # 再播放 5 秒
-
-    player.seek(55)  # 跳转到第 10 秒
-    time.sleep(5)  # 播放 5 秒
-
-    player.stop()
+    sys.exit(app.exec_())

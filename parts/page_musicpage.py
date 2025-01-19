@@ -181,5 +181,6 @@ class PageMusicPage(SiPage):
                 player[0].stop()
                 player[1].setStop()
         self.players[index][0].play()
+        self.players[index][0].finished.connect(self.players[index][1].setStop)
 
 
