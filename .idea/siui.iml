@@ -6,7 +6,7 @@
       <sourceFolder url="file://$MODULE_DIR$/parts" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/siui_env" isTestSource="true" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.10 (siui)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="PyQt5" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PyDocumentationSettings">

@@ -1,6 +1,6 @@
 # 获取某个git仓库的所有提交记录
 
-# test.py
+# git.py
 from git import Repo
 
 def get_all_commits(repo_path):

@@ -85,7 +85,7 @@ def send_music_message(png_path: str, music_name: str, music_artist: str, music_
 
     new_message_box = SiSideMessageBox()
     new_message_box.setMessageType(3)
-    new_message_box.setFoldAfter(1000)
+    # new_message_box.setFoldAfter(1000)
     new_message_box.content().container().setSpacing(0)
     new_message_box.content().container().addPlaceholder(16)
     new_message_box.content().container().addWidget(info_label)
