@@ -12,7 +12,6 @@
 #  @Python  :
 # -------------------------------
 
-import webbrowser
 from PyQt5.QtCore import *
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
@@ -86,6 +85,7 @@ def send_music_message(png_path: str, music_name: str, music_artist: str, music_
 
     new_message_box = SiSideMessageBox()
     new_message_box.setMessageType(3)
+    new_message_box.setFoldAfter(1000)
     new_message_box.content().container().setSpacing(0)
     new_message_box.content().container().addPlaceholder(16)
     new_message_box.content().container().addWidget(info_label)
@@ -287,6 +287,14 @@ class SiMusicDisplayer(SiWidget):
         self.info_panel.animationGroup().fromToken("resize").setBias(1)
         self.info_panel.loadAchievement("OVER 10K PLAYS")
 
+    def setStart(self):
+        self.quick_play_panel.play_button.attachment().load(SiGlobal.siui.iconpack.get("ic_fluent_pause_filled"))
+        self.quick_play_panel.is_playing = False
+
+    def setStop(self):
+        self.quick_play_panel.play_button.attachment().load(SiGlobal.siui.iconpack.get("ic_fluent_play_filled"))
+        self.quick_play_panel.is_playing = True
+
     def loadInfo(self, cover_path, title, artist, album):
         self.png_path = cover_path
         self.title = title
@@ -314,7 +322,6 @@ class SiMusicDisplayer(SiWidget):
     def on_quick_play_panel_triggered(self):
         if self.quick_play_panel.is_playing:
             self.stopped.emit()
-
         else:
             self.played.emit()
             send_music_message(self.png_path, self.title, self.artist, self.album)

@@ -624,7 +624,7 @@ class Autoexcal(SiPage):
         # 保存数据到 JSON 文件
         data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data.json')
         print(f"数据已保存到 {data_path}")
-        with open(data_path, 'w') as f:
+        with open(data_path, 'w', encoding='utf-8') as f:
             json.dump(data_list, f, ensure_ascii=False, indent=4)
 
         print("数据已保存")
@@ -684,7 +684,7 @@ class Autoexcal(SiPage):
         """
         file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data.json')
         try:
-            with open(file_path, 'r') as file:
+            with open(file_path, 'r', encoding='utf-8') as file:
                 data = json.load(file)
                 return data
         except FileNotFoundError:

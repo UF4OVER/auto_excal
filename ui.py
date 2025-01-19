@@ -13,7 +13,8 @@ from siui.templates.application.application import SiliconApplication
 from siui.templates.application.components.message.box import SiSideMessageBox
 
 import icons
-from page_aboutpage import About
+from box import LayerTopMessageSidebar
+from parts.page_aboutpage import About
 from parts.layer_left_global import LayerLeftGlobalDrawer
 from parts.page_musicpage import PageMusicPage
 from parts.close_event import CloseModalDialog
@@ -112,6 +113,10 @@ class My_SiliconApplication(SiliconApplication):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.layer_left_global_drawer = LayerLeftGlobalDrawer(self)
+        self.layer_top_message_sidebar = LayerTopMessageSidebar(self)
+
+    def LayerTopMessageSidebar(self):
+        return self.layer_top_message_sidebar
 
 
 class MySiliconApp(My_SiliconApplication):
@@ -144,7 +149,6 @@ class MySiliconApp(My_SiliconApplication):
         self.layerMain().addPage(PageSettingPage(self),
                                  icon=SiGlobal.siui.iconpack.get("ic_fluent_settings_filled"),
                                  hint="设置", side="bottom")
-
 
         self.layerMain().setPage(0)
 

@@ -49,7 +49,7 @@ build_exe_options = {
 }
 
 # 设置 GUI 基础
-base = "Win32GUI"
+base = None
 
 setup(
     name='Wedding Invitation',

@@ -10,7 +10,6 @@ from siui.components.widgets import (
     SiLineEdit)
 from siui.core import Si, SiGlobal
 
-from parts.MusicPlaybackBoxer import MusicPlay, MusicPlaybackBoxer
 from parts.music_displayer import SiMusicDisplayer
 from parts.music_player import MP3Player
 
@@ -24,7 +23,7 @@ print(f"music_mp3_path:{music_mp3_path}")
 
 config = configparser.ConfigParser()
 # 使用 open 函数指定编码为 utf-8
-with open("E:\\python\\auto_excal_new\\siui\\music\\info\\music.ini", 'r', encoding='utf-8') as fp:
+with open(music_info_path, 'r', encoding='utf-8') as fp:
     config.read_file(fp)
 
 
@@ -98,6 +97,7 @@ class PageMusicPage(SiPage):
         self.setAttachment(self.titled_widgets_group)
 
     def setupUi(self):
+        self.players: list = []
         with self.titled_widgets_group as group:
             self.displayer_container = SiMasonryContainer(self)
             self.displayer_container.setColumns(2)
@@ -108,37 +108,41 @@ class PageMusicPage(SiPage):
             self.displayer_1 = SiMusicDisplayer(self)
             self.displayer_1.resize(512, 128)
             self.displayer_1.loadInfo(f"{music_png_path}/I Really Want to Stay at Your House.png",
-                                      mp1_title, mp1_artist,mp1_album)  # noqa: E501
+                                      mp1_title, mp1_artist, mp1_album)  # noqa: E501
 
             self.player_1 = MP3Player(f"{music_mp3_path}/001.mp3")
-            self.displayer_1.played.connect(self.player_1.play)
+            self.players.append((self.player_1, self.displayer_1))
+            self.displayer_1.played.connect(lambda: self.handle_play(0))
             self.displayer_1.stopped.connect(self.player_1.stop)
 
             self.displayer_2 = SiMusicDisplayer(self)
             self.displayer_2.resize(512, 128)
             self.displayer_2.loadInfo(f"{music_png_path}/002.jpg", mp2_title,
-                                      mp2_artist,mp2_album)  # noqa: E501
+                                      mp2_artist, mp2_album)  # noqa: E501
 
             self.player_2 = MP3Player(f"{music_mp3_path}/002.mp3")
-            self.displayer_2.played.connect(self.player_2.play)
+            self.players.append((self.player_2, self.displayer_2))
+            self.displayer_2.played.connect(lambda: self.handle_play(1))
             self.displayer_2.stopped.connect(self.player_2.stop)
 
             self.displayer_3 = SiMusicDisplayer(self)
             self.displayer_3.resize(512, 128)
             self.displayer_3.loadInfo(f"{music_png_path}/003.jpg", mp3_title,
-                                      mp3_artist,mp3_album)  # noqa: E501
+                                      mp3_artist, mp3_album)  # noqa: E501
 
             self.player_3 = MP3Player(f"{music_mp3_path}/003.mp3")
-            self.displayer_3.played.connect(self.player_3.play)
+            self.players.append((self.player_3, self.displayer_3))
+            self.displayer_3.played.connect(lambda: self.handle_play(2))
             self.displayer_3.stopped.connect(self.player_3.stop)
 
             self.displayer_4 = SiMusicDisplayer(self)
             self.displayer_4.resize(512, 128)
             self.displayer_4.loadInfo(f"{music_png_path}/004.jpg", mp4_title,
-                                      mp4_artist,mp4_album)  # noqa: E501
+                                      mp4_artist, mp4_album)  # noqa: E501
 
             self.player_4 = MP3Player(f"{music_mp3_path}/004.mp3")
-            self.displayer_4.played.connect(self.player_4.play)
+            self.players.append((self.player_4, self.displayer_4))
+            self.displayer_4.played.connect(lambda: self.handle_play(3))
             self.displayer_4.stopped.connect(self.player_4.stop)
 
             self.displayer_5 = SiMusicDisplayer(self)
@@ -147,7 +151,8 @@ class PageMusicPage(SiPage):
                                       mp5_artist, mp5_album)  # noqa: E501
 
             self.player_5 = MP3Player(f"{music_mp3_path}/005.mp3")
-            self.displayer_5.played.connect(self.player_5.play)
+            self.players.append((self.player_5, self.displayer_5))
+            self.displayer_5.played.connect(lambda: self.handle_play(4))
             self.displayer_5.stopped.connect(self.player_5.stop)
 
             self.displayer_6 = SiMusicDisplayer(self)
@@ -156,7 +161,8 @@ class PageMusicPage(SiPage):
                                       mp6_artist, mp6_album)  # noqa: E501
 
             self.player_6 = MP3Player(f"{music_mp3_path}/006.mp3")
-            self.displayer_6.played.connect(self.player_6.play)
+            self.players.append((self.player_6, self.displayer_6))
+            self.displayer_6.played.connect(lambda: self.handle_play(5))
             self.displayer_6.stopped.connect(self.player_6.stop)
 
             self.displayer_container.addWidget(self.displayer_1)
@@ -169,7 +175,11 @@ class PageMusicPage(SiPage):
             group.addWidget(self.displayer_container)
             group.adjustSize()
 
-    # def load_music(self,path):
-    #     with self.titled_widgets_group as group:
-    #         self.music_mp3 = MusicPlaybackBoxer(self, path)
-    #         group.addWidget(self.music_mp3)
+    def handle_play(self, index):
+        for i, player in enumerate(self.players):
+            if i != index:
+                player[0].stop()
+                player[1].setStop()
+        self.players[index][0].play()
+
+
