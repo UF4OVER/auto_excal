@@ -422,7 +422,8 @@ class Autoexcal(SiPage):
         self.new_table_widget.setRowCount(0)
         self.new_table_widget.setColumnCount(0)
         self.index_current_data = 0
-        os.remove(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data.json'))
+        if os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data.json')):
+            os.remove(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data.json'))
         # 去实例化线程
         self.main_loop_thread = None
 
