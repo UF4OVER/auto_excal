@@ -4,7 +4,8 @@ import sys
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication
-from ui import MySiliconApp, send_custom_message
+from ui import MySiliconApp
+from parts.send_message import send_custom_message
 
 import config.CONFIG
 
@@ -73,7 +74,6 @@ def main():
 
 
 if __name__ == "__main__":
-
     main()
 
 

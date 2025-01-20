@@ -1,0 +1,205 @@
+import psutil
+from PyQt5.QtCore import QTimer, QPropertyAnimation
+from PyQt5.QtCore import Qt, QRect, QEasingCurve
+from PyQt5.QtGui import QFont, QPainter
+from PyQt5.QtWidgets import QGraphicsOpacityEffect
+from siui.components import SiDenseHContainer, SiLabel, SiSvgLabel
+from siui.components.widgets.expands import SiVExpandWidget
+from siui.core import Si
+from siui.core import SiColor, SiExpAccelerateAnimation, SiGlobal
+from siui.gui import SiFont
+from siui.templates.application.components.layer.layer import SiLayer
+
+
+class ScrollingLabel(SiLabel):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self._offset = 0
+        self._animation = QPropertyAnimation(self, b"offset")
+        self._animation.setDuration(10000)  # 滚动持续时间
+        self._animation.setStartValue(0)
+        # self._animation.setEndValue(-self.fontMetrics().horizontalAdvance(text))
+        self._animation.setEasingCurve(QEasingCurve.Linear)
+        self._animation.finished.connect(self.restartAnimation)
+
+    def setText(self, text):
+        self._text = text
+        self._offset = 0
+        self._animation.setEndValue(-self.fontMetrics().horizontalAdvance(text))
+        self.update()
+
+    def restartAnimation(self):
+        self._offset = 0
+        self._animation.start()
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.drawText(QRect(self._offset, 0, self.width(), self.height()), Qt.AlignLeft | Qt.AlignVCenter, self._text)
+        if self._offset < -self.fontMetrics().horizontalAdvance(self._text):
+            painter.drawText(QRect(self.width() + self._offset, 0, self.width(), self.height()), Qt.AlignLeft | Qt.AlignVCenter, self._text)
+
+    def startScrolling(self):
+        self._animation.start()
+
+    def stopScrolling(self):
+        self._animation.stop()
+
+    def setOffset(self, offset):
+        self._offset = offset
+        self.update()
+
+    offset = property(lambda self: self._offset, setOffset)
+
+
+class DenseVContainerBG(SiDenseHContainer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.background = SiLabel(self)
+        self.background.setFixedStyleSheet("border-radius: 15px")
+        self.background.setColor(SiColor.trans(self.getColor(SiColor.INTERFACE_BG_E), 1))
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self.background.resize(event.size())
+
+
+class TopStateOverlay(SiVExpandWidget):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.container = DenseVContainerBG(self)
+
+        self.title = ScrollingLabel(self)
+        self.title.setFont(SiFont.getFont(size=15, weight=QFont.Weight.Normal))
+        self.title.setTextColor(self.getColor(SiColor.TEXT_B))
+        self.title.setAlignment(Qt.AlignCenter)
+        self.title.setFixedHeight(24)
+        self.title.setFixedWidth(140)
+        self.title.setSiliconWidgetFlag(Si.AdjustSizeOnTextChanged)
+
+        self.subtitle = ScrollingLabel(self)
+        self.subtitle.setFont(SiFont.getFont(size=12, weight=QFont.Weight.DemiBold))
+        self.subtitle.setTextColor(self.getColor(SiColor.TEXT_THEME))
+        self.subtitle.setAlignment(Qt.AlignCenter)
+        self.subtitle.setFixedHeight(15)
+        self.subtitle.setFixedWidth(70)
+        self.subtitle.setSiliconWidgetFlag(Si.AdjustSizeOnTextChanged)
+
+        self.tip = ScrollingLabel(self)
+        self.tip.setFont(SiFont.getFont(size=12, weight=QFont.Weight.Normal))
+        self.tip.setTextColor(self.getColor(SiColor.TEXT_C))
+        self.tip.setAlignment(Qt.AlignCenter)
+        self.tip.setFixedHeight(16)
+        self.tip.setFixedWidth(100)
+        self.tip.setSiliconWidgetFlag(Si.AdjustSizeOnTextChanged)
+
+        self.container.setSpacing(0)
+        self.container.setAlignment(Qt.AlignCenter)
+        self.container.addPlaceholder(16)
+        self.container.addWidget(self.title)
+        self.container.addPlaceholder(4)
+        self.container.addWidget(self.subtitle)
+        self.container.addPlaceholder(10)
+        self.container.addWidget(self.tip)
+
+        self.container.adjustSize()
+
+        self.setAttachment(self.container)
+
+        self.animationGroup().fromToken("expand").setAccelerateFunction(lambda x: (x / 10) ** 5)
+        self.animation_opacity = SiExpAccelerateAnimation(self)
+        self.animation_opacity.setAccelerateFunction(lambda x: (x / 10) ** 3)
+        self.animation_opacity.setFactor(1 / 2)
+        self.animation_opacity.setBias(0.01)
+        self.animation_opacity.setCurrent(1)
+        self.animation_opacity.setTarget(1)
+        self.animation_opacity.ticked.connect(self.on_opacity_changed)
+
+        self.update_battery()
+
+        battery_timer = QTimer()
+        battery_timer.timeout.connect(self.update_battery)
+        battery_timer.start(30_0000)  # 5分钟 = 300000毫秒
+
+    def update_battery(self):
+
+        battery = psutil.sensors_battery()
+
+        self.battery_label = SiSvgLabel(self)  # 电量图标
+        self.container.addWidget(self.battery_label)
+        self.container.addPlaceholder(10)
+
+        battery_level = battery.percent // 10
+        match battery_level:
+            case 10:
+                self.battery_label.load(SiGlobal.siui.iconpack.get("ic_fluent_battery_10_regular"))
+            case 9:
+                self.battery_label.load(SiGlobal.siui.iconpack.get("ic_fluent_battery_9_regular"))
+            case 8:
+                self.battery_label.load(SiGlobal.siui.iconpack.get("ic_fluent_battery_8_regular"))
+            case 7:
+                self.battery_label.load(SiGlobal.siui.iconpack.get("ic_fluent_battery_7_regular"))
+            case 6:
+                self.battery_label.load(SiGlobal.siui.iconpack.get("ic_fluent_battery_6_regular"))
+            case 5:
+                self.battery_label.load(SiGlobal.siui.iconpack.get("ic_fluent_battery_5_regular"))
+            case 4:
+                self.battery_label.load(SiGlobal.siui.iconpack.get("ic_fluent_battery_4_regular"))
+            case 3:
+                self.battery_label.load(SiGlobal.siui.iconpack.get("ic_fluent_battery_3_regular"))
+            case 2:
+                self.battery_label.load(SiGlobal.siui.iconpack.get("ic_fluent_battery_2_regular"))
+            case 1:
+                self.battery_label.load(SiGlobal.siui.iconpack.get("ic_fluent_battery_1_regular"))
+            case 0:
+                self.battery_label.load(SiGlobal.siui.iconpack.get("ic_fluent_battery_0_regular"))
+            case _:
+                self.battery_label.load(SiGlobal.siui.iconpack.get("ic_fluent_battery_warning_filled"))
+
+    def on_opacity_changed(self, opacity):
+        effect = QGraphicsOpacityEffect()
+        effect.setOpacity(opacity)
+        self.setGraphicsEffect(effect)
+
+    def emerge(self):
+        self.expandTo(1)
+        self.setOpacityTo(1)
+        self.animation_opacity.start()
+        # self.fade_out_timer.start()
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+
+    def setContent(self, title, subtitle, tip, emerge=True):
+        self.title.setText(title)
+        self.subtitle.setText(subtitle)
+        self.tip.setText(tip)
+        if emerge:
+            self.emerge()
+
+
+class TopLayerOverLays(SiLayer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self.state_change_overlay = TopStateOverlay(self)
+        self.state_change_overlay.adjustSize()
+
+        self.send()
+
+    def send(self):
+        self.state_change_overlay.setOpacityTo(1)
+        self.state_change_overlay.setContent(
+            "测试标题", "测试", "测试")
+
+    def setContent(self, title, artist, album):
+        self.state_change_overlay.setContent(
+            title, artist, album)
+
+        self.update()
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self.state_change_overlay.move(self.width() // 2 - self.state_change_overlay.width() // 2, 20)

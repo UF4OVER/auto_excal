@@ -12,93 +12,76 @@
 #  @Python  :
 # -------------------------------
 
-from PyQt5.QtCore import *
 from PyQt5.QtCore import Qt
+from PyQt5.QtCore import pyqtSignal, QObject, QTimer
 from PyQt5.QtGui import QFont
-from siui.components import SiSimpleButton, SiDenseVContainer, SiPixLabel, SiLabel, SiDenseHContainer
+
+from mutagen.mp3 import MP3
+from pygame import mixer
+
+from siui.components import SiSimpleButton, SiDenseVContainer, SiPixLabel, SiLabel
 from siui.components import SiWidget
 from siui.core import Si, SiQuickEffect
-from siui.core import SiColor, SiGlobal, GlobalFont
+from siui.core import SiColor, SiGlobal
 from siui.gui import SiFont
-from siui.templates.application.components.message.box import SiSideMessageBox
+
+from parts.send_message import send_music_message
 
 
-def send_music_message(png_path: str, music_name: str, music_artist: str, music_album: str):
-    container = SiDenseHContainer()
-    container.setAdjustWidgetsSize(True)
-    container.setFixedHeight(80)
-    container.setSpacing(0)
+class MP3Player(QObject):
+    finished = pyqtSignal()
 
-    info_label = SiLabel()
-    info_label.setFont(SiFont.tokenized(GlobalFont.S_NORMAL))
-    info_label.setStyleSheet(f"color: {info_label.getColor(SiColor.TEXT_D)}; padding-left: 16px")
-    info_label.setText(f"正在播放歌曲:{music_name}")
-    info_label.adjustSize()
+    def __init__(self, file_path):
+        super().__init__()
+        # 初始化播放器
+        mixer.init()
+        self.file_path = file_path
+        self.audio = MP3(file_path)
+        self.is_paused = False
+        self.total_length = self.audio.info.length  # 获取音频总时长（秒）
 
-    split_line = SiLabel()
-    split_line.resize(300, 1)
-    split_line.setFixedStyleSheet("margin-left: 20px")
-    split_line.setColor(SiColor.trans(split_line.getColor(SiColor.TEXT_D), 0.3))
+    def play(self):
+        """播放音频"""
+        mixer.music.load(self.file_path)
+        mixer.music.play()
+        print(f"正在播放: {self.file_path}, 总时长: {self.total_length:.2f} 秒")
+        # 使用 singleShot 在总时长后发射 finished 信号
+        QTimer.singleShot(int(self.total_length * 1000), self.on_finished)
 
-    avatar = SiPixLabel(container)
-    avatar.resize(80, 120)
-    avatar.setBorderRadius(20)
-    avatar.load(f"{png_path}")
+    def pause(self):
+        """暂停或继续播放"""
+        if not self.is_paused:
+            mixer.music.pause()
+            self.is_paused = True
+            print("已暂停播放")
+        else:
+            mixer.music.unpause()
+            self.is_paused = False
+            print("继续播放")
 
-    container_v = SiDenseVContainer(container)
-    container_v.setFixedWidth(200)
-    container_v.setSpacing(0)
+    def stop(self):
+        """停止播放"""
+        mixer.music.stop()
+        print("播放已停止")
 
-    name_label = SiLabel()
-    name_label.setFont(SiFont.tokenized(GlobalFont.M_BOLD))
-    name_label.setStyleSheet(f"color: white; padding-left:8px")
-    name_label.setText(f"{music_name}")
-    name_label.adjustSize()
+    def seek(self, seconds):
+        """跳转到指定时间"""
+        if 0 <= seconds <= self.total_length:
+            mixer.music.play(start=seconds)
+            print(f"跳转到: {seconds:.2f} 秒")
+        else:
+            print("时间超出范围")
 
-    button_1 = SiLabel()
-    button_1.setFixedHeight(26)
-    button_1.setText(f"作者:{music_artist}")
-    button_1.setFont(SiFont.tokenized(GlobalFont.L_LIGHT))
-    button_1.setStyleSheet(f"color: white; padding-left:8px")
-    button_1.adjustSize()
-    button_1.reloadStyleSheet()
+    def get_position(self):
+        """获取当前播放位置"""
+        current_pos = mixer.music.get_pos() / 1000.0  # 返回的值是毫秒
+        print(f"当前播放位置: {current_pos:.2f} 秒")
+        return current_pos
 
-    button_2 = SiLabel()
-    button_2.setFixedHeight(22)
-    button_2.setText(f"专辑:{music_album}")
-    button_2.setFont(SiFont.tokenized(GlobalFont.S_NORMAL))
-    button_2.setStyleSheet(f"color: white; padding-left:8px")
-    button_2.adjustSize()
-    button_2.reloadStyleSheet()
-
-    container_v.addWidget(name_label)
-    container_v.addPlaceholder(8)
-    container_v.addWidget(button_1)
-    container_v.addWidget(button_2)
-    container_v.adjustSize()
-
-    container.addPlaceholder(24)
-    container.addWidget(avatar)
-    container.addPlaceholder(8)
-    container.addWidget(container_v)
-    container.adjustSize()
-
-    new_message_box = SiSideMessageBox()
-    new_message_box.setMessageType(3)
-    # new_message_box.setFoldAfter(1000)
-    new_message_box.content().container().setSpacing(0)
-    new_message_box.content().container().addPlaceholder(16)
-    new_message_box.content().container().addWidget(info_label)
-    new_message_box.content().container().addPlaceholder(8)
-    new_message_box.content().container().addWidget(split_line)
-    new_message_box.content().container().addPlaceholder(24)
-    new_message_box.content().container().addWidget(container)
-    new_message_box.content().container().addPlaceholder(32)
-    new_message_box.adjustSize()
-
-    # new_message_box.setFoldAfter(fold_after)
-
-    SiGlobal.siui.windows["MAIN_WINDOW"].LayerRightMessageSidebar().sendMessageBox(new_message_box)
+    def on_finished(self):
+        """音乐播放结束时的回调函数"""
+        self.finished.emit()
+        print("音乐播放结束")
 
 
 class InfoPanel(SiWidget):
@@ -287,15 +270,11 @@ class SiMusicDisplayer(SiWidget):
         self.info_panel.animationGroup().fromToken("resize").setBias(1)
         self.info_panel.loadAchievement("OVER 10K PLAYS")
 
-    def setStart(self):
-        self.quick_play_panel.play_button.attachment().load(SiGlobal.siui.iconpack.get("ic_fluent_pause_filled"))
-        self.quick_play_panel.is_playing = False
+        # 加载音乐
 
-    def setStop(self):
-        self.quick_play_panel.play_button.attachment().load(SiGlobal.siui.iconpack.get("ic_fluent_play_filled"))
-        self.quick_play_panel.is_playing = True
+    def loadMusic(self, mp3_path: str, cover_path: str, title: str, artist: str, album: str):
 
-    def loadInfo(self, cover_path, title, artist, album):
+        self.music_player = MP3Player(mp3_path)
         self.png_path = cover_path
         self.title = title
         self.artist = artist
@@ -304,6 +283,27 @@ class SiMusicDisplayer(SiWidget):
         self.info_panel.loadInfo(cover_path, title, artist, album)
         self.cover_label.load(cover_path)
         self.cover_lower_fix_label.load(cover_path)
+
+    def loadAchievement(self, number: int):
+        """
+        加载人数
+        :parm number:人数
+        """
+        _ten = number // 1000
+        _one = number % 1000
+
+        if _ten == 0:
+            self.info_panel.loadAchievement(f"OVER {_one} PLAYS")
+        else:
+            self.info_panel.loadAchievement(f"OVER {_ten}K PLAYS")
+
+    def setStart(self):
+        self.quick_play_panel.play_button.attachment().load(SiGlobal.siui.iconpack.get("ic_fluent_pause_filled"))
+        self.quick_play_panel.is_playing = False
+
+    def setStop(self):
+        self.quick_play_panel.play_button.attachment().load(SiGlobal.siui.iconpack.get("ic_fluent_play_filled"))
+        self.quick_play_panel.is_playing = True
 
     def enterEvent(self, a0):
         super().enterEvent(a0)
@@ -320,8 +320,16 @@ class SiMusicDisplayer(SiWidget):
         self.info_panel.move(128 - 12, 0)
 
     def on_quick_play_panel_triggered(self):
+        # self.music_player.stop() 停止播放
+        # self.music_player.play() 播放
+        # self.music_player.paush() 暂停
         if self.quick_play_panel.is_playing:
+            self.music_player.stop()
+            self.setStop()
             self.stopped.emit()
         else:
+            self.music_player.play()
+            self.setStart()
             self.played.emit()
+            SiGlobal.siui.windows["MAIN_WINDOW"].TopLayerOverLayer().setContent(self.title, self.artist, self.album)
             send_music_message(self.png_path, self.title, self.artist, self.album)

@@ -1,11 +1,6 @@
-import sys
 from cx_Freeze import setup, Executable
 
 pic_path = "E:\\python\\auto_excal_new\\siui\\pic"
-music_path = "E:\\python\\auto_excal_new\\siui\\music"
-# 定义构建选项
-# 添加依赖包
-
 build_exe_options = {
     "packages": [
         "PyQt5.QtCore",

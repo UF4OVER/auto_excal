@@ -3,5 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="PyQt5" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="PyQt5" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.10 (siui)" project-jdk-type="Python SDK" />
 </project>
