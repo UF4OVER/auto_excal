@@ -51,7 +51,7 @@ base = "Win32GUI"
 
 setup(
     name='Wedding Invitation',
-    version='1.1.2',
+    version='1.1.3.1',
     url='https://github.com/UF4OVER',
     license='MIT',
     author='UF4',

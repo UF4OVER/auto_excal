@@ -37,6 +37,11 @@ try:
     mp6_title, mp6_artist, mp6_album, mp6_path = load_music_info(6)
 
     mp1_path = str(os.path.join(os.path.dirname(os.path.dirname(__file__)), mp1_path))
+    mp2_path = str(os.path.join(os.path.dirname(os.path.dirname(__file__)), mp2_path))
+    mp3_path = str(os.path.join(os.path.dirname(os.path.dirname(__file__)), mp3_path))
+    mp4_path = str(os.path.join(os.path.dirname(os.path.dirname(__file__)), mp4_path))
+    mp5_path = str(os.path.join(os.path.dirname(os.path.dirname(__file__)), mp5_path))
+    mp6_path = str(os.path.join(os.path.dirname(os.path.dirname(__file__)), mp6_path))
 except FileNotFoundError as F:
     print(f"找不到配置文件:{F}")
 

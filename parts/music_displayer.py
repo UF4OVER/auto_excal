@@ -25,8 +25,6 @@ from siui.core import Si, SiQuickEffect
 from siui.core import SiColor, SiGlobal
 from siui.gui import SiFont
 
-from parts.send_message import send_music_message
-
 
 class MP3Player(QObject):
     finished = pyqtSignal()
@@ -291,6 +289,11 @@ class SiMusicDisplayer(SiWidget):
         self.cover_label.load(cover_path)
         self.cover_lower_fix_label.load(cover_path)
         self.button_pause.clicked.connect(self.music_player.pause)
+        self.music_player.finished.connect(self.setStop)
+        self.music_player.finished.connect(
+            lambda: SiGlobal.siui.windows["MAIN_WINDOW"].TopLayerOverLayer().setContent("Wedding Invitation",
+                                                                                        "",
+                                                                                        "UF4OVER"))
 
     def loadAchievement(self, number: int):
         """
@@ -338,7 +341,6 @@ class SiMusicDisplayer(SiWidget):
         else:
             self.setStart()
             self.played.emit()
-
             SiGlobal.siui.windows["MAIN_WINDOW"].TopLayerOverLayer().setContent(f"正在播放：{self.title}", self.artist,
                                                                                 self.album)
             # send_music_message(self.png_path, self.title, self.artist, self.album)
