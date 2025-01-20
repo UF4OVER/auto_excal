@@ -10,35 +10,38 @@ from siui.components.widgets import (
     SiLineEdit)
 from siui.core import Si, SiGlobal
 
-from parts.music_displayer import SiMusicDisplayer
+from parts.music_displayer import SiMusicDisplayer, MusicManager
+try:
+    music_info_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "music\\info\\music.ini")
+    music_png_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "music\\png")
 
-music_info_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "music\\info\\music.ini")
-music_png_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "music\\png")
+    print(f"music_info_path:{music_info_path}")
+    print(f"music_png_path:{music_png_path}")
 
-print(f"music_info_path:{music_info_path}")
-print(f"music_png_path:{music_png_path}")
-
-config = configparser.ConfigParser()
-# 使用 open 函数指定编码为 utf-8
-with open(music_info_path, 'r', encoding='utf-8') as fp:
-    config.read_file(fp)
-
-
-def load_music_info(index: int = 1) -> tuple:
-    music_info = config[f"00{index}"]
-    return music_info["title"], music_info["artist"], music_info["album"], music_info["path"]
+    config = configparser.ConfigParser()
+    # 使用 open 函数指定编码为 utf-8
+    with open(music_info_path, 'r', encoding='utf-8') as fp:
+        config.read_file(fp)
 
 
-mp1_title, mp1_artist, mp1_album, mp1_path = load_music_info(1)
-mp2_title, mp2_artist, mp2_album, mp2_path = load_music_info(2)
-mp3_title, mp3_artist, mp3_album, mp3_path = load_music_info(3)
-mp4_title, mp4_artist, mp4_album, mp4_path = load_music_info(4)
-mp5_title, mp5_artist, mp5_album, mp5_path = load_music_info(5)
-mp6_title, mp6_artist, mp6_album, mp6_path = load_music_info(6)
+    def load_music_info(index: int = 1) -> tuple:
+        music_info = config[f"00{index}"]
+        return music_info["title"], music_info["artist"], music_info["album"], music_info["path"]
 
-mp1_path = str(os.path.join(os.path.dirname(os.path.dirname(__file__)), mp1_path))
 
-print("mp1_" + mp1_path)
+    mp1_title, mp1_artist, mp1_album, mp1_path = load_music_info(1)
+    mp2_title, mp2_artist, mp2_album, mp2_path = load_music_info(2)
+    mp3_title, mp3_artist, mp3_album, mp3_path = load_music_info(3)
+    mp4_title, mp4_artist, mp4_album, mp4_path = load_music_info(4)
+    mp5_title, mp5_artist, mp5_album, mp5_path = load_music_info(5)
+    mp6_title, mp6_artist, mp6_album, mp6_path = load_music_info(6)
+
+    mp1_path = str(os.path.join(os.path.dirname(os.path.dirname(__file__)), mp1_path))
+except FileNotFoundError as F:
+    print(f"找不到配置文件:{F}")
+
+except Exception as E:
+    print(f"错误{E}")
 
 
 def read_config():  # 读取配置文件
@@ -98,7 +101,7 @@ class PageMusicPage(SiPage):
         self.setAttachment(self.titled_widgets_group)
 
     def setupUi(self):
-        self.players: list = []
+        self.players = MusicManager()
         with self.titled_widgets_group as group:
             self.displayer_container = SiMasonryContainer(self)
             self.displayer_container.setColumns(2)
@@ -142,6 +145,14 @@ class PageMusicPage(SiPage):
             self.displayer_container.addWidget(self.displayer_4)
             self.displayer_container.addWidget(self.displayer_5)
             self.displayer_container.addWidget(self.displayer_6)
+
+            self.players.add_music_displayer(self.displayer_1)
+            self.players.add_music_displayer(self.displayer_2)
+            self.players.add_music_displayer(self.displayer_3)
+            self.players.add_music_displayer(self.displayer_4)
+            self.players.add_music_displayer(self.displayer_5)
+            self.players.add_music_displayer(self.displayer_6)
+            # self.players.auto_adjust_music_playback()
 
             group.addWidget(self.displayer_container)
             group.adjustSize()

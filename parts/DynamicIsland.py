@@ -1,7 +1,7 @@
 import psutil
-from PyQt5.QtCore import QTimer, QPropertyAnimation
-from PyQt5.QtCore import Qt, QRect, QEasingCurve
-from PyQt5.QtGui import QFont, QPainter
+from PyQt5.QtCore import QTimer, QRect, Qt, pyqtProperty
+from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QPainter, QFontMetrics
 from PyQt5.QtWidgets import QGraphicsOpacityEffect
 from siui.components import SiDenseHContainer, SiLabel, SiSvgLabel
 from siui.components.widgets.expands import SiVExpandWidget
@@ -16,40 +16,54 @@ class ScrollingLabel(SiLabel):
         super().__init__(*args, **kwargs)
         self.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         self._offset = 0
-        self._animation = QPropertyAnimation(self, b"offset")
-        self._animation.setDuration(10000)  # 滚动持续时间
-        self._animation.setStartValue(0)
-        # self._animation.setEndValue(-self.fontMetrics().horizontalAdvance(text))
-        self._animation.setEasingCurve(QEasingCurve.Linear)
-        self._animation.finished.connect(self.restartAnimation)
+        self._timer = QTimer(self)
+        self._timer.setInterval(300)  # 设置定时器间隔
+        self._timer.timeout.connect(self.updateTextPosition)
+        self.setColor(self.getColor(SiColor.TEXT_B))
+        self._is_scrolling = False
 
     def setText(self, text):
+        super().setText(text)  # 调用父类的 setText 方法
         self._text = text
         self._offset = 0
-        self._animation.setEndValue(-self.fontMetrics().horizontalAdvance(text))
-        self.update()
+        text_width = QFontMetrics(self.font()).horizontalAdvance(text)
+        if text_width > self.width():
+            self._is_scrolling = True
+            self._timer.start()
+        else:
+            self._is_scrolling = False
+            self.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+            self._timer.stop()
+            self.update()
 
-    def restartAnimation(self):
-        self._offset = 0
-        self._animation.start()
+    def updateTextPosition(self):
+        current_text = self.text()
+        scroll_text = current_text[1:] + current_text[0]
+        self.setText(scroll_text)
 
     def paintEvent(self, event):
         painter = QPainter(self)
-        painter.drawText(QRect(self._offset, 0, self.width(), self.height()), Qt.AlignLeft | Qt.AlignVCenter, self._text)
-        if self._offset < -self.fontMetrics().horizontalAdvance(self._text):
-            painter.drawText(QRect(self.width() + self._offset, 0, self.width(), self.height()), Qt.AlignLeft | Qt.AlignVCenter, self._text)
+        text_width = QFontMetrics(self.font()).horizontalAdvance(self._text)
+        if self._is_scrolling:
+            painter.drawText(QRect(self._offset, 0, self.width(), self.height()), Qt.AlignLeft | Qt.AlignVCenter,
+                             self._text)
+            painter.drawText(QRect(self._offset + text_width, 0, self.width(), self.height()),
+                             Qt.AlignLeft | Qt.AlignVCenter, self._text)
+        else:
+            painter.drawText(QRect(0, 0, self.width(), self.height()), Qt.AlignCenter | Qt.AlignVCenter, self._text)
 
     def startScrolling(self):
-        self._animation.start()
+        if self._is_scrolling:
+            self._timer.start()
 
     def stopScrolling(self):
-        self._animation.stop()
+        self._timer.stop()
 
     def setOffset(self, offset):
         self._offset = offset
         self.update()
 
-    offset = property(lambda self: self._offset, setOffset)
+    offset = pyqtProperty(int, lambda self: self._offset, setOffset)
 
 
 class DenseVContainerBG(SiDenseHContainer):
@@ -76,8 +90,14 @@ class TopStateOverlay(SiVExpandWidget):
         self.title.setTextColor(self.getColor(SiColor.TEXT_B))
         self.title.setAlignment(Qt.AlignCenter)
         self.title.setFixedHeight(24)
-        self.title.setFixedWidth(140)
+        self.title.setFixedWidth(170)
         self.title.setSiliconWidgetFlag(Si.AdjustSizeOnTextChanged)
+        self.title.startScrolling()
+
+        self.led = SiLabel(self)
+        self.led.setFixedSize(4, 4)
+        self.led.setFixedStyleSheet("border-radius: 2px")
+        self.led.setColor(self.getColor(SiColor.BUTTON_LONG_PRESS_PROGRESS))
 
         self.subtitle = ScrollingLabel(self)
         self.subtitle.setFont(SiFont.getFont(size=12, weight=QFont.Weight.DemiBold))
@@ -86,18 +106,22 @@ class TopStateOverlay(SiVExpandWidget):
         self.subtitle.setFixedHeight(15)
         self.subtitle.setFixedWidth(70)
         self.subtitle.setSiliconWidgetFlag(Si.AdjustSizeOnTextChanged)
+        self.subtitle.startScrolling()
 
         self.tip = ScrollingLabel(self)
         self.tip.setFont(SiFont.getFont(size=12, weight=QFont.Weight.Normal))
         self.tip.setTextColor(self.getColor(SiColor.TEXT_C))
         self.tip.setAlignment(Qt.AlignCenter)
         self.tip.setFixedHeight(16)
-        self.tip.setFixedWidth(100)
+        self.tip.setFixedWidth(70)
         self.tip.setSiliconWidgetFlag(Si.AdjustSizeOnTextChanged)
+        self.tip.startScrolling()
 
         self.container.setSpacing(0)
         self.container.setAlignment(Qt.AlignCenter)
-        self.container.addPlaceholder(16)
+        self.container.addPlaceholder(8)
+        self.container.addWidget(self.led)
+        self.container.addPlaceholder(8)
         self.container.addWidget(self.title)
         self.container.addPlaceholder(4)
         self.container.addWidget(self.subtitle)
@@ -122,6 +146,10 @@ class TopStateOverlay(SiVExpandWidget):
         battery_timer = QTimer()
         battery_timer.timeout.connect(self.update_battery)
         battery_timer.start(30_0000)  # 5分钟 = 300000毫秒
+
+    def setLedColor(self, color):
+        self.led.setColor(color)
+        self.led.update()
 
     def update_battery(self):
 
@@ -191,8 +219,8 @@ class TopLayerOverLays(SiLayer):
 
     def send(self):
         self.state_change_overlay.setOpacityTo(1)
-        self.state_change_overlay.setContent(
-            "测试标题", "测试", "测试")
+        self.state_change_overlay.setContent("Wedding Invitation", "",
+                                                                            "UF4OVER")
 
     def setContent(self, title, artist, album):
         self.state_change_overlay.setContent(

@@ -223,6 +223,8 @@ class SiMusicDisplayer(SiWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        self.music_player = MP3Player
+
         self.cover_label = SiPixLabel(self)
         self.cover_label.setFixedSize(128, 128)
         self.cover_label.setBorderRadius(12)
@@ -248,14 +250,19 @@ class SiMusicDisplayer(SiWidget):
         self.folded_container.setSpacing(4)
 
         self.button_like = SiSimpleButton(self)
-        self.button_like.resize(32, 50)
+        self.button_like.resize(32, 32)
         self.button_like.attachment().load(SiGlobal.siui.iconpack.get("ic_fluent_heart_regular"))
         self.folded_container.addWidget(self.button_like)
 
         self.button_download = SiSimpleButton(self)
-        self.button_download.resize(32, 50)
+        self.button_download.resize(32, 32)
         self.button_download.attachment().load(SiGlobal.siui.iconpack.get("ic_fluent_arrow_download_regular"))
         self.folded_container.addWidget(self.button_download)
+
+        self.button_pause = SiSimpleButton(self)
+        self.button_pause.resize(32, 32)
+        self.button_pause.attachment().load(SiGlobal.siui.iconpack.get("ic_fluent_pause_circle_regular"))
+        self.folded_container.addWidget(self.button_pause)
 
         # 快捷播放面板
         self.quick_play_panel = QuickPlayPanel(self)
@@ -283,6 +290,7 @@ class SiMusicDisplayer(SiWidget):
         self.info_panel.loadInfo(cover_path, title, artist, album)
         self.cover_label.load(cover_path)
         self.cover_lower_fix_label.load(cover_path)
+        self.button_pause.clicked.connect(self.music_player.pause)
 
     def loadAchievement(self, number: int):
         """
@@ -300,10 +308,12 @@ class SiMusicDisplayer(SiWidget):
     def setStart(self):
         self.quick_play_panel.play_button.attachment().load(SiGlobal.siui.iconpack.get("ic_fluent_pause_filled"))
         self.quick_play_panel.is_playing = False
+        self.music_player.play()
 
     def setStop(self):
         self.quick_play_panel.play_button.attachment().load(SiGlobal.siui.iconpack.get("ic_fluent_play_filled"))
         self.quick_play_panel.is_playing = True
+        self.music_player.stop()
 
     def enterEvent(self, a0):
         super().enterEvent(a0)
@@ -320,16 +330,40 @@ class SiMusicDisplayer(SiWidget):
         self.info_panel.move(128 - 12, 0)
 
     def on_quick_play_panel_triggered(self):
-        # self.music_player.stop() 停止播放
-        # self.music_player.play() 播放
-        # self.music_player.paush() 暂停
         if self.quick_play_panel.is_playing:
-            self.music_player.stop()
             self.setStop()
             self.stopped.emit()
+            SiGlobal.siui.windows["MAIN_WINDOW"].TopLayerOverLayer().setContent("Wedding Invitation", "",
+                                                                                "UF4OVER")
         else:
-            self.music_player.play()
             self.setStart()
             self.played.emit()
-            SiGlobal.siui.windows["MAIN_WINDOW"].TopLayerOverLayer().setContent(self.title, self.artist, self.album)
-            send_music_message(self.png_path, self.title, self.artist, self.album)
+
+            SiGlobal.siui.windows["MAIN_WINDOW"].TopLayerOverLayer().setContent(f"正在播放：{self.title}", self.artist,
+                                                                                self.album)
+            # send_music_message(self.png_path, self.title, self.artist, self.album)
+
+    def is_playing(self):
+        return not self.quick_play_panel.is_playing
+
+
+class MusicManager:
+    def __init__(self):
+        self.music_displayer = []  # 存放SiMusicDisplayer的容器
+
+    def add_music_displayer(self, music_displayer: SiMusicDisplayer):
+        self.music_displayer.append(music_displayer)
+        music_displayer.played.connect(lambda: self.on_music_played(music_displayer))
+
+    def on_music_played(self, playing_music_displayer: SiMusicDisplayer):
+        for music_displayer in self.music_displayer:
+            if music_displayer != playing_music_displayer and music_displayer.is_playing():  # 其他的播放的才停止
+                music_displayer.setStop()
+            if music_displayer == playing_music_displayer:  # 当前点击的的播放
+                music_displayer.setStart()
+
+    # def auto_adjust_music_playback(self):
+    #     for music_displayer in self.music_displayer:
+    #         if music_displayer.is_playing():
+    #             music_displayer.setStop()
+    #     print("PPPPPPPPPPPPPPPPPPPPPPPPPPP")
