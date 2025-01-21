@@ -13,7 +13,6 @@ build_exe_options = {
         "openpyxl",
         "ui",
         "DrissionPage",
-        "pygame.mixer",
         "mutagen.mp3",
         "music",
         "pycaw",

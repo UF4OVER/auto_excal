@@ -1,42 +1,33 @@
-# -*- coding: utf-8 -*-
-# @Time : 2023/9/3 21:41
-# @Author : Leuanghing Chen
-# @Blog : https://blog.csdn.net/weixin_46153372?spm=1010.2135.3001.5421
-# @File : 基于pyqt5的Qlabel字幕滚动.py
-# @Software : PyCharm
+from mutagen.mp3 import MP3
+from mutagen.id3 import ID3, APIC
+import os
 
-from PyQt5.QtCore import QTimer
-from PyQt5 import QtCore
-from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QVBoxLayout
+def get_mp3_info(mp3_path):
+    audio = MP3(mp3_path, ID3=ID3)
 
-class MainWindow(QWidget):
-    def __init__(self):
-        super().__init__()
+    # 获取标签信息，并检查是否为空
+    title = audio.tags.get('TIT2', [None])[0] or 'Unknown Title'
+    artist = audio.tags.get('TPE1', [None])[0] or 'Unknown Artist'
+    album = audio.tags.get('TALB', [None])[0] or 'Unknown Album'
 
-        self.setWindowTitle("滚动字幕示例")
-        self.resize(300, 100)
+    # 打印信息
+    print('TIT2:', title, 'TPE1:', artist, 'TALB:', album)
 
-        layout = QVBoxLayout()
+    # 获取封面图片
+    cover_path = None
+    if 'APIC:' in audio.tags:
+        apic_frame = audio.tags['APIC:']
+        cover_path = os.path.join(os.path.dirname(mp3_path), f"{title}cover.{apic_frame.mime.split('/')[-1]}")
+        with open(cover_path, 'wb') as img:
+            img.write(apic_frame.data)
 
-        self.label = QLabel("时间不会辜负奋斗者的每一滴汗水，所有的努力都是在为更好的未来添砖加瓦。")
-        self.label.setAlignment(QtCore.Qt.AlignCenter)
+    # 返回三个值和封面路径
+    return title, artist, album, cover_path
 
-        layout.addWidget(self.label)
-        self.setLayout(layout)
-
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.scroll_text)
-        self.timer.start(100)  # 设置滚动速度，单位为毫秒
-
-    def scroll_text(self):
-        current_text = self.label.text()
-        scroll_text = current_text[1:] + current_text[0]
-        self.label.setText(scroll_text)
-
-
-if __name__ == "__main__":
-    app = QApplication([])
-    window = MainWindow()
-    window.show()
-    app.exec_()
-
+# 示例调用
+mp3_file_path = r"E:\python\auto_excal_new\siui\music\mp3\001.mp3"
+title, artist, album, cover_path = get_mp3_info(mp3_file_path)
+print("Title:", title)
+print("Artist:", artist)
+print("Album:", album)
+print("Cover Path:", cover_path)

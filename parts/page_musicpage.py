@@ -24,24 +24,18 @@ try:
         config.read_file(fp)
 
 
-    def load_music_info(index: int = 1) -> tuple:
+    def load_music_info(index: int = 1) -> str:
         music_info = config[f"00{index}"]
-        return music_info["title"], music_info["artist"], music_info["album"], music_info["path"]
+        return music_info["path"]
 
 
-    mp1_title, mp1_artist, mp1_album, mp1_path = load_music_info(1)
-    mp2_title, mp2_artist, mp2_album, mp2_path = load_music_info(2)
-    mp3_title, mp3_artist, mp3_album, mp3_path = load_music_info(3)
-    mp4_title, mp4_artist, mp4_album, mp4_path = load_music_info(4)
-    mp5_title, mp5_artist, mp5_album, mp5_path = load_music_info(5)
-    mp6_title, mp6_artist, mp6_album, mp6_path = load_music_info(6)
+    mp1_path = str(os.path.join(os.path.dirname(os.path.dirname(__file__)), load_music_info(1)))
+    mp2_path = str(os.path.join(os.path.dirname(os.path.dirname(__file__)), load_music_info(2)))
+    mp3_path = str(os.path.join(os.path.dirname(os.path.dirname(__file__)), load_music_info(3)))
+    mp4_path = str(os.path.join(os.path.dirname(os.path.dirname(__file__)), load_music_info(4)))
+    mp5_path = str(os.path.join(os.path.dirname(os.path.dirname(__file__)), load_music_info(5)))
+    mp6_path = str(os.path.join(os.path.dirname(os.path.dirname(__file__)), load_music_info(6)))
 
-    mp1_path = str(os.path.join(os.path.dirname(os.path.dirname(__file__)), mp1_path))
-    mp2_path = str(os.path.join(os.path.dirname(os.path.dirname(__file__)), mp2_path))
-    mp3_path = str(os.path.join(os.path.dirname(os.path.dirname(__file__)), mp3_path))
-    mp4_path = str(os.path.join(os.path.dirname(os.path.dirname(__file__)), mp4_path))
-    mp5_path = str(os.path.join(os.path.dirname(os.path.dirname(__file__)), mp5_path))
-    mp6_path = str(os.path.join(os.path.dirname(os.path.dirname(__file__)), mp6_path))
 except FileNotFoundError as F:
     print(f"找不到配置文件:{F}")
 
@@ -116,33 +110,27 @@ class PageMusicPage(SiPage):
 
             self.displayer_1 = SiMusicDisplayer(self)
             self.displayer_1.resize(512, 128)
-            self.displayer_1.loadMusic(mp1_path, f"{music_png_path}/I Really Want to Stay at Your House.png",
-                                       mp1_title, mp1_artist, mp1_album)  # noqa: E501
+            self.displayer_1.loadMusic(mp1_path)  # noqa: E501
 
             self.displayer_2 = SiMusicDisplayer(self)
             self.displayer_2.resize(512, 128)
-            self.displayer_2.loadMusic(mp2_path, f"{music_png_path}/002.jpg", mp2_title,
-                                       mp2_artist, mp2_album)  # noqa: E501
+            self.displayer_2.loadMusic(mp2_path)  # noqa: E501
 
             self.displayer_3 = SiMusicDisplayer(self)
             self.displayer_3.resize(512, 128)
-            self.displayer_3.loadMusic(mp3_path, f"{music_png_path}/003.jpg", mp3_title,
-                                       mp3_artist, mp3_album)  # noqa: E501
+            self.displayer_3.loadMusic(mp3_path)  # noqa: E501
 
             self.displayer_4 = SiMusicDisplayer(self)
             self.displayer_4.resize(512, 128)
-            self.displayer_4.loadMusic(mp4_path, f"{music_png_path}/004.jpg", mp4_title,
-                                       mp4_artist, mp4_album)  # noqa: E501
+            self.displayer_4.loadMusic(mp4_path)  # noqa: E501
 
             self.displayer_5 = SiMusicDisplayer(self)
             self.displayer_5.resize(512, 128)
-            self.displayer_5.loadMusic(mp5_path, f"{music_png_path}/005.jpg", mp5_title,
-                                       mp5_artist, mp5_album)  # noqa: E501
+            self.displayer_5.loadMusic(mp5_path)  # noqa: E501
 
             self.displayer_6 = SiMusicDisplayer(self)
             self.displayer_6.resize(512, 128)
-            self.displayer_6.loadMusic(mp6_path, f"{music_png_path}/006.jpg", mp6_title,
-                                       mp6_artist, mp6_album)  # noqa: E501
+            self.displayer_6.loadMusic(mp6_path)  # noqa: E501
 
             self.displayer_container.addWidget(self.displayer_1)
             self.displayer_container.addWidget(self.displayer_2)

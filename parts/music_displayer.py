@@ -11,19 +11,44 @@
 #  @Contact :
 #  @Python  :
 # -------------------------------
+import shutil
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtCore import pyqtSignal, QObject, QTimer
+from PyQt5.QtCore import Qt, QObject, pyqtSignal, QUrl
 from PyQt5.QtGui import QFont
-
-from mutagen.mp3 import MP3
-from pygame import mixer
+from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 
 from siui.components import SiSimpleButton, SiDenseVContainer, SiPixLabel, SiLabel
 from siui.components import SiWidget
 from siui.core import Si, SiQuickEffect
 from siui.core import SiColor, SiGlobal
 from siui.gui import SiFont
+import os
+from mutagen.mp3 import MP3
+from mutagen.id3 import ID3
+
+
+def get_mp3_info(mp3_path):
+    audio = MP3(mp3_path, ID3=ID3)
+
+    # 获取标签信息，并检查是否为空
+    title = audio.tags.get('TIT2', [None])[0] or 'Unknown Title'
+    artist = audio.tags.get('TPE1', [None])[0] or 'Unknown Artist'
+    album = audio.tags.get('TALB', [None])[0] or 'Unknown Album'
+
+    # 打印信息
+    print('TIT2:', title, 'TPE1:', artist, 'TALB:', album)
+
+    # 获取封面图片
+    cover_path = None
+    if 'APIC:' in audio.tags:
+        apic_frame = audio.tags['APIC:']
+        cover_path = os.path.join(os.path.dirname(mp3_path), f"{title}cover.{apic_frame.mime.split('/')[-1]}")
+        with open(cover_path, 'wb') as img:
+            img.write(apic_frame.data)
+
+    # 返回三个值和封面路径
+    return title, artist, album, cover_path
 
 
 class MP3Player(QObject):
@@ -31,55 +56,56 @@ class MP3Player(QObject):
 
     def __init__(self, file_path):
         super().__init__()
-        # 初始化播放器
-        mixer.init()
+        self.player = QMediaPlayer()
         self.file_path = file_path
-        self.audio = MP3(file_path)
+        self.player.setMedia(QMediaContent(QUrl.fromLocalFile(file_path)))
         self.is_paused = False
-        self.total_length = self.audio.info.length  # 获取音频总时长（秒）
+        audio = MP3(file_path, ID3=ID3)
+        self.total_length = audio.info.length  # 获取音频总时长（秒）
+
+        # 连接播放结束信号
+        self.player.stateChanged.connect(self.on_state_changed)
 
     def play(self):
         """播放音频"""
-        mixer.music.load(self.file_path)
-        mixer.music.play()
+        self.player.play()
         print(f"正在播放: {self.file_path}, 总时长: {self.total_length:.2f} 秒")
-        # 使用 singleShot 在总时长后发射 finished 信号
-        QTimer.singleShot(int(self.total_length * 1000), self.on_finished)
 
     def pause(self):
         """暂停或继续播放"""
         if not self.is_paused:
-            mixer.music.pause()
+            self.player.pause()
             self.is_paused = True
             print("已暂停播放")
         else:
-            mixer.music.unpause()
+            self.player.play()
             self.is_paused = False
             print("继续播放")
 
     def stop(self):
         """停止播放"""
-        mixer.music.stop()
+        self.player.stop()
         print("播放已停止")
 
     def seek(self, seconds):
         """跳转到指定时间"""
         if 0 <= seconds <= self.total_length:
-            mixer.music.play(start=seconds)
+            self.player.setPosition(int(seconds * 1000))
             print(f"跳转到: {seconds:.2f} 秒")
         else:
             print("时间超出范围")
 
     def get_position(self):
         """获取当前播放位置"""
-        current_pos = mixer.music.get_pos() / 1000.0  # 返回的值是毫秒
+        current_pos = self.player.position() / 1000.0  # 返回的值是毫秒
         print(f"当前播放位置: {current_pos:.2f} 秒")
         return current_pos
 
-    def on_finished(self):
+    def on_state_changed(self, state):
         """音乐播放结束时的回调函数"""
-        self.finished.emit()
-        print("音乐播放结束")
+        if state == QMediaPlayer.StoppedState and not self.is_paused:
+            self.finished.emit()
+            print("音乐播放结束")
 
 
 class InfoPanel(SiWidget):
@@ -241,6 +267,7 @@ class SiMusicDisplayer(SiWidget):
         self.state_label.resize(64, 128)
         self.state_label.setFixedStyleSheet("border-radius: 12px")
         self.state_label.setColor(self.getColor(SiColor.INTERFACE_BG_C))
+        print(self.getColor(SiColor.INTERFACE_BG_C))
 
         self.folded_container = SiDenseVContainer(self.state_label)
         self.folded_container.setAlignment(Qt.AlignHCenter)
@@ -256,6 +283,7 @@ class SiMusicDisplayer(SiWidget):
         self.button_download.resize(32, 32)
         self.button_download.attachment().load(SiGlobal.siui.iconpack.get("ic_fluent_arrow_download_regular"))
         self.folded_container.addWidget(self.button_download)
+        self.button_download.clicked.connect(self.DownloadMusic)
 
         self.button_pause = SiSimpleButton(self)
         self.button_pause.resize(32, 32)
@@ -275,19 +303,28 @@ class SiMusicDisplayer(SiWidget):
         self.info_panel.animationGroup().fromToken("resize").setBias(1)
         self.info_panel.loadAchievement("OVER 10K PLAYS")
 
-        # 加载音乐
+    def DownloadMusic(self):
+        if not os.path.exists(self.png_path):
+            return
+        else:
+            folder_path = QFileDialog.getExistingDirectory(self, "选择保存位置")
+            if folder_path == "":
+                return
+            else:
+                shutil.copy(self.mp3_path, folder_path)
 
-    def loadMusic(self, mp3_path: str, cover_path: str, title: str, artist: str, album: str):
+    def loadMusic(self, mp3_path: str):
+        if not os.path.exists(mp3_path) and mp3_path.split(".")[1] != "mp3":
+            raise print("不是有效的MP3的MP3文件")
 
         self.music_player = MP3Player(mp3_path)
-        self.png_path = cover_path
-        self.title = title
-        self.artist = artist
-        self.album = album
+        self.mp3_path = mp3_path
 
-        self.info_panel.loadInfo(cover_path, title, artist, album)
-        self.cover_label.load(cover_path)
-        self.cover_lower_fix_label.load(cover_path)
+        self.title, self.artist, self.album, self.png_path = get_mp3_info(mp3_path)
+
+        self.info_panel.loadInfo(self.png_path, self.title, self.artist, self.album)
+        self.cover_label.load(self.png_path)
+        self.cover_lower_fix_label.load(self.png_path)
         self.button_pause.clicked.connect(self.music_player.pause)
         self.music_player.finished.connect(self.setStop)
         self.music_player.finished.connect(
@@ -363,9 +400,3 @@ class MusicManager:
                 music_displayer.setStop()
             if music_displayer == playing_music_displayer:  # 当前点击的的播放
                 music_displayer.setStart()
-
-    # def auto_adjust_music_playback(self):
-    #     for music_displayer in self.music_displayer:
-    #         if music_displayer.is_playing():
-    #             music_displayer.setStop()
-    #     print("PPPPPPPPPPPPPPPPPPPPPPPPPPP")

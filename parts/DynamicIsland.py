@@ -160,31 +160,13 @@ class TopStateOverlay(SiVExpandWidget):
         self.container.addPlaceholder(10)
 
         battery_level = battery.percent // 10
-        match battery_level:
-            case 10:
-                self.battery_label.load(SiGlobal.siui.iconpack.get("ic_fluent_battery_10_regular"))
-            case 9:
-                self.battery_label.load(SiGlobal.siui.iconpack.get("ic_fluent_battery_9_regular"))
-            case 8:
-                self.battery_label.load(SiGlobal.siui.iconpack.get("ic_fluent_battery_8_regular"))
-            case 7:
-                self.battery_label.load(SiGlobal.siui.iconpack.get("ic_fluent_battery_7_regular"))
-            case 6:
-                self.battery_label.load(SiGlobal.siui.iconpack.get("ic_fluent_battery_6_regular"))
-            case 5:
-                self.battery_label.load(SiGlobal.siui.iconpack.get("ic_fluent_battery_5_regular"))
-            case 4:
-                self.battery_label.load(SiGlobal.siui.iconpack.get("ic_fluent_battery_4_regular"))
-            case 3:
-                self.battery_label.load(SiGlobal.siui.iconpack.get("ic_fluent_battery_3_regular"))
-            case 2:
-                self.battery_label.load(SiGlobal.siui.iconpack.get("ic_fluent_battery_2_regular"))
-            case 1:
-                self.battery_label.load(SiGlobal.siui.iconpack.get("ic_fluent_battery_1_regular"))
-            case 0:
-                self.battery_label.load(SiGlobal.siui.iconpack.get("ic_fluent_battery_0_regular"))
-            case _:
-                self.battery_label.load(SiGlobal.siui.iconpack.get("ic_fluent_battery_warning_filled"))
+
+        if 0 <= battery_level <= 10:
+            icon_name = f"ic_fluent_battery_{battery_level}_regular"
+        else:
+            icon_name = "ic_fluent_battery_warning_filled"
+
+        self.battery_label.load(SiGlobal.siui.iconpack.get(icon_name))
 
     def on_opacity_changed(self, opacity):
         effect = QGraphicsOpacityEffect()

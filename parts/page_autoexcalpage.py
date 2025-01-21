@@ -15,6 +15,7 @@ from siui.components.spinbox.spinbox import SiIntSpinBox
 from siui.core import SiGlobal, SiColor, Si
 from config import qss
 import config.CONFIG
+from parts.send_message import show_message
 
 PATH_CONFIG = config.CONFIG.CONFIG_PATH
 
@@ -38,13 +39,7 @@ finally:
     print(f"broswer_address:{broswer_address}")
 
 
-def show_message(_type: int, title: str, text: str, icon: str):
-    SiGlobal.siui.windows["MAIN_WINDOW"].LayerRightMessageSidebar().send(
-        title=title,
-        text=text,
-        msg_type=_type,
-        icon=SiGlobal.siui.iconpack.get(f"{icon}"),
-        fold_after=5000)
+
 
 
 class MainLoopThread(QThread):
