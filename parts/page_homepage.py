@@ -1,11 +1,10 @@
 #  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
 
-import os
 import time
 
 from PyQt5.QtCore import Qt
-from siui.components import SiPixLabel, Si, SiOptionCardLinear, SiPushButton
+from siui.components import SiPixLabel, Si, SiOptionCardLinear
 from siui.components.button import SiPushButtonRefactor
 from siui.components.page import SiPage
 from siui.components.titled_widget_group import SiTitledWidgetGroup
@@ -17,8 +16,12 @@ from siui.components.widgets import (
 from siui.core import GlobalFont, SiColor, SiGlobal
 from siui.gui import SiFont
 
-from parts.themed_option_card import ThemedOptionCardPlane
 from parts.task import TaskCardLinear, Task
+from parts.themed_option_card import ThemedOptionCardPlane
+
+import config.CONFIG
+
+PATH_PNG = config.CONFIG.PNG_PATH
 
 
 class Homepage(SiPage):
@@ -33,7 +36,7 @@ class Homepage(SiPage):
         self.background_image = SiPixLabel(self.head_area)
         self.background_image.setFixedSize(1366, 300)
         self.background_image.setBorderRadius(6)
-        self.background_image.load("./pic/ccc.jpg")
+        self.background_image.load(f"{PATH_PNG}\\back.jpg")
 
         self.background_fading_transition = SiLabel(self.head_area)
         self.background_fading_transition.setGeometry(0, 100, 0, 200)
@@ -116,7 +119,8 @@ class Homepage(SiPage):
 
             open_left_layer_btu = SiPushButtonRefactor(self)
             open_left_layer_btu.setText("打开左侧")
-            open_left_layer_btu.clicked.connect(lambda:SiGlobal.siui.windows["MAIN_WINDOW"].layerLeftGlobalDrawer().showLayer())
+            open_left_layer_btu.clicked.connect(
+                lambda: SiGlobal.siui.windows["MAIN_WINDOW"].layerLeftGlobalDrawer().showLayer())
 
             shortcut_tab.addWidget(open_left_layer_btu)
 
@@ -153,12 +157,16 @@ class WidgetsPanel(SiDenseVContainer):
         container_h_a.setSpacing(12)
 
         self.test_task_card = TaskCardLinear(
-            Task("语言详情", "全局语言：python，基本框架：PyQt5，UI框架：siui", "环境开发详情","IDE:Pycharm 24.1.6(pro)，python：3.10，siui：1.0.1",time.time(), self.getColor(SiColor.PROGRESS_BAR_COMPLETING)),
+            Task("语言详情", "全局语言：python，基本框架：PyQt5，UI框架：siui", "环境开发详情",
+                 "IDE:Pycharm 24.1.6(pro)，python：3.10，siui：1.0.1", time.time(),
+                 self.getColor(SiColor.PROGRESS_BAR_COMPLETING)),
             parent=self)
         self.test_task_card.resize(SiGlobal.siui.windows["MAIN_WINDOW"].height(), 80)
 
         self.test_task_card2 = TaskCardLinear(
-            Task("架构详情", "parts：页面组件，config：注册文件，pic：全局图片", "应用组成架构","parts：页面代码，config：配置文件，pic：页面图片",time.time(), self.getColor(SiColor.PROGRESS_BAR_PROCESSING)),
+            Task("架构详情", "parts：页面组件，config：注册文件，pic：全局图片", "应用组成架构",
+                 "parts：页面代码，config：配置文件，pic：页面图片", time.time(),
+                 self.getColor(SiColor.PROGRESS_BAR_PROCESSING)),
             parent=self)
         self.test_task_card2.resize(SiGlobal.siui.windows["MAIN_WINDOW"].height(), 80)
 

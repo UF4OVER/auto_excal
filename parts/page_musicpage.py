@@ -1,4 +1,5 @@
-﻿import configparser
+﻿#  Copyright (c) 2025 UF4OVER
+#   All rights reserved.
 import os
 
 from PyQt5.QtCore import Qt
@@ -11,41 +12,10 @@ from siui.components.widgets import (
 from siui.core import Si, SiGlobal
 
 from parts.music_displayer import SiMusicDisplayer, MusicManager
-try:
-    music_info_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "music\\info\\music.ini")
-    music_png_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "music\\png")
 
-    print(f"music_info_path:{music_info_path}")
-    print(f"music_png_path:{music_png_path}")
+import config.CONFIG
 
-    config = configparser.ConfigParser()
-    # 使用 open 函数指定编码为 utf-8
-    with open(music_info_path, 'r', encoding='utf-8') as fp:
-        config.read_file(fp)
-
-
-    def load_music_info(index: int = 1) -> str:
-        music_info = config[f"00{index}"]
-        return music_info["path"]
-
-
-    mp1_path = str(os.path.join(os.path.dirname(os.path.dirname(__file__)), load_music_info(1)))
-    mp2_path = str(os.path.join(os.path.dirname(os.path.dirname(__file__)), load_music_info(2)))
-    mp3_path = str(os.path.join(os.path.dirname(os.path.dirname(__file__)), load_music_info(3)))
-    mp4_path = str(os.path.join(os.path.dirname(os.path.dirname(__file__)), load_music_info(4)))
-    mp5_path = str(os.path.join(os.path.dirname(os.path.dirname(__file__)), load_music_info(5)))
-    mp6_path = str(os.path.join(os.path.dirname(os.path.dirname(__file__)), load_music_info(6)))
-
-except FileNotFoundError as F:
-    print(f"找不到配置文件:{F}")
-
-except Exception as E:
-    print(f"错误{E}")
-
-
-def read_config():  # 读取配置文件
-    config = configparser.ConfigParser()
-    config.read(music_info_path)
+PATH_MUSIC = config.CONFIG.MUSIC_PATH
 
 
 class search_box(SiLineEdit):
@@ -108,44 +78,18 @@ class PageMusicPage(SiPage):
             self.displayer_container.setFixedWidth(512 + 512 + 16)
             self.displayer_container.setSpacing(horizontal=16, vertical=16)
 
-            self.displayer_1 = SiMusicDisplayer(self)
-            self.displayer_1.resize(512, 128)
-            self.displayer_1.loadMusic(mp1_path)  # noqa: E501
+            mp3_files = []
+            for root, dirs, files in os.walk(PATH_MUSIC):
+                for file in files:
+                    if file.lower().endswith('.mp3'):
+                        mp3_files.append(os.path.join(root, file))
 
-            self.displayer_2 = SiMusicDisplayer(self)
-            self.displayer_2.resize(512, 128)
-            self.displayer_2.loadMusic(mp2_path)  # noqa: E501
-
-            self.displayer_3 = SiMusicDisplayer(self)
-            self.displayer_3.resize(512, 128)
-            self.displayer_3.loadMusic(mp3_path)  # noqa: E501
-
-            self.displayer_4 = SiMusicDisplayer(self)
-            self.displayer_4.resize(512, 128)
-            self.displayer_4.loadMusic(mp4_path)  # noqa: E501
-
-            self.displayer_5 = SiMusicDisplayer(self)
-            self.displayer_5.resize(512, 128)
-            self.displayer_5.loadMusic(mp5_path)  # noqa: E501
-
-            self.displayer_6 = SiMusicDisplayer(self)
-            self.displayer_6.resize(512, 128)
-            self.displayer_6.loadMusic(mp6_path)  # noqa: E501
-
-            self.displayer_container.addWidget(self.displayer_1)
-            self.displayer_container.addWidget(self.displayer_2)
-            self.displayer_container.addWidget(self.displayer_3)
-            self.displayer_container.addWidget(self.displayer_4)
-            self.displayer_container.addWidget(self.displayer_5)
-            self.displayer_container.addWidget(self.displayer_6)
-
-            self.players.add_music_displayer(self.displayer_1)
-            self.players.add_music_displayer(self.displayer_2)
-            self.players.add_music_displayer(self.displayer_3)
-            self.players.add_music_displayer(self.displayer_4)
-            self.players.add_music_displayer(self.displayer_5)
-            self.players.add_music_displayer(self.displayer_6)
-            # self.players.auto_adjust_music_playback()
+            for i, mp3_path in enumerate(mp3_files):
+                displayer = SiMusicDisplayer(self)
+                displayer.resize(512, 128)
+                displayer.loadMusic(mp3_path)  # noqa: E501
+                self.displayer_container.addWidget(displayer)
+                self.players.add_music_displayer(displayer)
 
             group.addWidget(self.displayer_container)
             group.adjustSize()

@@ -1,16 +1,6 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
-# -------------------------------
-#  @Project : siui
-#  @Time    : 2025 - 01-17 17:19
-#  @FileName: music_displayer.py
-#  @Software: PyCharm 2024.1.6 (Professional Edition)
-#  @System  : Windows 11 23H2
-#  @Author  : 33974
-#  @Contact :
-#  @Python  :
-# -------------------------------
 import shutil
 
 from PyQt5.QtCore import Qt, QObject, pyqtSignal, QUrl
@@ -37,13 +27,13 @@ def get_mp3_info(mp3_path):
     album = audio.tags.get('TALB', [None])[0] or 'Unknown Album'
 
     # 打印信息
-    print('TIT2:', title, 'TPE1:', artist, 'TALB:', album)
+    print(f'TIT2:, {title}, TPE1:, {artist}, TALB:{album}')
 
     # 获取封面图片
     cover_path = None
     if 'APIC:' in audio.tags:
         apic_frame = audio.tags['APIC:']
-        cover_path = os.path.join(os.path.dirname(mp3_path), f"{title}cover.{apic_frame.mime.split('/')[-1]}")
+        cover_path = os.path.join(os.path.dirname(mp3_path), "png", f"{title}cover.{apic_frame.mime.split('/')[-1]}")
         with open(cover_path, 'wb') as img:
             img.write(apic_frame.data)
 
@@ -267,7 +257,6 @@ class SiMusicDisplayer(SiWidget):
         self.state_label.resize(64, 128)
         self.state_label.setFixedStyleSheet("border-radius: 12px")
         self.state_label.setColor(self.getColor(SiColor.INTERFACE_BG_C))
-        print(self.getColor(SiColor.INTERFACE_BG_C))
 
         self.folded_container = SiDenseVContainer(self.state_label)
         self.folded_container.setAlignment(Qt.AlignHCenter)
@@ -319,13 +308,10 @@ class SiMusicDisplayer(SiWidget):
 
         self.music_player = MP3Player(mp3_path)
         self.mp3_path = mp3_path
-
         self.title, self.artist, self.album, self.png_path = get_mp3_info(mp3_path)
-
         self.info_panel.loadInfo(self.png_path, self.title, self.artist, self.album)
         self.cover_label.load(self.png_path)
         self.cover_lower_fix_label.load(self.png_path)
-        self.button_pause.clicked.connect(self.music_player.pause)
         self.music_player.finished.connect(self.setStop)
         self.music_player.finished.connect(
             lambda: SiGlobal.siui.windows["MAIN_WINDOW"].TopLayerOverLayer().setContent("Wedding Invitation",

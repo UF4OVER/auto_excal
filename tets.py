@@ -1,3 +1,6 @@
+#  Copyright (c) 2025 UF4OVER
+#   All rights reserved.
+
 from mutagen.mp3 import MP3
 from mutagen.id3 import ID3, APIC
 import os

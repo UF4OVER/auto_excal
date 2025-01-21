@@ -1,3 +1,6 @@
+#  Copyright (c) 2025 UF4OVER
+#   All rights reserved.
+
 import os
 
 from PyQt5.QtCore import Qt, QUrl

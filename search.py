@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+
+#  Copyright (c) 2025 UF4OVER
+#   All rights reserved.
+
 # -------------------------------
 #  @Project : PyQt-SiliconUI
 #  @Time    : 2025 - 01-19 22:24

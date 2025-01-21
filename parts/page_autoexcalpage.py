@@ -1,3 +1,6 @@
+#  Copyright (c) 2025 UF4OVER
+#   All rights reserved.
+
 import configparser
 import json
 import os

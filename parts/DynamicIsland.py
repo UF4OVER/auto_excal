@@ -1,3 +1,6 @@
+#  Copyright (c) 2025 UF4OVER
+#   All rights reserved.
+
 import psutil
 from PyQt5.QtCore import QTimer, QRect, Qt, pyqtProperty
 from PyQt5.QtGui import QFont

@@ -1,3 +1,8 @@
+#  Copyright (c) 2025 UF4OVER
+#   All rights reserved.
+from sys_std_io import setup_logging
+setup_logging(False)
+
 from PyQt5.QtCore import Qt
 from siui.components import SiLabel, SiTitledWidgetGroup
 from siui.components.combobox import SiComboBox
@@ -27,8 +32,6 @@ def set_brightness(brightness_level):  # 屏幕亮度设置
     brightness_methods = wmi_instance.WmiMonitorBrightnessMethods()[0]
     brightness_methods.WmiSetBrightness(brightness_level, 0)  # 第二个参数是时间，0 表示立即生效
 
-    # print(f"亮度已设置为: {brightness_level}%")
-
 
 def get_current_brightness() -> int:
     wmi_instance = wmi.WMI(namespace='root\\WMI')
@@ -47,6 +50,7 @@ def get_current_volume() -> int:
     volume = interface.QueryInterface(IAudioEndpointVolume)
     # 获取当前音量（比例值）
     current_volume = volume.GetMasterVolumeLevelScalar()
+    print(f"当前系统音量: {current_volume * 100}%")
     # 转换为百分比
     return int(round(current_volume * 100, 2))
 

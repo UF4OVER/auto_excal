@@ -1,3 +1,6 @@
+#  Copyright (c) 2025 UF4OVER
+#   All rights reserved.
+
 import os
 
 current_module_path = os.path.dirname(os.path.abspath(__file__))

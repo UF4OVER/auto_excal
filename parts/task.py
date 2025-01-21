@@ -1,16 +1,6 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
-# -------------------------------
-#  @Project : siui
-#  @Time    : 2025 - 01-17 14:31
-#  @FileName: task.py
-#  @Software: PyCharm 2024.1.6 (Professional Edition)
-#  @System  : Windows 11 23H2
-#  @Author  : 33974
-#  @Contact : 
-#  @Python  : 
-# -------------------------------
 from PyQt5.QtCore import QEvent, QRect, QPropertyAnimation, QEasingCurve
 from PyQt5.QtGui import QFont
 from siui.core import SiGlobal
