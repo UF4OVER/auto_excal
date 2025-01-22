@@ -3,7 +3,8 @@
 
 from cx_Freeze import setup, Executable
 
-# pic_path = "E:\\python\\auto_excal_new\\siui\\pic"
+VERSION = "V1.1.2"
+
 build_exe_options = {
     "packages": [
         "PyQt5.QtCore",
@@ -54,7 +55,7 @@ base = "Win32GUI"
 
 setup(
     name='Wedding Invitation',
-    version='1.1.3.4',
+    version=VERSION,
     url='https://github.com/UF4OVER',
     license='MIT',
     author='UF4',

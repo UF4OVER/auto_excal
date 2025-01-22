@@ -1,8 +1,0 @@
-python == 3.10
-PyQt5
-pygame
-mutagen
-PyQt-SiliconUI
-openpyxl
-DrissionPage
-numpy
