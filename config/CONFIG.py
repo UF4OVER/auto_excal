@@ -16,9 +16,6 @@
 import enum
 import os
 
-from sys_std_io import setup_logging
-
-setup_logging(False)
 
 
 class CONFIG(enum.Enum):
