@@ -1,7 +1,7 @@
 #  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
 from sys_stdio import setup_logging
-setup_logging(True)
+setup_logging(False)
 
 import argparse
 import configparser

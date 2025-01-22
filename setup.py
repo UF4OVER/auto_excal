@@ -3,7 +3,7 @@
 
 from cx_Freeze import setup, Executable
 
-pic_path = "E:\\python\\auto_excal_new\\siui\\pic"
+# pic_path = "E:\\python\\auto_excal_new\\siui\\pic"
 build_exe_options = {
     "packages": [
         "PyQt5.QtCore",

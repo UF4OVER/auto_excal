@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import QDesktopWidget, QShortcut
 from siui.core import SiColor, SiGlobal
 from siui.templates.application.application import SiliconApplication
 
+from parts.page.page_updatepage import UpDatePage
 from parts.component.DynamicIsland import DynamicIsland
 from parts.event.close_event import CloseModalDialog
 from parts.component.layer_left_global import LayerLeftGlobalDrawer
@@ -29,6 +30,7 @@ SiGlobal.siui.loadIcons(
 import config.CONFIG
 
 PATH_CONFIG = config.CONFIG.CONFIG_PATH
+PATH_PIC = config.CONFIG.PNG_PATH
 
 
 class My_SiliconApplication(SiliconApplication):
@@ -65,7 +67,7 @@ class MySiliconApp(My_SiliconApplication):
         self.layerMain().setTitle("Loot Hearts系列")
         self.setWindowTitle("Wedding Invitation")
         self.ShortcutKey()
-        self.setWindowIcon(QIcon("pic/圆角-default.jpg"))
+        self.setWindowIcon(QIcon(f"{PATH_PIC}/圆角-default.jpg"))
 
         self.layerMain().addPage(Homepage(self),
                                  icon=SiGlobal.siui.iconpack.get("ic_fluent_home_filled"),
@@ -76,12 +78,16 @@ class MySiliconApp(My_SiliconApplication):
         self.layerMain().addPage(PageMusicPage(self),
                                  icon=SiGlobal.siui.iconpack.get("ic_fluent_music_note_2_play_filled"),
                                  hint="音乐", side="top")
+
         self.layerMain().addPage(About(self),
                                  icon=SiGlobal.siui.iconpack.get("ic_fluent_info_filled"),
                                  hint="关于", side="bottom")
         self.layerMain().addPage(PageSettingPage(self),
                                  icon=SiGlobal.siui.iconpack.get("ic_fluent_settings_filled"),
                                  hint="设置", side="bottom")
+        self.layerMain().addPage(UpDatePage(self),
+                                 icon=SiGlobal.siui.iconpack.get("ic_fluent_cloud_sync_filled"),
+                                 hint="更新", side="bottom")
 
         self.layerMain().setPage(0)
 

@@ -1,6 +1,6 @@
 import psutil
 from PyQt5.QtCore import QTimer, QRect, Qt, pyqtProperty, QPropertyAnimation, QEasingCurve, QSize, QPoint
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QFont, QColor, QPalette
 from PyQt5.QtGui import QPainter, QFontMetrics
 from siui.components import SiDenseHContainer, SiLabel, SiSvgLabel
 from siui.core import Si
@@ -130,22 +130,41 @@ class DynamicIsland(SiHExpandWidget):
         battery_timer.timeout.connect(self.update_battery)
         battery_timer.start(30_0000)  # 5分钟 = 300000毫秒
 
-        self.container_animation = QPropertyAnimation(self, b"Geometry")
-        self.container_animation.setDuration(300)
-        self.container_animation.setEasingCurve(QEasingCurve.InOutQuad)
+        self._color = QColor(255, 255, 255)  # 初始颜色为白色
+        self.tip_color_animation = QPropertyAnimation(self, b"tipColor")
+        self.tip_color_animation.setDuration(300)
+        self.tip_color_animation.setEasingCurve(QEasingCurve.InOutQuad)
+
+
+    @pyqtProperty(QColor)
+    def tipColor(self):
+        return self._color
+
+    @tipColor.setter
+    def tipColor(self, value):
+        self._color = value
+        palette = self.tip.palette()
+        palette.setColor(QPalette.WindowText, self._color)
+        self.tip.setPalette(palette)
 
     def enterEvent(self, a0):
         super().enterEvent(a0)
-        self.tip.setText("进入")
+        self.tip.setText("UF4OVER")
+        self.tip_color_animation.setStartValue(self.tipColor)
+        self.tip_color_animation.setEndValue(QColor(255, 0, 0))  # 鼠标进入时颜色变为红色
+        self.tip_color_animation.start()
 
     def leaveEvent(self, a0):
         super().leaveEvent(a0)
-        self.tip.setText("离开")
+        self.tip.setText("UF4OVER")
+        self.tip_color_animation.setStartValue(self.tipColor)
+        self.tip_color_animation.setEndValue(QColor(255, 255, 255))  # 鼠标离开时颜色变为白色
+        self.tip_color_animation.start()
 
     def send_default(self):
-        self.title.setText("测试")
-        self.subtitle.setText("测试")
-        self.tip.setText("测试")
+        self.title.setText("Loot Hearts")
+        self.subtitle.setText("")
+        self.tip.setText("UF4OVER")
 
     def send(self, title, subtitle, tip):
         self.title.setText(title)
