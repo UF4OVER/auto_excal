@@ -1,19 +1,25 @@
 ﻿#  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
 import os
+import shutil
+import sys
 
+import psutil
 from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QFileDialog, QApplication, QMessageBox
 from siui.components import SiTitledWidgetGroup, SiMasonryContainer
+from siui.components.button import (
+    SiPushButtonRefactor,
+)
 from siui.components.page import SiPage
 from siui.components.widgets import (
-    SiDenseVContainer,
+    SiDenseHContainer,
     SiSimpleButton,
     SiLineEdit)
 from siui.core import Si, SiGlobal
 
-from parts.component.music_displayer import SiMusicDisplayer, MusicManager
-
 import config.CONFIG
+from parts.component.music_displayer import SiMusicDisplayer, MusicManager
 
 PATH_MUSIC = config.CONFIG.MUSIC_PATH
 
@@ -52,11 +58,20 @@ class PageMusicPage(SiPage):
         self.line_edit_with_button.resize(512, 32)
         self.line_edit_with_button.setText("点击右侧按钮搜索")
 
+        self.add_music_btu = SiPushButtonRefactor(self)
+        self.add_music_btu.setFixedSize(512, 32)
+        self.add_music_btu.setSvgIcon(SiGlobal.siui.iconpack.get("ic_fluent_add_circle_regular"))
+        self.add_music_btu.setText("添加音乐")
+        self.add_music_btu.clicked.connect(self.AddMusic)
+        self.add_music_btu.setToolTip("只能添加.mp3格式的音乐")
+        self.add_music_btu.adjustSize()
+
         self.titled_widgets_group = SiTitledWidgetGroup(self)
         self.titled_widgets_group.setSiliconWidgetFlag(Si.EnableAnimationSignals)
 
-        self.scroll_container = SiDenseVContainer(self.titled_widgets_group)
+        self.scroll_container = SiDenseHContainer(self.titled_widgets_group)
         self.scroll_container.addWidget(self.line_edit_with_button)
+        self.scroll_container.addWidget(self.add_music_btu)
         self.scroll_container.adjustSize()
 
         self.titled_widgets_group.addWidget(self.scroll_container)
@@ -90,6 +105,33 @@ class PageMusicPage(SiPage):
                 displayer.loadMusic(mp3_path)  # noqa: E501
                 self.displayer_container.addWidget(displayer)
                 self.players.add_music_displayer(displayer)
-
             group.addWidget(self.displayer_container)
             group.adjustSize()
+
+    def AddMusic(self):
+        AddMusic_path, _ = QFileDialog.getOpenFileName(self, "选择音乐文件", "", "*.mp3")
+        if AddMusic_path:
+            try:
+                # 确保目标目录存在
+                if not os.path.exists(PATH_MUSIC):
+                    os.makedirs(PATH_MUSIC)
+
+                # 复制文件
+                shutil.copy(AddMusic_path, PATH_MUSIC)
+                print(f"{AddMusic_path}::: successfully copied to :::{PATH_MUSIC}")
+                # 重新加载界面
+                self.setupUi()
+                self.displayer_container.arrangeWidgets()
+                # 强制刷新界面
+                self.update()
+                self.repaint()
+                QApplication.processEvents()
+            except IOError as e:
+                print(f"无法复制文件: {str(e)}")
+            except Exception as e:
+                print(f"复制文件时发生错误: {str(e)}")
+        else:
+            print("未选择文件")
+
+    def showEvent(self, a0):
+        super().showEvent(a0)

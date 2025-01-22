@@ -8,7 +8,7 @@ from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 
-from siui.components import SiSimpleButton, SiDenseVContainer, SiPixLabel, SiLabel
+from siui.components import SiSimpleButton, SiDenseVContainer, SiPixLabel, SiLabel, SiPushButton
 from siui.components import SiWidget
 from siui.core import Si, SiQuickEffect
 from siui.core import SiColor, SiGlobal
@@ -382,3 +382,8 @@ class MusicManager:
                 music_displayer.setStop()
             if music_displayer == playing_music_displayer:  # 当前点击的的播放
                 music_displayer.setStart()
+
+
+
+
+

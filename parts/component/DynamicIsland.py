@@ -172,7 +172,5 @@ class DynamicIsland(SiHExpandWidget):
         # self.title.move(10, 0)
 
 
-
-
 def Send_DynamicIsland_Message(title, subtitle, tip):
     SiGlobal.siui.windows["MAIN_WINDOW"].Dynamic_Island().send(title, subtitle, tip)

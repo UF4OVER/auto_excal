@@ -1,7 +1,7 @@
 #  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
 from sys_stdio import setup_logging
-setup_logging(False)
+setup_logging(True)
 
 import argparse
 import configparser
@@ -79,9 +79,8 @@ def main():
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    except Exception as e:
-        print(f"An error occurred: {e}")
+
+    main()
+
 
 

@@ -62,7 +62,7 @@ class MySiliconApp(My_SiliconApplication):
         self.resize(1350, 900)
         self.setMaximumSize(1500, 1200)
         self.move((screen_geo.width() - self.width()) // 2, (screen_geo.height() - self.height()) // 2)
-        self.layerMain().setTitle("Wedding Invitation")
+        self.layerMain().setTitle("Loot Hearts系列")
         self.setWindowTitle("Wedding Invitation")
         self.ShortcutKey()
         self.setWindowIcon(QIcon("pic/圆角-default.jpg"))

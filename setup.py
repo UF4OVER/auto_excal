@@ -54,12 +54,12 @@ base = "Win32GUI"
 
 setup(
     name='Wedding Invitation',
-    version='1.1.3.3',
+    version='1.1.3.4',
     url='https://github.com/UF4OVER',
     license='MIT',
     author='UF4',
     author_email='uf4hp@foxmail.com',
-    description='Wedding Invitation 系列',
+    description='Loot Hearts 系列',
     options={"build_exe": build_exe_options},
     executables=[
         Executable(
