@@ -14,6 +14,8 @@
 #  @Python  : 
 # -------------------------------
 import os
+
+import requests
 from PyQt5.QtCore import QThread, pyqtSignal, Qt
 from PyQt5.QtWidgets import QTableWidget, QFileDialog, QTableWidgetItem, QAbstractItemView
 from openpyxl.reader.excel import load_workbook
@@ -80,6 +82,7 @@ class UpDatePage(SiPage):
             self.check_btu = SiProgressPushButton(self)
             self.check_btu.resize(128, 32)
             self.check_btu.setText("检查新版本")
+            self.check_btu.clicked.connect(self.get_file_content)
 
             boswer_filter = SiOptionCardLinear(self)
             boswer_filter.setTitle("检查更新", "检测是否发布了新版本")
@@ -88,5 +91,6 @@ class UpDatePage(SiPage):
 
             group.addWidget(boswer_filter)
 
-    def check_update(self):
+
+
 
