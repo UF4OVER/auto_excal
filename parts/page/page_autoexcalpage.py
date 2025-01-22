@@ -16,10 +16,10 @@ from siui.components.editbox import SiLineEdit
 from siui.components.page import SiPage
 from siui.components.spinbox.spinbox import SiIntSpinBox
 from siui.core import SiGlobal, SiColor, Si
+from parts.event.send_message import show_message
+
 from config import qss
 import config.CONFIG
-from parts.send_message import show_message
-
 PATH_CONFIG = config.CONFIG.CONFIG_PATH
 
 config = configparser.ConfigParser()
@@ -40,9 +40,6 @@ except Exception as e:
 finally:
     print(f"browser_path:{browser_path}")
     print(f"broswer_address:{broswer_address}")
-
-
-
 
 
 class MainLoopThread(QThread):
@@ -280,10 +277,9 @@ class Autoexcal(SiPage):
             self.table_widget.setFixedSize(table_widget_height, table_widget_width)
 
             self.clear_data_btu = SiLongPressButton(self)
-            self.clear_data_btu.resize(80,32)
+            self.clear_data_btu.resize(80, 32)
             self.clear_data_btu.attachment().setText("清除数据")
             self.clear_data_btu.longPressed.connect(self.delete_data_for_table_widget)
-
 
             choose_file_btu = SiPushButtonRefactor(self)
             choose_file_btu.setText("选择文件")
@@ -752,7 +748,6 @@ class Autoexcal(SiPage):
     def stop_main_loop_in_thread(self):
         if self.main_loop_thread.isRunning():
             self.main_loop_thread.stop()
-
 
     def on_main_loop_finished(self):
         self.start_btu.attachment().setText("开始")

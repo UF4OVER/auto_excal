@@ -11,18 +11,20 @@ from PyQt5.QtWidgets import QDesktopWidget, QShortcut
 from siui.core import SiColor, SiGlobal
 from siui.templates.application.application import SiliconApplication
 
-from parts.DynamicIsland import TopLayerOverLays
-from parts.close_event import CloseModalDialog
-from parts.layer_left_global import LayerLeftGlobalDrawer
-from parts.page_aboutpage import About
-from parts.page_autoexcalpage import Autoexcal
-from parts.page_homepage import Homepage
-from parts.page_musicpage import PageMusicPage
-from parts.page_settingpage import PageSettingPage
+from parts.component.DynamicIsland import DynamicIsland
+from parts.event.close_event import CloseModalDialog
+from parts.component.layer_left_global import LayerLeftGlobalDrawer
+from parts.page.page_aboutpage import About
+from parts.page.page_autoexcalpage import Autoexcal
+from parts.page.page_homepage import Homepage
+from parts.page.page_musicpage import PageMusicPage
+from parts.page.page_settingpage import PageSettingPage
 
 # 载入图标
 SiGlobal.siui.loadIcons(
-    icons.IconDictionary(color=SiGlobal.siui.colors.fromToken(SiColor.SVG_NORMAL)).icons
+    icons.IconDictionary(
+        color=SiGlobal.siui.colors.fromToken(SiColor.SVG_NORMAL)
+    ).icons
 )
 import config.CONFIG
 
@@ -33,15 +35,21 @@ class My_SiliconApplication(SiliconApplication):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.layer_left_global_drawer = LayerLeftGlobalDrawer(self)
+        self.dynamic_island = DynamicIsland(self)
+        self.layerMain().container_title.addWidget(self.dynamic_island)
+        # self.dynamic_island.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
 
-        self.state_layer_overlay = TopLayerOverLays(self)
+    def Dynamic_Island(self):
+        return self.dynamic_island
 
-    def TopLayerOverLayer(self):
-        return self.state_layer_overlay
+    def showEvent(self, event):
+        super().showEvent(event)
+        self.dynamic_island.move(self.size().width() // 2 - 150, 15)
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
-        self.state_layer_overlay.resize(event.size())
+        # print(f"event.size().width()//2::{event.size().width() // 3}")
+        self.dynamic_island.move(event.size().width() // 2 - 150, 15)
 
 
 class MySiliconApp(My_SiliconApplication):

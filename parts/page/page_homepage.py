@@ -16,8 +16,8 @@ from siui.components.widgets import (
 from siui.core import GlobalFont, SiColor, SiGlobal
 from siui.gui import SiFont
 
-from parts.task import TaskCardLinear, Task
-from parts.themed_option_card import ThemedOptionCardPlane
+from parts.component.task import TaskCardLinear, Task
+from parts.component.themed_option_card import ThemedOptionCardPlane
 
 import config.CONFIG
 
@@ -126,6 +126,17 @@ class Homepage(SiPage):
 
             group.addWidget(shortcut_tab)
 
+            _tab = SiOptionCardLinear(self)
+            _tab.setTitle("测试", "灵动岛测试")
+            _tab.load(SiGlobal.siui.iconpack.get("ic_fluent_keyboard_layout_float_regular"))
+
+            open_left_ = SiPushButtonRefactor(self)
+            open_left_.setText("灵动岛")
+            open_left_.clicked.connect(SiGlobal.siui.windows["MAIN_WINDOW"].Dynamic_Island().send_default)
+            _tab.addWidget(open_left_)
+
+            group.addWidget(_tab)
+
         self.titled_widget_group.addPlaceholder(64)
 
         # 添加到滚动区域容器
@@ -157,7 +168,7 @@ class WidgetsPanel(SiDenseVContainer):
         container_h_a.setSpacing(12)
 
         self.test_task_card = TaskCardLinear(
-            Task("语言详情", "全局语言：python，基本框架：PyQt5，UI框架：siui", "环境开发详情",
+            Task("语言详情", "全局语言：python，GUI框架：PyQt5，UI框架：siui", "环境开发详情",
                  "IDE:Pycharm 24.1.6(pro)，python：3.10，siui：1.0.1", time.time(),
                  self.getColor(SiColor.PROGRESS_BAR_COMPLETING)),
             parent=self)
@@ -165,7 +176,7 @@ class WidgetsPanel(SiDenseVContainer):
 
         self.test_task_card2 = TaskCardLinear(
             Task("架构详情", "parts：页面组件，config：注册文件，pic：全局图片", "应用组成架构",
-                 "parts：页面代码，config：配置文件，pic：页面图片", time.time(),
+                 "parts：页面代码，config：配置文件，pic：全局图片", time.time(),
                  self.getColor(SiColor.PROGRESS_BAR_PROCESSING)),
             parent=self)
         self.test_task_card2.resize(SiGlobal.siui.windows["MAIN_WINDOW"].height(), 80)

@@ -17,6 +17,9 @@ import os
 from mutagen.mp3 import MP3
 from mutagen.id3 import ID3
 
+from parts.component.DynamicIsland import Send_DynamicIsland_Message
+
+
 
 def get_mp3_info(mp3_path):
     audio = MP3(mp3_path, ID3=ID3)
@@ -313,10 +316,6 @@ class SiMusicDisplayer(SiWidget):
         self.cover_label.load(self.png_path)
         self.cover_lower_fix_label.load(self.png_path)
         self.music_player.finished.connect(self.setStop)
-        self.music_player.finished.connect(
-            lambda: SiGlobal.siui.windows["MAIN_WINDOW"].TopLayerOverLayer().setContent("Wedding Invitation",
-                                                                                        "",
-                                                                                        "UF4OVER"))
 
     def loadAchievement(self, number: int):
         """
@@ -359,14 +358,11 @@ class SiMusicDisplayer(SiWidget):
         if self.quick_play_panel.is_playing:
             self.setStop()
             self.stopped.emit()
-            SiGlobal.siui.windows["MAIN_WINDOW"].TopLayerOverLayer().setContent("Wedding Invitation", "",
-                                                                                "UF4OVER")
+            Send_DynamicIsland_Message("self.title", "self.artist", "self.album")
         else:
             self.setStart()
             self.played.emit()
-            SiGlobal.siui.windows["MAIN_WINDOW"].TopLayerOverLayer().setContent(f"正在播放：{self.title}", self.artist,
-                                                                                self.album)
-            # send_music_message(self.png_path, self.title, self.artist, self.album)
+            Send_DynamicIsland_Message(self.title, self.artist, self.album)
 
     def is_playing(self):
         return not self.quick_play_panel.is_playing

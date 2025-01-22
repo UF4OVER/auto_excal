@@ -66,7 +66,7 @@ setup(
             script="start.py",
             target_name="Wedding Invitation",
             base=base,
-            icon="pic/圆角-default_256x256.ico"
+            icon="pic/logo.ico"
         )
     ]
 )

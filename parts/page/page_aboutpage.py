@@ -39,7 +39,7 @@ class About(SiPage):
         self.version_picture.setFixedSize(128, 128)
         self.version_picture.setBorderRadius(64)
 
-        path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "pic", "avatar.png")
+        path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "pic", "avatar.png")
         print(path)
         self.version_picture.load(path)
 

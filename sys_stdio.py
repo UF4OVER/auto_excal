@@ -1,24 +1,21 @@
 # -*- coding: utf-8 -*-
+import logging
 import sys
+from typing import overload
+
 
 #  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
-
 # -------------------------------
 #  @Project : siui
 #  @Time    : 2025 - 01-21 22:13
-#  @FileName: sys_std_io.py
+#  @FileName: sys_stdio.py
 #  @Software: PyCharm 2024.1.6 (Professional Edition)
 #  @System  : Windows 11 23H2
 #  @Author  : 33974
-#  @Contact : 
-#  @Python  : 
+#  @Contact :
+#  @Python  :
 # -------------------------------
-
-
-import logging
-from typing import overload, Union
-from typing_extensions import Literal
 
 class StreamToLogger:
     def __init__(self, logger, log_level):
@@ -43,7 +40,7 @@ def setup_logging(arg: bool):
     if arg:
         print("Logging is enabled.")
         logging.basicConfig(filename='app.log',
-                            level=logging.DEBUG,
+                            level=logging.INFO,
                             format='%(asctime)s - %(levelname)s - %(message)s',
                             filemode="w")
 

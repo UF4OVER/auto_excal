@@ -1,8 +1,5 @@
 #  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
-from sys_std_io import setup_logging
-setup_logging(False)
-
 from PyQt5.QtCore import Qt
 from siui.components import SiLabel, SiTitledWidgetGroup
 from siui.components.combobox import SiComboBox

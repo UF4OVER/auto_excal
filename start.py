@@ -1,5 +1,7 @@
 #  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
+from sys_stdio import setup_logging
+setup_logging(False)
 
 import argparse
 import configparser
@@ -8,8 +10,8 @@ from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication
 from ui import MySiliconApp
-from parts.send_message import send_custom_message
-from sys_std_io import setup_logging
+from parts.event.send_message import send_custom_message
+
 import config.CONFIG
 
 PATH_CONFIG = config.CONFIG.CONFIG_PATH
@@ -77,9 +79,9 @@ def main():
 
 
 if __name__ == "__main__":
-    setup_logging(False)
     try:
         main()
     except Exception as e:
-        print(f"全局错误收集:{e}")
+        print(f"An error occurred: {e}")
+
 

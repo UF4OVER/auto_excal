@@ -10,7 +10,7 @@ from siui.components import SiDenseHContainer, SiLabel, SiDenseVContainer, SiOpt
 from siui.components.button import SiRadioButtonRefactor, SiPushButtonRefactor, SiSwitchRefactor
 from siui.components.page import SiPage
 from siui.core import SiGlobal, Si, SiColor
-from parts.page_autoexcalpage import show_message
+from parts.page.page_autoexcalpage import show_message
 import config.CONFIG
 
 PATH_CONFIG = config.CONFIG.CONFIG_PATH

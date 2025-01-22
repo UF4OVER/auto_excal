@@ -11,7 +11,7 @@ from siui.components.widgets import (
     SiLineEdit)
 from siui.core import Si, SiGlobal
 
-from parts.music_displayer import SiMusicDisplayer, MusicManager
+from parts.component.music_displayer import SiMusicDisplayer, MusicManager
 
 import config.CONFIG
 
