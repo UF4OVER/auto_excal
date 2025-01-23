@@ -32,7 +32,7 @@ class Label(SiLabel):
 
 def read_config():
     config = configparser.ConfigParser()
-    config.read(PATH_CONFIG)
+    config.read(PATH_CONFIG,encoding='utf-8')
     dpi_policy = config.get('Settings', 'dpi_policy', fallback='PassThrough')
     enable_hdpi_scaling = config.getboolean('Settings', 'enable_hdpi_scaling', fallback=False)
     use_hdpi_pixmaps = config.getboolean('Settings', 'use_hdpi_pixmaps', fallback=False)
@@ -41,7 +41,7 @@ def read_config():
 
 def save_config(dpi_policy, enable_hdpi_scaling, use_hdpi_pixmaps):
     config = configparser.ConfigParser()
-    config.read(PATH_CONFIG)  # 读取整个配置文件
+    config.read(PATH_CONFIG,encoding='utf-8')  # 读取整个配置文件
 
     # 修改或添加 Settings 部分
     if not config.has_section('Settings'):
@@ -58,7 +58,7 @@ def save_config(dpi_policy, enable_hdpi_scaling, use_hdpi_pixmaps):
 
 def save_close_options(b_: bool):
     config = configparser.ConfigParser()
-    config.read(PATH_CONFIG)
+    config.read(PATH_CONFIG,encoding='utf-8')
     config1 = config["switch_options"]
     config1['enable_switch'] = str(b_)
     with open(PATH_CONFIG, 'w') as configfile:
@@ -67,7 +67,7 @@ def save_close_options(b_: bool):
 
 def read_close_options() -> bool:
     config = configparser.ConfigParser()
-    config.read(PATH_CONFIG)
+    config.read(PATH_CONFIG,encoding='utf-8')
     return config.getboolean('switch_options', 'enable_switch')
 
 

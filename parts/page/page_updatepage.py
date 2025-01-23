@@ -1,3 +1,6 @@
+#  Copyright (c) 2025 UF4OVER
+#   All rights reserved.
+
 import configparser
 import os
 
@@ -16,15 +19,18 @@ from parts.event.send_message import show_message
 
 PATH_CONFIG = config.CONFIG.CONFIG_PATH
 config = configparser.ConfigParser()
-config.read(PATH_CONFIG)
+config.read(PATH_CONFIG, encoding='utf-8')
 
 VERSION = config["version"]["version"]
 REPO_OWNER = config["version"]["repo_owner"]
 REPO_NAME = config["version"]["repo_name"]
 GITHUB_API_URL = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/releases/latest"
 DOWNLOAD_PATH = config["version"]["path"]
-if not os.path.exists(DOWNLOAD_PATH):
-    os.makedirs(DOWNLOAD_PATH)
+try:
+    if not os.path.exists(DOWNLOAD_PATH):
+        os.makedirs(DOWNLOAD_PATH)
+except FileNotFoundError:
+    print("配置文件不存在，请检查路径")
 
 
 class VersionChecker(QObject):
@@ -212,6 +218,7 @@ class UpDatePage(SiPage):
 
     def on_version_check_error(self, error_message):
         show_message(1, "请求出错", error_message, "ic_fluent_globe_error_filled")
+        print(f"请求出错: {error_message}")
 
     def download_new_version(self):
         self.download_url = self.get_download_url()
@@ -220,11 +227,12 @@ class UpDatePage(SiPage):
             return
 
         self.destination_folder = DOWNLOAD_PATH
+        print(f"下载到目录文件夹{self.destination_folder}")
         if not self.destination_folder:
             show_message(1, "下载错误", "未选择文件夹", "ic_fluent_globe_error_filled")
             return
 
-        self.destination_path = os.path.join(self.destination_folder, "new_version.zip")
+        self.destination_path = os.path.join(self.destination_folder, "Wedding Invitation.7z")
 
         self.download_thread = DownloadThread(self.download_url, self.destination_path)
         self.download_thread.progress.connect(self.update_progress)
@@ -241,8 +249,11 @@ class UpDatePage(SiPage):
             for asset in assets:
                 if asset.get("name", "").endswith(".7z"):
                     return asset.get("browser_download_url", "")
+                print(f"未找到 7z 文件: {latest_release['name']}")
+                show_message(1, "下载错误", "未找到 7z 的安装文件，请联系开发者", "ic_fluent_globe_error_filled")
             return None  # 如果没有找到 7z 文件，返回 None
         except requests.exceptions.RequestException as e:
+            show_message(1, "请求出错", f"请求出错: {e}", "ic_fluent_globe_error_filled")
             print(f"请求出错: {e}")
             return None
 
@@ -250,11 +261,11 @@ class UpDatePage(SiPage):
         folder_path = QFileDialog.getExistingDirectory(self, "选择文件夹")
         config = configparser.ConfigParser()
         if folder_path:
-            config.read(PATH_CONFIG)
+            config.read(PATH_CONFIG,encoding='utf-8')
             config["version"]["path"] = folder_path
             with open(PATH_CONFIG, "w") as configfile:
                 config.write(configfile)
-            print(folder_path)
+            print(f"路径已更改为:{folder_path}")
         else:
             pass
 
@@ -262,13 +273,15 @@ class UpDatePage(SiPage):
         self.check_btu.setProgress(percent/100)
 
     def on_download_finished(self, message):
-        show_message(1, "下载完成", message, "ic_fluent_globe_arrow_up_filled")
+        show_message(1, "下载完成", f"{message}到\r\n文件夹{DOWNLOAD_PATH}", "ic_fluent_globe_arrow_up_filled")
+        print(f"{message}到文件夹：{DOWNLOAD_PATH}")
         self.check_btu.setText("检查新版本")
         self.check_btu.clicked.disconnect()
         self.check_btu.clicked.connect(self.start_version_check)
 
     def on_download_error(self, error_message):
         show_message(1, "下载错误", error_message, "ic_fluent_globe_error_filled")
+        print(f"下载出错: {error_message}")
         self.check_btu.setText("检查新版本")
         self.check_btu.clicked.disconnect()
         self.check_btu.clicked.connect(self.start_version_check)

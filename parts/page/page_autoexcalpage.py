@@ -9,13 +9,22 @@ from DrissionPage import ChromiumOptions, Chromium
 from PyQt5.QtCore import QThread, pyqtSignal, Qt
 from PyQt5.QtWidgets import QTableWidget, QFileDialog, QTableWidgetItem, QAbstractItemView
 from openpyxl.reader.excel import load_workbook
-from siui.components import SiLabel, SiTitledWidgetGroup, SiLongPressButton, SiOptionCardLinear, SiDenseHContainer, \
-    SiDenseVContainer, SiOptionCardPlane, SiPushButton
-from siui.components.button import SiSwitchRefactor, SiPushButtonRefactor
+
+from siui.components import (SiLabel,
+                             SiTitledWidgetGroup,
+                             SiLongPressButton,
+                             SiOptionCardLinear,
+                             SiDenseHContainer,
+                             SiDenseVContainer,
+                             SiOptionCardPlane,
+                             SiPushButton)
+from siui.components.button import (SiSwitchRefactor,
+                                    SiPushButtonRefactor)
 from siui.components.editbox import SiLineEdit
 from siui.components.page import SiPage
 from siui.components.spinbox.spinbox import SiIntSpinBox
 from siui.core import SiGlobal, SiColor, Si
+
 from parts.event.send_message import show_message
 
 from config import qss
@@ -23,7 +32,7 @@ import config.CONFIG
 PATH_CONFIG = config.CONFIG.CONFIG_PATH
 
 config = configparser.ConfigParser()
-config.read(PATH_CONFIG)
+config.read(PATH_CONFIG, encoding='utf-8')
 
 co = ChromiumOptions(read_file=True, ini_path=PATH_CONFIG)
 
@@ -746,8 +755,9 @@ class Autoexcal(SiPage):
 
     @limit_for_table
     def stop_main_loop_in_thread(self):
-        if self.main_loop_thread.isRunning():
-            self.main_loop_thread.stop()
+        if self.main_loop_thread:
+            if self.main_loop_thread.isRunning():
+                self.main_loop_thread.stop()
 
     def on_main_loop_finished(self):
         self.start_btu.attachment().setText("开始")
@@ -787,9 +797,11 @@ class Autoexcal(SiPage):
     def load_web_port(self):
         try:
             config1 = configparser.ConfigParser()
-            config1.read(PATH_CONFIG)
+            config1.read(PATH_CONFIG, encoding="utf-8")
             config = config1["chromium_options"]
             port = config["address"].split(":")[1]
+
+            print(f"port: {port}")
             self.port_int_spin_box.setValue(int(port))
         except Exception as e:
             print(f"发生错误: {e}")

@@ -1,7 +1,7 @@
 #  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
 from sys_stdio import setup_logging
-setup_logging(False)
+setup_logging(False)  # 配置日志
 
 import argparse
 import configparser
@@ -19,7 +19,7 @@ PATH_CONFIG = config.CONFIG.CONFIG_PATH
 
 def read_config() -> tuple:  # 读取配置文件
     config = configparser.ConfigParser()
-    config.read(PATH_CONFIG)
+    config.read(PATH_CONFIG, encoding='utf-8')
     dpi_policy = config.get('Settings', 'dpi_policy', fallback='PassThrough')
     enable_hdpi_scaling = config.getboolean('Settings', 'enable_hdpi_scaling', fallback=False)
     use_hdpi_pixmaps = config.getboolean('Settings', 'use_hdpi_pixmaps', fallback=False)
@@ -81,6 +81,8 @@ def main():
 if __name__ == "__main__":
 
     main()
+
+
 
 
 

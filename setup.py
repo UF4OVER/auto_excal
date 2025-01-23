@@ -1,9 +1,19 @@
 #  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
+import configparser
+
+VERSION = "V1.1.4"
 
 from cx_Freeze import setup, Executable
+import config.CONFIG
 
-VERSION = "V1.1.2"
+PATH_CONFIG = config.CONFIG.CONFIG_PATH
+config = configparser.ConfigParser()
+config.read(PATH_CONFIG,encoding='utf-8')
+config["version"]["version"] = VERSION
+
+with open(PATH_CONFIG, "w") as configfile:
+    config.write(configfile)
 
 build_exe_options = {
     "packages": [
@@ -30,15 +40,15 @@ build_exe_options = {
         "scipy",
         "scipy.libs",
         "matplotlib",
-        "backports",        # 通常用于兼容旧版 Python，如果您运行的是现代 Python 版本（如 3.8+），可以移除。
+        "backports",  # 通常用于兼容旧版 Python，如果您运行的是现代 Python 版本（如 3.8+），可以移除。
         "PIL",
         "lib2to3",
         "cryptography",
         "setuptools",
-        "tkinter",          # 排除 tkinter 以减小体积
-        "unittest",         # 排除测试模块
-        "email",            # 排除 email 模块
-        "pydoc",            # 排除文档模块
+        "tkinter",  # 排除 tkinter 以减小体积
+        "unittest",  # 排除测试模块
+        "email",  # 排除 email 模块
+        "pydoc",  # 排除文档模块
     ],
     # "zip_include_packages": ["*"],
     # #

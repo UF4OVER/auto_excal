@@ -1,16 +1,6 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
-# -------------------------------
-#  @Project : siui
-#  @Time    : 2025 - 01-22 22:53
-#  @FileName: updata.py
-#  @Software: PyCharm 2024.1.6 (Professional Edition)
-#  @System  : Windows 11 23H2
-#  @Author  : 33974
-#  @Contact :
-#  @Python  :
-# -------------------------------
 import configparser
 import requests
 from parts.event.send_message import show_message
@@ -20,7 +10,7 @@ PATH_CONFIG = config.CONFIG.CONFIG_PATH
 
 config = configparser.ConfigParser()
 
-config.read(PATH_CONFIG)
+config.read(PATH_CONFIG,encoding='utf-8')
 
 config = config["version"]
 VERSION = config["version"]

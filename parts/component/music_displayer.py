@@ -1,24 +1,22 @@
 # -*- coding: utf-8 -*-
 #  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
+import os
 import shutil
 
 from PyQt5.QtCore import Qt, QObject, pyqtSignal, QUrl
 from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
-
-from siui.components import SiSimpleButton, SiDenseVContainer, SiPixLabel, SiLabel, SiPushButton
+from PyQt5.QtWidgets import QFileDialog
+from mutagen.id3 import ID3
+from mutagen.mp3 import MP3
+from siui.components import SiSimpleButton, SiDenseVContainer, SiPixLabel, SiLabel
 from siui.components import SiWidget
 from siui.core import Si, SiQuickEffect
 from siui.core import SiColor, SiGlobal
 from siui.gui import SiFont
-import os
-from mutagen.mp3 import MP3
-from mutagen.id3 import ID3
 
-from parts.component.DynamicIsland import Send_DynamicIsland_Message
-
+from parts.component.DynamicIsland import Send_DynamicIsland_Message, Send_DynamicIsland_Message_Default
 
 
 def get_mp3_info(mp3_path):
@@ -30,7 +28,7 @@ def get_mp3_info(mp3_path):
     album = audio.tags.get('TALB', [None])[0] or 'Unknown Album'
 
     # 打印信息
-    print(f'TIT2:, {title}, TPE1:, {artist}, TALB:{album}')
+    print(f'标题:, {title}, 作者:, {artist}, 专辑:{album}')
 
     # 获取封面图片
     cover_path = None
@@ -358,7 +356,7 @@ class SiMusicDisplayer(SiWidget):
         if self.quick_play_panel.is_playing:
             self.setStop()
             self.stopped.emit()
-            Send_DynamicIsland_Message("self.title", "self.artist", "self.album")
+            Send_DynamicIsland_Message_Default()
         else:
             self.setStart()
             self.played.emit()

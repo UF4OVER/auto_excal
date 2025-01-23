@@ -103,7 +103,7 @@ class MySiliconApp(My_SiliconApplication):
 
     def closeEvent(self, event):
         config = configparser.ConfigParser()
-        config.read(PATH_CONFIG)
+        config.read(PATH_CONFIG,encoding='utf-8')
         config = config["switch_options"]
         config_content = config.getboolean("enable_switch")
         print(f"read_ui_enable_switch:{config_content}")

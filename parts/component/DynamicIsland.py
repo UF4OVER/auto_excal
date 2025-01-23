@@ -1,3 +1,8 @@
+#  Copyright (c) 2025 UF4OVER
+#   All rights reserved.
+
+import configparser
+
 import psutil
 from PyQt5.QtCore import QTimer, QRect, Qt, pyqtProperty, QPropertyAnimation, QEasingCurve, QSize, QPoint
 from PyQt5.QtGui import QFont, QColor, QPalette
@@ -7,6 +12,17 @@ from siui.core import Si
 from siui.core import SiColor, SiGlobal
 from siui.gui import SiFont
 from siui.components.widgets.expands import SiHExpandWidget
+import config.CONFIG
+
+PATH_CONFIG = config.CONFIG.CONFIG_PATH
+
+config = configparser.ConfigParser()
+config.read(PATH_CONFIG,encoding='utf-8')
+
+VERSION = config.get('version', 'version')
+AUTHOR = config.get('name', 'author')
+
+print(VERSION)
 
 
 class DenseVContainerBG(SiDenseHContainer):
@@ -135,7 +151,6 @@ class DynamicIsland(SiHExpandWidget):
         self.tip_color_animation.setDuration(300)
         self.tip_color_animation.setEasingCurve(QEasingCurve.InOutQuad)
 
-
     @pyqtProperty(QColor)
     def tipColor(self):
         return self._color
@@ -156,15 +171,16 @@ class DynamicIsland(SiHExpandWidget):
 
     def leaveEvent(self, a0):
         super().leaveEvent(a0)
-        self.tip.setText("UF4OVER")
+        self.tip.setText(AUTHOR)
         self.tip_color_animation.setStartValue(self.tipColor)
-        self.tip_color_animation.setEndValue(QColor(255, 255, 255))  # 鼠标离开时颜色变为白色
+        self.tip_color_animation.setEndValue(QColor(235, 235, 235))  # 鼠标离开时颜色变为白色
         self.tip_color_animation.start()
 
     def send_default(self):
+
         self.title.setText("Loot Hearts")
-        self.subtitle.setText("")
-        self.tip.setText("UF4OVER")
+        self.subtitle.setText(VERSION)
+        self.tip.setText(AUTHOR)
 
     def send(self, title, subtitle, tip):
         self.title.setText(title)
@@ -193,3 +209,7 @@ class DynamicIsland(SiHExpandWidget):
 
 def Send_DynamicIsland_Message(title, subtitle, tip):
     SiGlobal.siui.windows["MAIN_WINDOW"].Dynamic_Island().send(title, subtitle, tip)
+
+
+def Send_DynamicIsland_Message_Default():
+    SiGlobal.siui.windows["MAIN_WINDOW"].Dynamic_Island().send_default()
