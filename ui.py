@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import QDesktopWidget, QShortcut
 from siui.core import SiColor, SiGlobal
 from siui.templates.application.application import SiliconApplication
 
+from parts.page.page_electronicpage import PageElectronicComputing
 from parts.page.page_updatepage import UpDatePage
 from parts.component.DynamicIsland import DynamicIsland
 from parts.event.close_event import CloseModalDialog
@@ -78,6 +79,10 @@ class MySiliconApp(My_SiliconApplication):
         self.layerMain().addPage(PageMusicPage(self),
                                  icon=SiGlobal.siui.iconpack.get("ic_fluent_music_note_2_play_filled"),
                                  hint="音乐", side="top")
+
+        self.layerMain().addPage(PageElectronicComputing(self),
+                                 icon=SiGlobal.siui.iconpack.get("ic_fluent_content_view_gallery_lightning_regular"),
+                                 hint="电子", side="top")
 
         self.layerMain().addPage(About(self),
                                  icon=SiGlobal.siui.iconpack.get("ic_fluent_info_filled"),

@@ -2,11 +2,9 @@
 #   All rights reserved.
 import os
 import shutil
-import sys
 
-import psutil
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QFileDialog, QApplication, QMessageBox
+from PyQt5.QtWidgets import QFileDialog, QApplication
 from siui.components import SiTitledWidgetGroup, SiMasonryContainer
 from siui.components.button import (
     SiPushButtonRefactor,

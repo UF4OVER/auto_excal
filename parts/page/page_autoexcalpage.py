@@ -28,27 +28,22 @@ from siui.core import SiGlobal, SiColor, Si
 from parts.event.send_message import show_message
 
 from config import qss
-import config.CONFIG
-PATH_CONFIG = config.CONFIG.CONFIG_PATH
+import config.CONFIG as F
 
-config = configparser.ConfigParser()
-config.read(PATH_CONFIG, encoding='utf-8')
-
+PATH_CONFIG = F.CONFIG_PATH
 co = ChromiumOptions(read_file=True, ini_path=PATH_CONFIG)
 
 try:
-    config = config["chromium_options"]
-
-    browser_path = config["browser_path"]
-    broswer_address = config["address"]
+    broswer_address = F.READ_CONFIG("chromium_options", "address")
+    browser_path = F.READ_CONFIG("chromium_options", "browser_path")
 
 except Exception as e:
     print(f"config.ini 配置文件读取失败: {e}")
     browser_path = "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
     broswer_address = "127.0.0.1:9222"
 finally:
-    print(f"browser_path:{browser_path}")
-    print(f"broswer_address:{broswer_address}")
+    print(f"浏览器路径:{browser_path}")
+    print(f"浏览器地址:{broswer_address}")
 
 
 class MainLoopThread(QThread):
@@ -768,13 +763,8 @@ class Autoexcal(SiPage):
         try:
             file_path = QFileDialog.getOpenFileName(self, "选择浏览器路径", "", "Executable Files (*.exe)")[0]
             if file_path:
-                config2 = configparser.ConfigParser()
-                config2.read(PATH_CONFIG)
-                config = config2["chromium_options"]
-                config["browser_path"] = file_path
-                with open(PATH_CONFIG, 'w') as configfile:
-                    config2.write(configfile)
-                show_message(1, "提示", "浏览器路径已更改", "ic_fluent_wrench_settings_filled")
+                F.WRITE_CONFIG("chromium_options", "browser_path", file_path)
+                show_message(1, "提示", f"浏览器路径已更改\r\n{file_path}", "ic_fluent_wrench_settings_filled")
             print(file_path)
         except Exception as e:
             print(f"发生错误: {e}")
@@ -783,12 +773,7 @@ class Autoexcal(SiPage):
     def change_web_port(self):
         try:
             port = self.port_int_spin_box.value()
-            config1 = configparser.ConfigParser()
-            config1.read(PATH_CONFIG)
-            config = config1["chromium_options"]
-            config["address"] = f"127.0.0.1:{port}"
-            with open(PATH_CONFIG, 'w') as configfile:
-                config1.write(configfile)
+            F.WRITE_CONFIG("chromium_options", "address", f"127.0.0.1:{port}")
             show_message(1, "提示", "端口已更改", "ic_fluent_wrench_settings_filled")
         except Exception as e:
             print(f"发生错误: {e}")
@@ -796,13 +781,10 @@ class Autoexcal(SiPage):
 
     def load_web_port(self):
         try:
-            config1 = configparser.ConfigParser()
-            config1.read(PATH_CONFIG, encoding="utf-8")
-            config = config1["chromium_options"]
-            port = config["address"].split(":")[1]
+            port = F.READ_CONFIG("chromium_options", "address")
 
-            print(f"port: {port}")
-            self.port_int_spin_box.setValue(int(port))
+            print(f"浏览器端口: {port}")
+            self.port_int_spin_box.setValue(int(port.split(":")[1]))
         except Exception as e:
             print(f"发生错误: {e}")
             self.port_int_spin_box.setValue(9222)

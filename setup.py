@@ -1,19 +1,11 @@
 #  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
-import configparser
 
-VERSION = "V1.1.4"
+VERSION_A = "V1.1.4"
 
 from cx_Freeze import setup, Executable
-import config.CONFIG
-
-PATH_CONFIG = config.CONFIG.CONFIG_PATH
-config = configparser.ConfigParser()
-config.read(PATH_CONFIG,encoding='utf-8')
-config["version"]["version"] = VERSION
-
-with open(PATH_CONFIG, "w") as configfile:
-    config.write(configfile)
+import config.CONFIG as F
+F.WRITE_CONFIG("version", "version", VERSION_A)
 
 build_exe_options = {
     "packages": [
@@ -65,7 +57,7 @@ base = "Win32GUI"
 
 setup(
     name='Wedding Invitation',
-    version=VERSION,
+    version=VERSION_A,
     url='https://github.com/UF4OVER',
     license='MIT',
     author='UF4',

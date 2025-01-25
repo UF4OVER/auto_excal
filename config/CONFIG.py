@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import configparser
 #  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
 
@@ -15,7 +15,6 @@
 # -------------------------------
 import enum
 import os
-
 
 
 class CONFIG(enum.Enum):
@@ -46,3 +45,17 @@ MUSIC_PATH: str = CONFIG.PATH_MUSIC.value
 print(f"全局配置文件路径:{CONFIG_PATH}")
 print(f"全局图片文件路径:{PNG_PATH}")
 print(f"全局音乐文件路径:{MUSIC_PATH}")
+
+
+def READ_CONFIG(cls: str, name: str) -> str | int | bool | list:
+    config = configparser.ConfigParser()
+    config.read(CONFIG_PATH, encoding='utf-8')
+    return config.get(cls, name)
+
+
+def WRITE_CONFIG(cls: str, name: str, value: str | int | bool | list):
+    config = configparser.ConfigParser()
+    config.read(CONFIG_PATH, encoding='utf-8')
+    config.set(cls, name, value)
+    with open(CONFIG_PATH, 'w', encoding='utf-8') as configfile:
+        config.write(configfile)

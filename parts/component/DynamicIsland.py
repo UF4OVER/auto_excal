@@ -12,15 +12,13 @@ from siui.core import Si
 from siui.core import SiColor, SiGlobal
 from siui.gui import SiFont
 from siui.components.widgets.expands import SiHExpandWidget
-import config.CONFIG
+import config.CONFIG as F
 
-PATH_CONFIG = config.CONFIG.CONFIG_PATH
 
-config = configparser.ConfigParser()
-config.read(PATH_CONFIG,encoding='utf-8')
+PATH_CONFIG = F.CONFIG_PATH
 
-VERSION = config.get('version', 'version')
-AUTHOR = config.get('name', 'author')
+VERSION = F.READ_CONFIG('version', 'version')
+AUTHOR = F.READ_CONFIG('name', 'author')
 
 print(VERSION)
 

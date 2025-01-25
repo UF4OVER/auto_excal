@@ -14,18 +14,16 @@ from siui.components.page import SiPage
 from siui.components.titled_widget_group import SiTitledWidgetGroup
 from siui.core import Si, SiGlobal
 
-import config.CONFIG
+import config.CONFIG as F
 from parts.event.send_message import show_message
 
-PATH_CONFIG = config.CONFIG.CONFIG_PATH
-config = configparser.ConfigParser()
-config.read(PATH_CONFIG, encoding='utf-8')
+PATH_CONFIG = F.CONFIG_PATH
 
-VERSION = config["version"]["version"]
-REPO_OWNER = config["version"]["repo_owner"]
-REPO_NAME = config["version"]["repo_name"]
+VERSION = F.READ_CONFIG("version", "version")
+REPO_OWNER = F.READ_CONFIG("version", "repo_owner")
+REPO_NAME = F.READ_CONFIG("version", "repo_name")
 GITHUB_API_URL = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/releases/latest"
-DOWNLOAD_PATH = config["version"]["path"]
+DOWNLOAD_PATH = F.READ_CONFIG("version", "path")
 try:
     if not os.path.exists(DOWNLOAD_PATH):
         os.makedirs(DOWNLOAD_PATH)
@@ -259,12 +257,8 @@ class UpDatePage(SiPage):
 
     def choose_folder(self):
         folder_path = QFileDialog.getExistingDirectory(self, "选择文件夹")
-        config = configparser.ConfigParser()
         if folder_path:
-            config.read(PATH_CONFIG,encoding='utf-8')
-            config["version"]["path"] = folder_path
-            with open(PATH_CONFIG, "w") as configfile:
-                config.write(configfile)
+            F.WRITE_CONFIG("version", "path", folder_path)
             print(f"路径已更改为:{folder_path}")
         else:
             pass
