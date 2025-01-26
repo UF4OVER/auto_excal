@@ -2,9 +2,11 @@
 #   All rights reserved.
 
 import configparser
+import shutil
 import webbrowser
 
 from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QFileDialog
 from siui.components import SiDenseHContainer, SiLabel, SiDenseVContainer, SiOptionCardPlane, SiTitledWidgetGroup, \
     SiOptionCardLinear
 from siui.components.button import SiRadioButtonRefactor, SiPushButtonRefactor, SiSwitchRefactor
@@ -14,6 +16,7 @@ from parts.page.page_autoexcalpage import show_message
 import config.CONFIG
 
 PATH_CONFIG = config.CONFIG.CONFIG_PATH
+PATH_PNG = config.CONFIG.PNG_PATH
 
 
 class Label(SiLabel):
@@ -210,6 +213,26 @@ class PageSettingPage(SiPage):
             close_options.load(SiGlobal.siui.iconpack.get("ic_fluent_closed_caption_off_filled"))
             close_options.addWidget(self.close_options_toggle)
             group.addWidget(close_options)
+        with self.titled_widgets_group as group:
+            group.addTitle("主页背景")
+
+            self.change_background_btu = SiPushButtonRefactor(self)
+            self.change_background_btu.setText("更换背景")
+            self.change_background_btu.resize(128, 32)
+            self.change_background_btu.clicked.connect(self.change_background)
+
+            self.background_options = SiOptionCardLinear(self)
+            self.background_options.setTitle("主页背景", "启用后主页背景为图片")
+            self.background_options.load(SiGlobal.siui.iconpack.get("ic_fluent_image_arrow_back_filled"))
+            self.background_options.addWidget(self.change_background_btu)
+
+            group.addWidget(self.background_options)
+
+    def change_background(self):
+        png_file_path = QFileDialog.getOpenFileName(self, "选择PNG文件", "", "JPG(嘿嘿嘿) Files (*.jpg)")[0]
+        if png_file_path:
+            shutil.copy(png_file_path,f"{PATH_PNG}\\back.jpg")
+            show_message(1, "背景更换成功", "下次重启生效", "ic_fluent_emoji_hand_filled")
 
     def load_settings(self):
         dpi_policy, enable_hdpi_scaling, use_hdpi_pixmaps = read_config()

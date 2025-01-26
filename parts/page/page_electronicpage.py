@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
-
 #  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
-
 # -------------------------------
 #  @Project : siui
 #  @Time    : 2025 - 01-25 15:06
@@ -10,26 +8,12 @@
 #  @Software: PyCharm 2024.1.6 (Professional Edition)
 #  @System  : Windows 11 23H2
 #  @Author  : 33974
-#  @Contact : 
-#  @Python  : 
-# -------------------------------s
-from siui.core import Si, SiColor, SiGlobal
+#  @Contact :
+#  @Python  :
+# -------------------------------
 
-from siui.components.widgets import (
-    SiCheckBox,
-    SiDenseHContainer,
-    SiDraggableLabel,
-    SiIconLabel,
-    SiLabel,
-    SiLongPressButton,
-    SiPixLabel,
-    SiPushButton,
-    SiRadioButton,
-    SiSimpleButton,
-    SiSwitch,
-    SiToggleButton,
-)
 from PyQt5.QtCore import Qt
+from siui.components.button import (SiPushButtonRefactor)
 from siui.components.combobox import SiComboBox
 from siui.components.editbox import SiDoubleSpinBox
 from siui.components.option_card import SiOptionCardPlane
@@ -38,10 +22,13 @@ from siui.components.titled_widget_group import SiTitledWidgetGroup
 from siui.components.widgets import (
     SiDenseHContainer,
 )
-from siui.components.button import (SiSwitchRefactor,
-                                    SiPushButtonRefactor)
-
+from siui.components.widgets import (
+    SiLabel,
+)
 from siui.core import Si, SiGlobal
+
+from siui.core import SiColor
+
 import config.CONFIG as F
 from event.send_message import show_message
 
@@ -167,59 +154,67 @@ class PageElectronicComputing(SiPage):
             g.addWidget(resistors_tab)
 
     def calculate_r1_r2(self, vout: float = 0, vref: float = 0):
-        print("-"*70)
-        # VOUT = 0.8 × (1 + (R1 ÷ R2))
-        if vref == 0 or vref <= 0:
-            show_message(1, "错误", "参考电压不正确哦", "ic_fluent_wrench_settings_filled")
-            return
 
-        self.r1_r2 = round((vout / vref) - 1, 3)
-        print(f"比例系数：{self.r1_r2}")
+        try:
+            print("-"*70)
+            # VOUT = 0.8 × (1 + (R1 ÷ R2))
+            if vref == 0 or vref <= 0:
+                show_message(1, "错误", "参考电压不正确哦", "ic_fluent_wrench_settings_filled")
+                return
 
-        match self.resistance_select.value():
-            case "E6 ±20%":
-                self.EEE = self.E6
-                print("E6 ±20%")
-            case "E12 ±10%":
-                self.EEE = self.E12
-                print("E12 ±10%")
-            case "E24 ±5%":
+            self.r1_r2 = round((vout / vref) - 1, 3)
+            print(f"比例系数：{self.r1_r2}")
+
+            if self.resistance_select.value():
+                match self.resistance_select.value():
+                    case "E6 ±20%":
+                        self.EEE = self.E6
+                        print("E6 ±20%")
+                    case "E12 ±10%":
+                        self.EEE = self.E12
+                        print("E12 ±10%")
+                    case "E24 ±5%":
+                        self.EEE = self.E24
+                        print("E24 ±5%")
+                    case "E48 ±2%":
+                        self.EEE = self.E48
+                        print("E48 ±2%")
+                    case "E96 ±1%":
+                        self.EEE = self.E96
+                        print("E96 ±1%")
+                    case "E192 ±0.5%":
+                        self.EEE = self.E192
+                        print("E192 ±0.5%")
+                    case _:
+                        self.EEE = self.E24
+                        print("E24 ±5%")
+            else:
                 self.EEE = self.E24
-                print("E24 ±5%")
-            case "E48 ±2%":
-                self.EEE = self.E48
-                print("E48 ±2%")
-            case "E96 ±1%":
-                self.EEE = self.E96
-                print("E96 ±1%")
-            case "E192 ±0.5%":
-                self.EEE = self.E192
-                print("E192 ±0.5%")
-            case _:
-                self.EEE = self.E24
-                print("E24 ±5%")
 
-        res = []
-        err = []
-        rat = []
-        for r1 in self.EEE:
-            for r2 in self.EEE:
-                ratio = round(float(r1) / float(r2), 3)
-                error = round(abs(ratio - self.r1_r2), 3)
+            res = []
+            err = []
+            rat = []
+            for r1 in self.EEE:
+                for r2 in self.EEE:
+                    ratio = round(float(r1) / float(r2), 3)
+                    error = round(abs(ratio - self.r1_r2), 3)
 
-                res.append((r1, r2))
-                rat.append(ratio)
-                err.append(error)
-        # print(f"RES: {res}")
-        # print(f"RAT: {rat}")
-        # print(f"ERR: {err}")
+                    res.append((r1, r2))
+                    rat.append(ratio)
+                    err.append(error)
+            # print(f"RES: {res}")
+            # print(f"RAT: {rat}")
+            # print(f"ERR: {err}")
 
-        min_index, min_value = min(enumerate(err), key=lambda x: x[1])
-        self.r1_result.setText(str(res[min_index][0]))
-        self.r2_result.setText(str(res[min_index][1]))
-        self.deviation_result.setText(str(round(min_value * 100, 2)) + " %")
-        print(f"最小误差: {min_value}, 对应的 R1, R2: {res[min_index]}")
-        print("-"*70)
+            min_index, min_value = min(enumerate(err), key=lambda x: x[1])
+            self.r1_result.setText(str(res[min_index][0]))
+            self.r2_result.setText(str(res[min_index][1]))
+            self.deviation_result.setText(str(round(min_value * 100, 2)) + " %")
+            print(f"最小误差: {min_value}, 对应的 R1, R2: {res[min_index]}")
+            print("-"*70)
+        except Exception as e:
+            print(e)
+            show_message(1, "错误", f"计算出错了哦\r\n{e}", "ic_fluent_wrench_settings_filled")
 
     def read_res_nominal_resistance(self):
         self.E6 = list(map(float, F.READ_CONFIG("resistance", "E6").split(",")))

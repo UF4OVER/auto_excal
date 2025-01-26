@@ -8,40 +8,43 @@ import config.CONFIG as F
 F.WRITE_CONFIG("version", "version", VERSION_A)
 
 build_exe_options = {
-    "packages": [
-        "PyQt5.QtCore",
-        "PyQt5.QtGui",
-        "PyQt5.QtWidgets",
-        "siui",
-        "icons",
-        "parts",
-        "config",
-        "openpyxl",
-        "ui",
-        "DrissionPage",
-        "mutagen.mp3",
-        "music",
-        "pycaw",
-        "wmi",
-        "comtypes",
-        "pic"
-    ],
-    "include_files": [
-    ],
-    "excludes": [
-        "scipy",
-        "scipy.libs",
-        "matplotlib",
-        "backports",  # 通常用于兼容旧版 Python，如果您运行的是现代 Python 版本（如 3.8+），可以移除。
-        "PIL",
-        "lib2to3",
-        "cryptography",
-        "setuptools",
-        "tkinter",  # 排除 tkinter 以减小体积
-        "unittest",  # 排除测试模块
-        "email",  # 排除 email 模块
-        "pydoc",  # 排除文档模块
-    ],
+    "packages":
+        [
+            "PyQt5.QtCore",
+            "PyQt5.QtGui",
+            "PyQt5.QtWidgets",
+            "siui",
+            "icons",
+            "parts",
+            "config",
+            "openpyxl",
+            "ui",
+            "DrissionPage",
+            "mutagen.mp3",
+            "music",
+            "pycaw",
+            "wmi",
+            "comtypes",
+            "pic"
+        ],
+    "include_files":
+        [
+        ],
+    "excludes":
+        [
+            "scipy",
+            "scipy.libs",
+            "matplotlib",
+            "backports",  # 通常用于兼容旧版 Python，如果您运行的是现代 Python 版本（如 3.8+），可以移除。
+            "PIL",
+            "lib2to3",
+            "cryptography",
+            "setuptools",
+            "tkinter",  # 排除 tkinter 以减小体积
+            "unittest",  # 排除测试模块
+            "email",  # 排除 email 模块
+            "pydoc",  # 排除文档模块
+        ],
     # "zip_include_packages": ["*"],
     # #
     # "zip_exclude_packages": ["siui",

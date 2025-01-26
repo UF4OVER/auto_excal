@@ -52,6 +52,30 @@ class About(SiPage):
         version_picture_container.addWidget(self.version_picture)
         version_picture_container.addWidget(self.version_label)
         self.titled_widget_group.addWidget(version_picture_container)
+        with self.titled_widget_group as group:
+            group.addTitle("关于")
+            self.about_me = SiOptionCardLinear(self)
+            self.about_me.setTitle("关于我", "I am an ordinary person, now learning Python.")
+            self.about_me.load(SiGlobal.siui.iconpack.get("ic_fluent_share_screen_person_overlay_filled"))
+
+            self.about_me_btu = SiSimpleButton(self)
+            self.about_me_btu.resize(32, 32)
+            self.about_me_btu.attachment().load(SiGlobal.siui.iconpack.get("ic_fluent_open_regular"))
+            self.about_me_btu.clicked.connect(lambda: QDesktopServices.openUrl(QUrl("https://github.com/UF4OVER")))
+            self.about_me.addWidget(self.about_me_btu)
+
+            self.button_to_me_repo = SiSimpleButton(self)
+            self.button_to_me_repo.resize(32, 32)
+            self.button_to_me_repo.attachment().load(SiGlobal.siui.iconpack.get("ic_fluent_open_regular"))
+            self.button_to_me_repo.clicked.connect(lambda: QDesktopServices.openUrl(QUrl("https://github.com/UF4OVER/auto_excal")))
+
+            self.option_card_my_repo = SiOptionCardLinear(self)
+            self.option_card_my_repo.setTitle("开源仓库", "在 GitHub 上查看 Wedding Invitation 的项目主页")
+            self.option_card_my_repo.load(SiGlobal.siui.iconpack.get("ic_fluent_home_database_regular"))
+            self.option_card_my_repo.addWidget(self.button_to_me_repo)
+
+            group.addWidget(self.about_me)
+            group.addWidget(self.option_card_my_repo)
 
         with self.titled_widget_group as group:
             group.addTitle("UI开源库")

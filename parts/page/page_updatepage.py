@@ -1,10 +1,9 @@
 #  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
 
-import configparser
 import os
-
 import requests
+
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject
 from PyQt5.QtWidgets import QFileDialog
 from siui.components import SiLongPressButton
