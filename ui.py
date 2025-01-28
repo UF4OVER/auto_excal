@@ -1,12 +1,10 @@
 #  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
-
-import configparser
 import icons
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QKeySequence
-from PyQt5.QtWidgets import QDesktopWidget, QShortcut
+from PyQt5.QtWidgets import QDesktopWidget, QShortcut, QSystemTrayIcon, QAction, QMenu
 
 from siui.core import SiColor, SiGlobal
 from siui.templates.application.application import SiliconApplication
@@ -28,10 +26,10 @@ SiGlobal.siui.loadIcons(
         color=SiGlobal.siui.colors.fromToken(SiColor.SVG_NORMAL)
     ).icons
 )
-import config.CONFIG
+import config.CONFIG as F
 
-PATH_CONFIG = config.CONFIG.CONFIG_PATH
-PATH_PIC = config.CONFIG.PNG_PATH
+PATH_CONFIG = F.CONFIG_PATH
+PATH_PIC = F.PNG_PATH
 
 
 class My_SiliconApplication(SiliconApplication):
@@ -47,12 +45,12 @@ class My_SiliconApplication(SiliconApplication):
 
     def showEvent(self, event):
         super().showEvent(event)
-        self.dynamic_island.move(self.size().width() // 2 - 150, 15)
+        self.dynamic_island.move(self.size().width() // 2 - 200, 15)
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
         # print(f"event.size().width()//2::{event.size().width() // 3}")
-        self.dynamic_island.move(event.size().width() // 2 - 150, 15)
+        self.dynamic_island.move(event.size().width() // 2 - 200, 15)
 
 
 class MySiliconApp(My_SiliconApplication):
@@ -97,6 +95,38 @@ class MySiliconApp(My_SiliconApplication):
         self.layerMain().setPage(0)
 
         SiGlobal.siui.reloadAllWindowsStyleSheet()
+        # 创建系统托盘图标
+        self.tray_icon = QSystemTrayIcon(QIcon(f"{PATH_PIC}/圆角-default.jpg"), self)
+        self.tray_icon.setToolTip("Wedding Invitation")
+
+        # 创建托盘菜单
+        self.tray_menu = QMenu(self)
+        show_action = QAction("作者:UF4OVER", self)
+        quit_action = QAction("退出", self)
+
+        show_action.triggered.connect(self.show)
+        quit_action.triggered.connect(self.quit_app)
+
+        self.tray_menu.addAction(show_action)
+        self.tray_menu.addAction(quit_action)
+
+        self.tray_icon.setContextMenu(self.tray_menu)
+        self.tray_icon.activated.connect(self.on_tray_icon_activated)
+        self.tray_menu.setStyleSheet("""
+            QMenu {
+                background-color: #2c313c;
+                border: 1px solid #2c313c;
+                border-radius: 5px;
+                color: #ffffff;
+                font-size: 12px;
+            }
+            QMenu::item:selected {
+                background-color: #3a3f4b;
+            }
+        """)
+
+        # 显示托盘图标
+        self.tray_icon.show()
 
     def GlobalLeft(self):
         SiGlobal.siui.windows["MAIN_WINDOW"].layerLeftGlobalDrawer().showLayer()
@@ -106,26 +136,9 @@ class MySiliconApp(My_SiliconApplication):
         shortcut_show.setContext(Qt.ApplicationShortcut)  # 设置为全局快捷键
         shortcut_show.activated.connect(self.GlobalLeft)  # 连接 GlobalLeft 方法
 
-    def closeEvent(self, event):
-        config = configparser.ConfigParser()
-        config.read(PATH_CONFIG,encoding='utf-8')
-        config = config["switch_options"]
-        config_content = config.getboolean("enable_switch")
-        print(f"read_ui_enable_switch:{config_content}")
+    def quit_app(self):
+        self.close()
 
-        if config_content:
-            self.event = event
-            if self.stu:
-                event.accept()
-            else:
-                self.event.ignore()
-                temp_widget = CloseModalDialog(self)
-                SiGlobal.siui.windows["MAIN_WINDOW"].layerModalDialog().setDialog(temp_widget)
-                temp_widget.user_decision.connect(self._sw_stu)  # 连接信号到槽
-        else:
-            SiGlobal.siui.windows["MAIN_WINDOW"].close()
-            event.accept()
-
-    def _sw_stu(self):
-        self.stu = not self.stu
-        SiGlobal.siui.windows["MAIN_WINDOW"].close()
+    def on_tray_icon_activated(self, reason):
+        if reason == QSystemTrayIcon.DoubleClick:
+            self.show()

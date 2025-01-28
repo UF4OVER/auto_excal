@@ -15,6 +15,8 @@ import configparser
 # -------------------------------
 import enum
 import os
+from datetime import datetime
+import pytz
 
 
 class CONFIG(enum.Enum):
@@ -59,3 +61,16 @@ def WRITE_CONFIG(cls: str, name: str, value: str | int | bool | list):
     config.set(cls, name, value)
     with open(CONFIG_PATH, 'w', encoding='utf-8') as configfile:
         config.write(configfile)
+
+
+utc_now = datetime.utcnow()
+eastern = pytz.timezone('Asia/Shanghai')
+today = utc_now.replace(tzinfo=pytz.utc).astimezone(eastern).strftime("%Y-%m-%d")
+
+
+if READ_CONFIG("date","time") != today:
+    WRITE_CONFIG('date', 'time', today)
+    WRITE_CONFIG("Email", "email_send", "True")
+else:
+    print("时间未更新")
+

@@ -1,19 +1,17 @@
 #  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
 
-import configparser
-
 import psutil
-from PyQt5.QtCore import QTimer, QRect, Qt, pyqtProperty, QPropertyAnimation, QEasingCurve, QSize, QPoint
+from PyQt5.QtCore import QTimer, QRect, Qt, pyqtProperty, QPropertyAnimation, QEasingCurve, QTime
 from PyQt5.QtGui import QFont, QColor, QPalette
 from PyQt5.QtGui import QPainter, QFontMetrics
 from siui.components import SiDenseHContainer, SiLabel, SiSvgLabel
+from siui.components.widgets.expands import SiHExpandWidget
 from siui.core import Si
 from siui.core import SiColor, SiGlobal
 from siui.gui import SiFont
-from siui.components.widgets.expands import SiHExpandWidget
-import config.CONFIG as F
 
+import config.CONFIG as F
 
 PATH_CONFIG = F.CONFIG_PATH
 
@@ -97,7 +95,7 @@ class DynamicIsland(SiHExpandWidget):
         # self.setFixedSize(350, 30)
 
         self.container = DenseVContainerBG(self)
-        self.container.setFixedSize(350, 30)
+        self.container.setFixedSize(440, 30)
         self.adjustSize()
 
         self.title = ScrollingLabel(self)
@@ -127,6 +125,15 @@ class DynamicIsland(SiHExpandWidget):
         self.tip.setSiliconWidgetFlag(Si.AdjustSizeOnTextChanged)
         self.tip.startScrolling()
 
+        self.time_label = SiLabel(self)
+        self.time_label.setFixedSize(70, 30)
+        self.time_label.setFont(SiFont.getFont(size=12, weight=QFont.Weight.Normal))
+        self.time_label.setTextColor(self.getColor(SiColor.TEXT_C))
+        self.time_label.setAlignment(Qt.AlignCenter)
+        self.time_label.resize(70, self.size().height())
+        self.time_label.moveTo(350, 0)
+        self.time_label.setText(f"{F.READ_CONFIG('date', 'time')}")
+
         self.container.setSpacing(0)
         self.container.addPlaceholder(10)
         self.container.addWidget(self.title)
@@ -135,6 +142,9 @@ class DynamicIsland(SiHExpandWidget):
         self.container.addPlaceholder(3)
         self.container.addWidget(self.tip)
         self.container.addPlaceholder(5)
+        self.container.addWidget(self.time_label)
+        self.container.addPlaceholder(10)
+        # self.time_label.moveTo(350, 0)
 
         self.send_default()
 
@@ -144,10 +154,20 @@ class DynamicIsland(SiHExpandWidget):
         battery_timer.timeout.connect(self.update_battery)
         battery_timer.start(30_0000)  # 5分钟 = 300000毫秒
 
+        time_timer = QTimer()
+        time_timer.timeout.connect(self.update_time)
+        time_timer.start(60_000)
+
         self._color = QColor(255, 255, 255)  # 初始颜色为白色
         self.tip_color_animation = QPropertyAnimation(self, b"tipColor")
         self.tip_color_animation.setDuration(300)
         self.tip_color_animation.setEasingCurve(QEasingCurve.InOutQuad)
+
+    def update_time(self):
+        current_time = QTime.currentTime()
+        formatted_time = current_time.toString("hh:mm:ss")
+        self.time_label.setText(formatted_time)
+
 
     @pyqtProperty(QColor)
     def tipColor(self):
@@ -199,6 +219,7 @@ class DynamicIsland(SiHExpandWidget):
         self.battery_label.load(SiGlobal.siui.iconpack.get(icon_name))
         self.container.addWidget(self.battery_label)
         self.battery_label.setFixedSize(20, 30)
+        self.battery_label.moveTo(320, 0)
 
     def resizeEvent(self, event):
         super().resizeEvent(event)

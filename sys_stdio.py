@@ -20,6 +20,11 @@ from typing import overload
 #  @Contact :
 #  @Python  :
 # -------------------------------
+import sys
+
+# sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+# sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
+
 
 class StreamToLogger:
     def __init__(self, logger, log_level):
@@ -33,7 +38,6 @@ class StreamToLogger:
 
     def flush(self):
         pass
-
 
 @overload
 def setup_logging(arg: bool):

@@ -27,8 +27,8 @@ def get_mp3_info(mp3_path):
     artist = audio.tags.get('TPE1', [None])[0] or 'Unknown Artist'
     album = audio.tags.get('TALB', [None])[0] or 'Unknown Album'
 
-    # 打印信息
-    print(f'标题:, {title}, 作者:, {artist}, 专辑:{album}')
+    # 打印信息，使用 repr 函数处理特殊字符
+    print(f'标题:, {repr(title)}, 作者:, {repr(artist)}, 专辑:{repr(album)}')
 
     # 获取封面图片
     cover_path = None
@@ -380,8 +380,3 @@ class MusicManager:
                 music_displayer.setStop()
             if music_displayer == playing_music_displayer:  # 当前点击的的播放
                 music_displayer.setStart()
-
-
-
-
-

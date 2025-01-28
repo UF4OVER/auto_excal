@@ -13,10 +13,12 @@ from siui.components.button import SiRadioButtonRefactor, SiPushButtonRefactor, 
 from siui.components.page import SiPage
 from siui.core import SiGlobal, Si, SiColor
 from parts.page.page_autoexcalpage import show_message
-import config.CONFIG
+from siui.components.editbox import SiCapsuleEdit, SiLineEdit, SiSpinBox, SiDoubleSpinBox
 
-PATH_CONFIG = config.CONFIG.CONFIG_PATH
-PATH_PNG = config.CONFIG.PNG_PATH
+import config.CONFIG as F
+
+PATH_CONFIG = F.CONFIG_PATH
+PATH_PNG = F.PNG_PATH
 
 
 class Label(SiLabel):
@@ -35,7 +37,7 @@ class Label(SiLabel):
 
 def read_config():
     config = configparser.ConfigParser()
-    config.read(PATH_CONFIG,encoding='utf-8')
+    config.read(PATH_CONFIG, encoding='utf-8')
     dpi_policy = config.get('Settings', 'dpi_policy', fallback='PassThrough')
     enable_hdpi_scaling = config.getboolean('Settings', 'enable_hdpi_scaling', fallback=False)
     use_hdpi_pixmaps = config.getboolean('Settings', 'use_hdpi_pixmaps', fallback=False)
@@ -44,7 +46,7 @@ def read_config():
 
 def save_config(dpi_policy, enable_hdpi_scaling, use_hdpi_pixmaps):
     config = configparser.ConfigParser()
-    config.read(PATH_CONFIG,encoding='utf-8')  # 读取整个配置文件
+    config.read(PATH_CONFIG, encoding='utf-8')  # 读取整个配置文件
 
     # 修改或添加 Settings 部分
     if not config.has_section('Settings'):
@@ -61,7 +63,7 @@ def save_config(dpi_policy, enable_hdpi_scaling, use_hdpi_pixmaps):
 
 def save_close_options(b_: bool):
     config = configparser.ConfigParser()
-    config.read(PATH_CONFIG,encoding='utf-8')
+    config.read(PATH_CONFIG, encoding='utf-8')
     config1 = config["switch_options"]
     config1['enable_switch'] = str(b_)
     with open(PATH_CONFIG, 'w') as configfile:
@@ -70,7 +72,7 @@ def save_close_options(b_: bool):
 
 def read_close_options() -> bool:
     config = configparser.ConfigParser()
-    config.read(PATH_CONFIG,encoding='utf-8')
+    config.read(PATH_CONFIG, encoding='utf-8')
     return config.getboolean('switch_options', 'enable_switch')
 
 
@@ -200,19 +202,7 @@ class PageSettingPage(SiPage):
             self.load_settings()
 
             group.addWidget(self.refactor_radiobuttons)
-        with self.titled_widgets_group as group:
-            group.addTitle("关闭")
-            close_options = SiOptionCardLinear(self)
-            close_options.setTitle("关闭应用时询问", "启用后关闭应用时会询问")
-            self.close_options_toggle = SiSwitchRefactor(self)
-            # 确保读取的值被正确转换为布尔类型
-            self.close_options_toggle.setChecked(True)
-            self.close_options_toggle.setChecked(read_close_options())
-            print(f"read_setting_enable_switch:{read_close_options()}")
-            self.close_options_toggle.toggled.connect(lambda b_: save_close_options(b_))
-            close_options.load(SiGlobal.siui.iconpack.get("ic_fluent_closed_caption_off_filled"))
-            close_options.addWidget(self.close_options_toggle)
-            group.addWidget(close_options)
+
         with self.titled_widgets_group as group:
             group.addTitle("主页背景")
 
@@ -228,10 +218,49 @@ class PageSettingPage(SiPage):
 
             group.addWidget(self.background_options)
 
+        with self.titled_widgets_group as group:
+            group.addTitle("API_KEY")
+            self.key_code_input = SiLineEdit(self)
+            self.key_code_input.resize(500, 36)
+            self.key_code_input.setTitleWidth(100)
+            self.key_code_input.setTitle("ColaKey")
+            self.key_code_input.setText("")
+
+            self.change_api_key_btu = SiPushButtonRefactor(self)
+            self.change_api_key_btu.setText("确认")
+            self.change_api_key_btu.resize(96, 32)
+            self.change_api_key_btu.clicked.connect(self.save_api_key)
+
+            self.api_key_options = SiOptionCardLinear(self)
+            self.api_key_options.setTitle("LuckyColaAI手动更新", "LuckyColaAI的ColaKey")
+            self.api_key_options.load(SiGlobal.siui.iconpack.get("ic_fluent_mail_edit_filled"))
+            self.api_key_options.addWidget(self.change_api_key_btu)
+            self.api_key_options.addWidget(self.key_code_input)
+
+            self.auto_update_api_key_btu = SiPushButtonRefactor(self)
+            self.auto_update_api_key_btu.setText("自动更新")
+            self.auto_update_api_key_btu.resize(128, 32)
+
+            self.api_key_options1 = SiOptionCardLinear(self)
+            self.api_key_options1.setTitle("LuckyColaAI自动更新", "LuckyColaAI的ColaKey")
+            self.api_key_options1.load(SiGlobal.siui.iconpack.get("ic_fluent_mail_clock_filled"))
+
+            self.api_key_options1.addWidget(self.auto_update_api_key_btu)
+
+            group.addWidget(self.api_key_options)
+            group.addWidget(self.api_key_options1)
+
+    def save_api_key(self):
+        if len(self.key_code_input.text()) > 10:
+            # F.WRITE_CONFIG("LuckyColaAI", "ColaKey", self.key_code_input.text())
+            show_message(1, "ColaKey更新成功", "下次重启生效", "ic_fluent_emoji_hand_filled")
+        else:
+            show_message(3, "ColaKey不合理", "请输入合理的ColaKey", "ic_fluent_emoji_hand_filled")
+
     def change_background(self):
         png_file_path = QFileDialog.getOpenFileName(self, "选择PNG文件", "", "JPG(嘿嘿嘿) Files (*.jpg)")[0]
         if png_file_path:
-            shutil.copy(png_file_path,f"{PATH_PNG}\\back.jpg")
+            shutil.copy(png_file_path, f"{PATH_PNG}\\back.jpg")
             show_message(1, "背景更换成功", "下次重启生效", "ic_fluent_emoji_hand_filled")
 
     def load_settings(self):

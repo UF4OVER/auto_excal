@@ -5,16 +5,20 @@ import os
 
 from PyQt5.QtCore import Qt, QUrl
 from PyQt5.QtGui import QDesktopServices
-
 from siui.components import (
-    SiDenseVContainer,
-    SiLabel,
     SiOptionCardLinear,
+    SiOptionCardPlane,
     SiPixLabel,
-    SiSimpleButton,
     SiTitledWidgetGroup,
 )
+from siui.components.editbox import SiLineEdit
 from siui.components.page import SiPage
+from siui.components.widgets import (
+    SiDenseVContainer,
+    SiLabel,
+    SiSimpleButton,
+)
+from siui.components.button import SiPushButtonRefactor
 from siui.core import GlobalFont, Si, SiColor, SiGlobal, SiQuickEffect
 from siui.gui import SiFont
 
@@ -67,7 +71,8 @@ class About(SiPage):
             self.button_to_me_repo = SiSimpleButton(self)
             self.button_to_me_repo.resize(32, 32)
             self.button_to_me_repo.attachment().load(SiGlobal.siui.iconpack.get("ic_fluent_open_regular"))
-            self.button_to_me_repo.clicked.connect(lambda: QDesktopServices.openUrl(QUrl("https://github.com/UF4OVER/auto_excal")))
+            self.button_to_me_repo.clicked.connect(
+                lambda: QDesktopServices.openUrl(QUrl("https://github.com/UF4OVER/auto_excal")))
 
             self.option_card_my_repo = SiOptionCardLinear(self)
             self.option_card_my_repo.setTitle("开源仓库", "在 GitHub 上查看 Wedding Invitation 的项目主页")
@@ -83,7 +88,8 @@ class About(SiPage):
             self.button_to_repo = SiSimpleButton(self)
             self.button_to_repo.resize(32, 32)
             self.button_to_repo.attachment().load(SiGlobal.siui.iconpack.get("ic_fluent_open_regular"))
-            self.button_to_repo.clicked.connect(lambda: QDesktopServices.openUrl(QUrl("https://github.com/ChinaIceF/PyQt-SiliconUI")))
+            self.button_to_repo.clicked.connect(
+                lambda: QDesktopServices.openUrl(QUrl("https://github.com/ChinaIceF/PyQt-SiliconUI")))
 
             self.option_card_repo = SiOptionCardLinear(self)
             self.option_card_repo.setTitle("开源仓库", "在 GitHub 上查看 Silicon UI 的项目主页")
@@ -110,13 +116,48 @@ class About(SiPage):
             group.addTitle("第三方资源")
 
             self.option_card_icon_pack = SiOptionCardLinear(self)
-            self.option_card_icon_pack.setTitle("Fluent UI 图标库", "本项目内置了 Fluent UI 图标库，Microsoft 公司保有这些图标的版权")
+            self.option_card_icon_pack.setTitle("Fluent UI 图标库",
+                                                "本项目内置了 Fluent UI 图标库，Microsoft 公司保有这些图标的版权")
             self.option_card_icon_pack.load(SiGlobal.siui.iconpack.get("ic_fluent_diversity_regular"))
 
             group.addWidget(self.option_card_icon_pack)
 
-        # add placeholder for better outfit
-        self.titled_widget_group.addPlaceholder(64)
+        with self.titled_widget_group as group:
+            group.addTitle("邮件")
 
-        # Set SiTitledWidgetGroup object as the attachment of the page's scroll area
+            self.title_line_edit = SiLineEdit(self)
+            self.title_line_edit.setFixedSize(800, 32)
+            self.title_line_edit.setTitle("标题")
+
+            self.subject_line_edit = SiLineEdit(self)
+            self.subject_line_edit.setFixedSize(800, 32)
+            self.subject_line_edit.setTitle("主题")
+
+            self.content_line_edit = SiLineEdit(self)
+            self.content_line_edit.setFixedSize(800, 96)
+            self.content_line_edit.setTitle("内容")
+
+            self.send_button = SiPushButtonRefactor(self)
+            self.send_button.setFixedSize(128, 32)
+            self.send_button.clicked.connect(lambda: print("send email"))
+            self.send_button.setText("发送邮件")
+
+            explain_label= SiLabel(self)
+            explain_label.setText("向开发者提出修改意见")
+            explain_label.setTextColor(self.getColor(SiColor.TEXT_B))
+
+            email_options = SiOptionCardPlane(self)
+            email_options.setTitle("发送邮件")
+            email_options.header().addWidget(self.send_button, "right")
+            email_options.body().addWidget(self.title_line_edit)
+            email_options.body().addWidget(self.subject_line_edit)
+            email_options.body().addWidget(self.content_line_edit)
+            email_options.body().addPlaceholder(12)
+            email_options.footer().addWidget(explain_label)
+            email_options.footer().adjustSize()
+            email_options.adjustSize()
+
+            group.addWidget(email_options)
+
+        self.titled_widget_group.addPlaceholder(64)
         self.setAttachment(self.titled_widget_group)
