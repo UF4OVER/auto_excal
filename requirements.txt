@@ -1,0 +1,12 @@
+PyQt5==5.15.11
+DrissionPage==4.1.0.15
+openpyxl==3.1.5
+mutagen== 1.47.0
+pycaw==20240210
+comtypes==1.4.9
+wmi==1.5.1
+cx_Freeze==7.2.7
+
+
+
+

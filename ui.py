@@ -1,32 +1,30 @@
 #  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
-import icons
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QKeySequence
 from PyQt5.QtWidgets import QDesktopWidget, QShortcut, QSystemTrayIcon, QAction, QMenu
-
-from siui.core import SiColor, SiGlobal
+from siui.core import SiGlobal
 from siui.templates.application.application import SiliconApplication
 
-from parts.page.page_electronicpage import PageElectronicComputing
-from parts.page.page_updatepage import UpDatePage
+# 载入图标
+# SiGlobal.siui.loadIcons(
+#     icons.IconDictionary(
+#         color=SiGlobal.siui.colors.fromToken(SiColor.SVG_NORMAL)
+#     ).icons
+# )
+import config.CONFIG as F
+from parts.page.page_aipage import AI
 from parts.component.DynamicIsland import DynamicIsland
-from parts.event.close_event import CloseModalDialog
 from parts.component.layer_left_global import LayerLeftGlobalDrawer
+
 from parts.page.page_aboutpage import About
 from parts.page.page_autoexcalpage import Autoexcal
+from parts.page.page_electronicpage import PageElectronicComputing
 from parts.page.page_homepage import Homepage
 from parts.page.page_musicpage import PageMusicPage
 from parts.page.page_settingpage import PageSettingPage
-
-# 载入图标
-SiGlobal.siui.loadIcons(
-    icons.IconDictionary(
-        color=SiGlobal.siui.colors.fromToken(SiColor.SVG_NORMAL)
-    ).icons
-)
-import config.CONFIG as F
+from parts.page.page_updatepage import UpDatePage
 
 PATH_CONFIG = F.CONFIG_PATH
 PATH_PIC = F.PNG_PATH
@@ -77,10 +75,13 @@ class MySiliconApp(My_SiliconApplication):
         self.layerMain().addPage(PageMusicPage(self),
                                  icon=SiGlobal.siui.iconpack.get("ic_fluent_music_note_2_play_filled"),
                                  hint="音乐", side="top")
-
-        self.layerMain().addPage(PageElectronicComputing(self),
-                                 icon=SiGlobal.siui.iconpack.get("ic_fluent_content_view_gallery_lightning_regular"),
-                                 hint="电子", side="top")
+        # self.layerMain().addPage(AI(self),
+        #                          icon=SiGlobal.siui.iconpack.get("ic_fluent_content_view_gallery_lightning_regular"),
+        #                          hint="CHAT_AI", side="top")
+        #
+        # self.layerMain().addPage(PageElectronicComputing(self),
+        #                          icon=SiGlobal.siui.iconpack.get("ic_fluent_content_view_gallery_lightning_regular"),
+        #                          hint="电子", side="top")
 
         self.layerMain().addPage(About(self),
                                  icon=SiGlobal.siui.iconpack.get("ic_fluent_info_filled"),
