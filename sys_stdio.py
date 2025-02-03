@@ -47,7 +47,7 @@ def setup_logging(arg: bool):
 def setup_logging(arg: bool):
     if arg:
         print("Logging is enabled.")
-        logging.basicConfig(filename='app.log',
+        logging.basicConfig(filename='debug.log',
                             level=logging.INFO,
                             format='%(asctime)s - %(levelname)s - %(message)s',
                             filemode="w")
