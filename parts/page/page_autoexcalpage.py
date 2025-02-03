@@ -1,15 +1,14 @@
 #  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
 
-import configparser
 import json
 import os
 import time
+
 from DrissionPage import ChromiumOptions, Chromium
 from PyQt5.QtCore import QThread, pyqtSignal, Qt
 from PyQt5.QtWidgets import QTableWidget, QFileDialog, QTableWidgetItem, QAbstractItemView
 from openpyxl.reader.excel import load_workbook
-
 from siui.components import (SiLabel,
                              SiTitledWidgetGroup,
                              SiLongPressButton,
@@ -25,10 +24,9 @@ from siui.components.page import SiPage
 from siui.components.spinbox.spinbox import SiIntSpinBox
 from siui.core import SiGlobal, SiColor, Si
 
-from parts.event.send_message import show_message
-
-from config import qss
 import config.CONFIG as F
+from config import qss
+from parts.event.send_message import show_message
 
 PATH_CONFIG = F.CONFIG_PATH
 co = ChromiumOptions(read_file=True, ini_path=PATH_CONFIG)

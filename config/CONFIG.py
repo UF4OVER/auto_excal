@@ -68,7 +68,7 @@ eastern = pytz.timezone('Asia/Shanghai')
 today = utc_now.replace(tzinfo=pytz.utc).astimezone(eastern).strftime("%Y-%m-%d")
 
 
-if READ_CONFIG("date","time") != today:
+if READ_CONFIG("date", "time") != today:
     WRITE_CONFIG('date', 'time', today)
     WRITE_CONFIG("Email", "email_send", "True")
 else:

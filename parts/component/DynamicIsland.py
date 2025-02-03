@@ -16,9 +16,10 @@ import config.CONFIG as F
 PATH_CONFIG = F.CONFIG_PATH
 
 VERSION = F.READ_CONFIG('version', 'version')
-AUTHOR = F.READ_CONFIG('name', 'author')
+L_AUTHOR = F.READ_CONFIG('name', 'L_author')
+H_AUTHOR = F.READ_CONFIG('name', 'H_author')
+M_AUTHOR = F.READ_CONFIG('name', 'M_author')
 
-print(VERSION)
 
 
 class DenseVContainerBG(SiDenseHContainer):
@@ -182,23 +183,23 @@ class DynamicIsland(SiHExpandWidget):
 
     def enterEvent(self, a0):
         super().enterEvent(a0)
-        self.tip.setText("UF4OVER")
+        self.tip.setText(L_AUTHOR)
         self.tip_color_animation.setStartValue(self.tipColor)
         self.tip_color_animation.setEndValue(QColor(255, 0, 0))  # 鼠标进入时颜色变为红色
         self.tip_color_animation.start()
 
     def leaveEvent(self, a0):
         super().leaveEvent(a0)
-        self.tip.setText(AUTHOR)
+        self.tip.setText(H_AUTHOR)
         self.tip_color_animation.setStartValue(self.tipColor)
         self.tip_color_animation.setEndValue(QColor(235, 235, 235))  # 鼠标离开时颜色变为白色
         self.tip_color_animation.start()
 
     def send_default(self):
 
-        self.title.setText("Loot Hearts")
+        self.title.setText(M_AUTHOR)
         self.subtitle.setText(VERSION)
-        self.tip.setText(AUTHOR)
+        self.tip.setText(L_AUTHOR)
 
     def send(self, title, subtitle, tip):
         self.title.setText(title)
