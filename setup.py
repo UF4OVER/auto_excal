@@ -1,22 +1,21 @@
 #  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
 
-VERSION_A = "1.1.5"
 
 from cx_Freeze import setup, Executable
-import config.CONFIG as F
-from setuptools import setup
 
-F.WRITE_CONFIG("version", "version", VERSION_A)
-upx_exe_path = r"E:\python\auto_excal_new\siui\upx.exe"
+
+VERSION_A = "1.1.5"
+import config.CONFIG as F
+F.WRITE_CONFIG("version", "version", VERSION_A)  # 写入配置文件版本号
 
 # 设置 GUI 基础
 base = "Win32GUI"
 
 
 def build_exe_cx_freeze():
-    build_exe_options = {
-        "packages":
+    build_exe_options = {  # 构建选项
+        "packages":  # 包
             [
                 "PyQt5.QtCore",
                 "PyQt5.QtGui",
@@ -35,14 +34,11 @@ def build_exe_cx_freeze():
                 "comtypes",
                 "pic"
             ],
-        "include_files":
+        "include_files":  # 包含文件
             [
-                upx_exe_path
             ],
-        "excludes":
+        "excludes":  # 排除文件/包
             [
-                "scipy",
-                "scipy.libs",
                 "matplotlib",
                 "backports",
                 "PIL",
@@ -54,28 +50,27 @@ def build_exe_cx_freeze():
                 "email",
                 "pydoc",
             ],
-        "optimize": 2
+        "optimize": 2  # 优化级别
     }
 
     setup(
-        name='Wedding Invitation',
-        version=VERSION_A,
-        url='https://github.com/UF4OVER',
-        license='MIT',
-        author='UF4',
-        author_email='uf4hp@foxmail.com',
-        description='Loot Hearts 系列',
-        options={"build_exe": build_exe_options},
-        executables=[
+        name='Wedding Invitation',  # 项目名称
+        version=VERSION_A,  # 项目版本
+        url='https://github.com/UF4OVER',  # 项目地址
+        license='MIT',  # 许可证
+        author='UF4',  # 作者
+        author_email='uf4hp@foxmail.com',  # 邮箱
+        description='Loot Hearts 系列',  # 描述
+        options={"build_exe": build_exe_options},  # 构建选项
+        executables=[  # 构建可执行文件
             Executable(
-                script="start.py",
-                target_name="Wedding Invitation",
-                base=base,
-                icon="pic/logo.ico"
+                script="start.py",  # 起始脚本
+                target_name="Wedding Invitation",  # 可执行文件名
+                base=base,  # GUI基础
+                icon="pic/logo.ico"  # 图标
             )
         ]
     )
-
 
 
 if __name__ == '__main__':

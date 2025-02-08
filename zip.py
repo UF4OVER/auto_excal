@@ -1,3 +1,6 @@
+#  Copyright (c) 2025 UF4OVER
+#   All rights reserved.
+
 import os
 import subprocess
 import shutil
@@ -11,7 +14,7 @@ def compress_with_upx(directory):
             print(f"Deleted translations folder at {translations_path}")
             dirs.remove('translations')
 
-        # 排除指定目录，防止发生PyQt5平台错误
+        # 鎺掗櫎鎸囧畾鐩綍锛岄槻姝㈠彂鐢烶yQt5骞冲彴閿欒
         if 'lib' in root and 'PyQt5' in root and 'Qt5' in root and 'plugins' in root:
             continue
 
@@ -19,12 +22,17 @@ def compress_with_upx(directory):
             if file.endswith(('.exe', '.dll', 'pyd')):
                 file_path = os.path.join(root, file)
                 try:
-                    subprocess.run(['upx', '--best', file_path], check=True)
+                    subprocess.run(['upx.exe', '--best', file_path], check=True)
                     print(f"Compressed: {file_path}")
                 except subprocess.CalledProcessError as e:
                     print(f"Failed to compress {file_path}: {e}")
 
 
 if __name__ == "__main__":
-    target_directory = ".\\build\\exe.win-amd64-3.10"
-    compress_with_upx(target_directory)
+    if os.path.exists("build\\exe.win-amd64-3.10"):
+        print("build\\exe.win-amd64-3.10 exists")
+        target_directory = "build\\exe.win-amd64-3.10"
+        compress_with_upx(target_directory)
+    else:
+        print("build\\exe.win-amd64-3.10 does not exist")
+
