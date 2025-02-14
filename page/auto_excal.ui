@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>802</width>
+    <height>511</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout_3">
+   <item row="0" column="0" rowspan="6">
+    <widget class="TableWidget" name="tableWidget"/>
+   </item>
+   <item row="0" column="1" colspan="6">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="BodyLabel" name="label">
+       <property name="text">
+        <string>文件路径</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="LineEdit" name="lineEdit"/>
+     </item>
+     <item>
+      <widget class="PrimaryPushButton" name="pushButton">
+       <property name="text">
+        <string>打开..</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="1" column="1">
+    <widget class="CheckBox" name="checkBox_2">
+     <property name="text">
+      <string>数据去重</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1" colspan="6">
+    <widget class="QTextBrowser" name="textBrowser"/>
+   </item>
+   <item row="5" column="1">
+    <widget class="PrimaryPushButton" name="pushButton_2">
+     <property name="text">
+      <string>打开浏览器</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="2">
+    <widget class="PrimaryPushButton" name="pushButton_3">
+     <property name="text">
+      <string>开始</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="3">
+    <widget class="TransparentPushButton&#10;" name="pushButton_4">
+     <property name="text">
+      <string>结束</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="4">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>41</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="5" column="5">
+    <widget class="PushButton" name="pushButton_7">
+     <property name="text">
+      <string>重置</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="6">
+    <spacer name="horizontalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>90</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="2" column="1" colspan="6">
+    <widget class="QWidget" name="widget" native="true">
+     <property name="styleSheet">
+      <string notr="true">background-color: rgba(38, 38, 37, 15);
+border-radius: 10px;</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout" rowstretch="1,1,1,1" columnstretch="1,1,1,2">
+      <property name="leftMargin">
+       <number>14</number>
+      </property>
+      <property name="topMargin">
+       <number>7</number>
+      </property>
+      <property name="rightMargin">
+       <number>7</number>
+      </property>
+      <property name="bottomMargin">
+       <number>7</number>
+      </property>
+      <property name="spacing">
+       <number>11</number>
+      </property>
+      <item row="1" column="1" colspan="2">
+       <widget class="LineEdit" name="lineEdit_2"/>
+      </item>
+      <item row="3" column="3">
+       <widget class="LineEdit" name="lineEdit_5"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="BodyLabel" name="label_2">
+        <property name="text">
+         <string>姓名</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1" colspan="2">
+       <widget class="LineEdit" name="lineEdit_4"/>
+      </item>
+      <item row="3" column="0">
+       <widget class="BodyLabel" name="label_4">
+        <property name="text">
+         <string>操行</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="BodyLabel" name="label_6">
+        <property name="text">
+         <string>结束</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" colspan="2">
+       <widget class="LineEdit" name="lineEdit_3"/>
+      </item>
+      <item row="2" column="3">
+       <widget class="LineEdit" name="lineEdit_7"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="BodyLabel" name="label_3">
+        <property name="text">
+         <string>学号</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="LineEdit" name="lineEdit_6"/>
+      </item>
+      <item row="0" column="0">
+       <widget class="CheckBox" name="checkBox">
+        <property name="text">
+         <string>自定义</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" colspan="2">
+       <widget class="BodyLabel" name="label_5">
+        <property name="text">
+         <string>开始</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="3" column="1" colspan="6">
+    <widget class="QWidget" name="" native="true">
+     <property name="styleSheet">
+      <string notr="true">background-color: rgba(38, 38, 37, 15);
+border-radius: 10px;</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2" columnstretch="3,3,3,2">
+      <property name="leftMargin">
+       <number>12</number>
+      </property>
+      <property name="topMargin">
+       <number>5</number>
+      </property>
+      <property name="rightMargin">
+       <number>5</number>
+      </property>
+      <property name="bottomMargin">
+       <number>5</number>
+      </property>
+      <item row="0" column="0">
+       <widget class="BodyLabel" name="label_8">
+        <property name="text">
+         <string>姓名</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="BodyLabel" name="label_9">
+        <property name="text">
+         <string>学号</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="BodyLabel" name="label_10">
+        <property name="text">
+         <string>操行</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="PushButton" name="pushButton_5">
+        <property name="text">
+         <string>删除</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="LineEdit" name="lineEdit_8"/>
+      </item>
+      <item row="1" column="1">
+       <widget class="LineEdit" name="lineEdit_9"/>
+      </item>
+      <item row="1" column="2">
+       <widget class="LineEdit" name="lineEdit_10"/>
+      </item>
+      <item row="1" column="3">
+       <widget class="PrimaryPushButton" name="pushButton_6">
+        <property name="text">
+         <string>添加</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PrimaryPushButton</class>
+   <extends>QPushButton</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>PushButton</class>
+   <extends>QPushButton</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>TransparentPushButton
+</class>
+   <extends>QPushButton</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>CheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>LineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>TableWidget</class>
+   <extends>QTableWidget</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>BodyLabel</class>
+   <extends>QLabel</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

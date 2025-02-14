@@ -1,0 +1,24 @@
+{
+    "MainWindow": {
+        "BrowserPort": 9222,
+        "DpiScale": 1.25,
+        "EnableAcrylicBackground": false,
+        "MinimizeToTray": true,
+        "RecentPlayNumbers": 300
+    },
+    "Update": {
+        "CheckUpdateAtStartUp": true
+    },
+    "DesktopLyric": {
+        "Alignment": "Center",
+        "FontFamily": "Microsoft YaHei",
+        "FontSize": 50,
+        "HighlightColor": "#ff0099bc",
+        "StrokeColor": "#ff000000",
+        "StrokeSize": 5
+    },
+    "QFluentWidgets": {
+        "ThemeColor": "#ffaa6997",
+        "ThemeMode": "Light"
+    }
+}
