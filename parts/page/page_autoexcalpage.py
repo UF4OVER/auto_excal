@@ -670,28 +670,56 @@ class Autoexcal(SiPage):
             else:
                 self.browser = Chromium(broswer_address)
                 self.browser.latest_tab.get(F.READ_CONFIG("vpn", "vpn_url"))
-
-                try:
-                    name = F.READ_CONFIG("vpn", "vpn_name")
-                    pwrd = F.READ_CONFIG("vpn", "vpn_password")
-                    name_input = self.browser.latest_tab.ele("@tabindex=1")
-                    pwrd_input = self.browser.latest_tab.ele("@id=loginPwd")
-                    rank_code = self.browser.latest_tab.ele("@tabindex=3")
-                    name_input.input(name)
-                    pwrd_input.input(pwrd)
-
-                    captcha_img = self.browser.latest_tab.ele("@class=password__code__image pointer")
-                    result = get_rand_code(captcha_img.get_screenshot(as_base64="jpg"))
-                    if result:
-                        rank_code.input(result)
-
-                        login_button = self.browser.latest_tab.ele("@class=button button--normal")
-                        login_button.click()
-
-                except Exception as e:
-                    print(f"无法找到元素: {e}")
-                    show_message(3, "提示", f"无法找到元素: {e}", "ic_fluent_task_list_ltr_filled")
+                if F.READ_CONFIG("ocr", "ocr_api_token") == "":
+                    show_message(3, "VPN", "请先设置OCR_Token来自动进入网站\r\n或者\r\n手动进入网站", "ic_fluent_emoji_edit_filled")
                     return
+
+                # try:
+                name = F.READ_CONFIG("vpn", "vpn_name")
+                pwrd = F.READ_CONFIG("vpn", "vpn_password")
+                name_input = self.browser.latest_tab.ele("@tabindex=1")
+                pwrd_input = self.browser.latest_tab.ele("@id=loginPwd")
+                rank_code = self.browser.latest_tab.ele("@tabindex=3")
+                name_input.input(name)
+                pwrd_input.input(pwrd)
+
+                captcha_img = self.browser.latest_tab.ele("@class=password__code__image pointer")
+                result = get_rand_code(captcha_img.get_screenshot(as_base64="jpg"))
+                if result:
+                    rank_code.input(result)
+
+                    login_button = self.browser.latest_tab.ele("@class=button button--normal")
+                    login_button.click()
+
+                    comprehensive_information_portal = self.browser.latest_tab.ele("@title=综合信息门户")
+                    comprehensive_information_portal.click()
+
+                    info_name = self.browser.latest_tab.ele("@id=User_ID")
+                    info_name.input(F.READ_CONFIG("info", "name"))
+                    info_pwrd = self.browser.latest_tab.ele("@id=User_Pass")
+                    info_pwrd.input(F.READ_CONFIG("info", "password").format())
+
+                    # rank_code_info = self.browser.latest_tab.ele("@id=txtyzm")
+                    # # 等待验证码用户输入
+                    self.browser.latest_tab.wait.doc_loaded()
+
+                    login_info_button = self.browser.latest_tab.ele("@id=btnLogin")
+                    login_info_button.click()
+
+                    label_href = self.browser.latest_tab.ele("@class=nav").ele("教务系统")
+                    label_href.click()
+
+                    label_href_1 = self.browser.latest_tab.ele("id=subtree3").ele("新增操行成绩")
+                    label_href_1.click()
+
+
+                else:
+                    show_message(1, "警告", "验证码识别失败\r\n请手动输入", "ic_fluent_task_list_ltr_filled")
+
+                # except Exception as e:
+                #     print(f"无法找到元素: {e}")
+                #     show_message(3, "提示", f"无法找到元素: {e}", "ic_fluent_task_list_ltr_filled")
+                #     return
 
         except Exception as e:
             print(f"无法启动浏览器: {e}")

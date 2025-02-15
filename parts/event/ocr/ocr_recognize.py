@@ -13,56 +13,64 @@
 #  @Contact : 
 #  @Python  : 
 # -------------------------------
-
-# encoding:utf-8
-
-import requests
 import base64
+import config.CONFIG as F
+import requests
+import logging
+from typing import Optional
 
-'''
-手写文字识别
-'''
-
-# request_url = "https://aip.baidubce.com/rest/2.0/ocr/v1/accurate_basic"
-# # 二进制方式打开图片文件
-
-
-
-#
-# params = {"image": img}
-# access_token = '24.729fa8c3f778f790ea9bc2da30b5dd5e.2592000.1742201918.282335-117532117'
-# request_url = request_url + "?access_token=" + access_token
-# headers = {'content-type': 'application/x-www-form-urlencoded'}
-# response = requests.post(request_url, data=params, headers=headers)
-# if response:
-#     print(response.json())
+# 配置日志记录
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
-def get_rand_code(base64_img) -> str | None:
-    request_url = "https://aip.baidubce.com/rest/2.0/ocr/v1/handwriting"
-    params = {"image": base64_img}
-    access_token = '24.729fa8c3f778f790ea9bc2da30b5dd5e.2592000.1742201918.282335-117532117'
-    request_url = request_url + "?access_token=" + access_token
+
+def get_rand_code(base64_img: str) -> Optional[str]:
+    request_url = F.READ_CONFIG("ocr", "ocr_api_url")
+    access_token = F.READ_CONFIG("ocr", "ocr_api_token")
+    request_url = f"{request_url}?access_token={access_token}"
     headers = {'content-type': 'application/x-www-form-urlencoded'}
-    response = requests.post(request_url, data=params, headers=headers)
-    if response:
-        print(response.json())
-        a: dict = response.json()
-        if 'words_result' in a:
-            words_result = a['words_result']
-            if isinstance(words_result, list) and len(words_result) > 0:
-                for result in words_result:
-                    print(f"识别结果：{result['words']}")
-                    return result['words']
-            else:
-                print('识别结果格式不正确')
-                return None
-        else:
-            print('识别失败')
-            return None
+    params = {"image": base64_img}
+
+    try:
+        response = requests.post(request_url, data=params, headers=headers)
+        response.raise_for_status()  # 检查请求是否成功
+    except requests.exceptions.RequestException as e:
+        logger.error(f"请求OCR API失败: {e}")
+        return None
+
+    response_json = response.json()
+    logger.debug(f"OCR API响应: {response_json}")
+
+    if 'words_result' not in response_json:
+        logger.error("识别结果格式不正确")
+        return None
+
+    words_result = response_json['words_result']
+    if not isinstance(words_result, list) or len(words_result) == 0:
+        logger.error("识别结果格式不正确")
+        return None
+
+    for result in words_result:
+        original_words = result.get('words', '')
+        logger.debug(f"原始识别结果: {original_words}")
+
+        # 过滤掉非数字字符
+        filtered_words = ''.join(char for char in original_words if char.isdigit())
+        logger.debug(f"过滤非数字识别结果: {filtered_words}")
+
+        # 补全识别结果至4位
+        if len(filtered_words) < 4:
+            filtered_words += '0' * (4 - len(filtered_words))
+            logger.debug(f"补全识别结果: {filtered_words}")
+
+        return filtered_words
+
+    logger.error("识别结果格式不正确")
+    return None
 
 
 if __name__ == '__main__':
-    f = open('rand_code.gif', 'rb')
+    f = open('LogicVerifyCode.jpg', 'rb')
     img = base64.b64encode(f.read())
     get_rand_code(img)
