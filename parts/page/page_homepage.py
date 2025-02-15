@@ -31,7 +31,7 @@ class Homepage(SiPage):
         self.scroll_container = SiTitledWidgetGroup(self)
         # 整个顶部
         self.head_area = SiLabel(self)
-        self.head_area.setFixedHeight(450)
+        self.head_area.setFixedHeight(550)
         # 创建背景底图和渐变
         self.background_image = SiPixLabel(self.head_area)
         self.background_image.setFixedSize(1366, 300)
@@ -62,8 +62,8 @@ class Homepage(SiPage):
         self.subtitle.setFont(SiFont.tokenized(GlobalFont.S_MEDIUM))
 
         self.container_for_cards = SiDenseHContainer(self.head_area)
-        self.container_for_cards.move(0, 130)
-        self.container_for_cards.setFixedHeight(310)
+        self.container_for_cards.move(0, 170)
+        self.container_for_cards.setFixedHeight(400)
         self.container_for_cards.setAlignment(Qt.AlignCenter)
         self.container_for_cards.setSpacing(32)
         # 添加卡片
@@ -72,24 +72,49 @@ class Homepage(SiPage):
         self.option_card_project.setFixedSize(218, 270)
         self.option_card_project.setThemeColor("#855198")
         self.option_card_project.setDescription(
-            "connect to my github\r\n"
+            "connect to my project\r\n"
             "home page.you can click\r\n"
-            "btu to mypage")
+            "btu to project page")
         self.option_card_project.setURL("https://github.com/UF4OVER/auto_excal")
 
-        self.option_card_example = ThemedOptionCardPlane(self)
-        self.option_card_example.setTitle("Bilibili")
-        self.option_card_example.setFixedSize(218, 270)
-        self.option_card_example.setThemeColor("#FB7299")
-        self.option_card_example.setDescription(
+        self.option_card = ThemedOptionCardPlane(self)
+        self.option_card.setTitle("Bilibili")
+        self.option_card.setFixedSize(218, 270)
+        self.option_card.setThemeColor("#FB7299")
+        self.option_card.setDescription(
             "connect to my bilibili\r\n"
             "home page.you can click\r\n"
-            "btu to mypage .")  # noqa: E501
-        self.option_card_example.setURL("https://space.bilibili.com/1000215778?spm_id_from=333.1007.0.0")
+            "btu to my page .")  # noqa: E501
+        self.option_card.setURL("https://space.bilibili.com/1000215778?spm_id_from=333.1007.0.0")
+
+        self.option_card_demo = ThemedOptionCardPlane(self)
+        self.option_card_demo.setTitle("Home Page")
+        self.option_card_demo.setFixedSize(218, 270)
+        self.option_card_demo.setThemeColor("#58A6FF")
+        self.option_card_demo.setDescription(
+            "connect to my github\r\n"
+            "home page.you can click\r\n"
+            "btu to my page .")  # noqa: E501
+        self.option_card_demo.setURL("https://github.com/UF4OVER")
+
+
+        self.option_card_collaborator = ThemedOptionCardPlane(self)
+        self.option_card_collaborator.setTitle("TreaYang-002")
+        self.option_card_collaborator.setFixedSize(218, 270)
+        self.option_card_collaborator.setThemeColor("#0366D6")
+        self.option_card_collaborator.setDescription(
+            "connect to collaborator\r\n"
+            "home page.you can click\r\n"
+            "btu to page .")  # noqa: E501
+        self.option_card_collaborator.setURL("https://github.com/TreaYang-002")
+
         # 添加到水平容器
-        self.container_for_cards.addPlaceholder(64 - 32)
+
+        self.container_for_cards.addPlaceholder(64)
         self.container_for_cards.addWidget(self.option_card_project)
-        self.container_for_cards.addWidget(self.option_card_example)
+        self.container_for_cards.addWidget(self.option_card)
+        self.container_for_cards.addWidget(self.option_card_demo)
+        self.container_for_cards.addWidget(self.option_card_collaborator)
 
         # 添加到滚动区域容器
         self.scroll_container.addWidget(self.head_area)
@@ -125,17 +150,6 @@ class Homepage(SiPage):
             shortcut_tab.addWidget(open_left_layer_btu)
 
             group.addWidget(shortcut_tab)
-
-            _tab = SiOptionCardLinear(self)
-            _tab.setTitle("测试", "灵动岛测试")
-            _tab.load(SiGlobal.siui.iconpack.get("ic_fluent_keyboard_layout_float_regular"))
-
-            open_left_ = SiPushButtonRefactor(self)
-            open_left_.setText("灵动岛")
-            open_left_.clicked.connect(SiGlobal.siui.windows["MAIN_WINDOW"].Dynamic_Island().send_default)
-            _tab.addWidget(open_left_)
-
-            group.addWidget(_tab)
 
         self.titled_widget_group.addPlaceholder(64)
 

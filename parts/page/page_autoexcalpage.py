@@ -26,6 +26,7 @@ from siui.core import SiGlobal, SiColor, Si
 
 import config.CONFIG as F
 from config import qss
+from parts.event.ocr.ocr_recognize import get_rand_code
 from parts.event.send_message import show_message
 
 PATH_CONFIG = F.CONFIG_PATH
@@ -418,11 +419,10 @@ class Autoexcal(SiPage):
         self.new_table_widget.setRowCount(0)
         self.new_table_widget.setColumnCount(0)
         self.index_current_data = 0
-        if os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data.json')):
-            os.remove(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data.json'))
+        if os.path.exists('data.json'):
+            os.remove('data.json')
         # 去实例化线程
         self.main_loop_thread = None
-
         show_message(2, "成功", "表格数据已清空", "ic_fluent_eraser_medium_filled")
 
     def import_file_for_table_widget(self):
@@ -669,6 +669,30 @@ class Autoexcal(SiPage):
                 self.browser = Chromium(int(self.port_int_spin_box.value()))
             else:
                 self.browser = Chromium(broswer_address)
+                self.browser.latest_tab.get(F.READ_CONFIG("vpn", "vpn_url"))
+
+                try:
+                    name = F.READ_CONFIG("vpn", "vpn_name")
+                    pwrd = F.READ_CONFIG("vpn", "vpn_password")
+                    name_input = self.browser.latest_tab.ele("@tabindex=1")
+                    pwrd_input = self.browser.latest_tab.ele("@id=loginPwd")
+                    rank_code = self.browser.latest_tab.ele("@tabindex=3")
+                    name_input.input(name)
+                    pwrd_input.input(pwrd)
+
+                    captcha_img = self.browser.latest_tab.ele("@class=password__code__image pointer")
+                    result = get_rand_code(captcha_img.get_screenshot(as_base64="jpg"))
+                    if result:
+                        rank_code.input(result)
+
+                        login_button = self.browser.latest_tab.ele("@class=button button--normal")
+                        login_button.click()
+
+                except Exception as e:
+                    print(f"无法找到元素: {e}")
+                    show_message(3, "提示", f"无法找到元素: {e}", "ic_fluent_task_list_ltr_filled")
+                    return
+
         except Exception as e:
             print(f"无法启动浏览器: {e}")
             show_message(3, "提示", f"无法启动浏览器: {e}", "ic_fluent_task_list_ltr_filled")
@@ -707,7 +731,7 @@ class Autoexcal(SiPage):
         主循环，从当前索引位置开始输入49个数据
         """
         if self.browser:
-            self.last_tab = self.browser.latest_tab
+            self.last_tab = 'https://vpn.neepu.edu.cn/portal/#!/login'
             self.data = self.read_to_json()
             try:
                 start_index = self.index_current_data

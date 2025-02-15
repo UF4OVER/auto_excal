@@ -1,13 +1,4 @@
 # -*- coding: utf-8 -*-
-
-#  Copyright (c) 2025 UF4OVER
-#   All rights reserved.
-
-import logging
-import sys
-from typing import overload
-
-
 #  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
 # -------------------------------
@@ -25,6 +16,8 @@ import sys
 # sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 # sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 
+import logging
+from typing import overload
 
 class StreamToLogger:
     def __init__(self, logger, log_level):

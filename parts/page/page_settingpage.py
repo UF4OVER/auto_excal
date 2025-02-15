@@ -10,12 +10,12 @@ from PyQt5.QtWidgets import QFileDialog
 from siui.components import SiDenseHContainer, SiLabel, SiDenseVContainer, SiOptionCardPlane, SiTitledWidgetGroup, \
     SiOptionCardLinear
 from siui.components.button import SiRadioButtonRefactor, SiPushButtonRefactor, SiSwitchRefactor
+from siui.components.editbox import SiLineEdit
 from siui.components.page import SiPage
 from siui.core import SiGlobal, Si, SiColor
-from parts.page.page_autoexcalpage import show_message
-from siui.components.editbox import SiCapsuleEdit, SiLineEdit, SiSpinBox, SiDoubleSpinBox
 
 import config.CONFIG as F
+from parts.page.page_autoexcalpage import show_message
 
 PATH_CONFIG = F.CONFIG_PATH
 PATH_PNG = F.PNG_PATH
@@ -219,7 +219,7 @@ class PageSettingPage(SiPage):
             group.addWidget(self.background_options)
 
         with self.titled_widgets_group as group:
-            group.addTitle("API_KEY")
+            group.addTitle("Access_Token")
             self.key_code_input = SiLineEdit(self)
             self.key_code_input.resize(500, 36)
             self.key_code_input.setTitleWidth(100)
@@ -237,18 +237,7 @@ class PageSettingPage(SiPage):
             self.api_key_options.addWidget(self.change_api_key_btu)
             self.api_key_options.addWidget(self.key_code_input)
 
-            self.auto_update_api_key_btu = SiPushButtonRefactor(self)
-            self.auto_update_api_key_btu.setText("自动更新")
-            self.auto_update_api_key_btu.resize(128, 32)
-
-            self.api_key_options1 = SiOptionCardLinear(self)
-            self.api_key_options1.setTitle("LuckyColaAI自动更新", "LuckyColaAI的ColaKey")
-            self.api_key_options1.load(SiGlobal.siui.iconpack.get("ic_fluent_mail_clock_filled"))
-
-            self.api_key_options1.addWidget(self.auto_update_api_key_btu)
-
             group.addWidget(self.api_key_options)
-            group.addWidget(self.api_key_options1)
 
     def save_api_key(self):
         if len(self.key_code_input.text()) > 10:

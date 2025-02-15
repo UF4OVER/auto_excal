@@ -15,6 +15,7 @@ from siui.components.widgets import (
     SiSimpleButton,
     SiLineEdit)
 from siui.core import Si, SiGlobal
+from typing_extensions import Union
 
 import config.CONFIG
 from parts.component.music_displayer import SiMusicDisplayer, MusicManager
@@ -113,17 +114,14 @@ class PageMusicPage(SiPage):
                 # 确保目标目录存在
                 if not os.path.exists(PATH_MUSIC):
                     os.makedirs(PATH_MUSIC)
-
                 # 复制文件
                 shutil.copy(AddMusic_path, PATH_MUSIC)
                 print(f"{AddMusic_path}::: successfully copied to :::{PATH_MUSIC}")
                 # 重新加载界面
-                self.setupUi()
-                self.displayer_container.arrangeWidgets()
+                # self.displayer_container.arrangeWidgets()
+                self.displayer_container.adjustSize()
                 # 强制刷新界面
-                self.update()
-                self.repaint()
-                QApplication.processEvents()
+                self.adjustSize()
             except IOError as e:
                 print(f"无法复制文件: {str(e)}")
             except Exception as e:

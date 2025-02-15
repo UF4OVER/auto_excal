@@ -1,0 +1,4 @@
+### GET request to example server
+POST https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=6Qa8DitF5RcX9hPVcSFheget&client_secret=VkzzzzGw6f8h1X4jygEIWiEDI9SUTrAl&
+
+###
