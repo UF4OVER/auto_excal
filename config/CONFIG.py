@@ -3,7 +3,6 @@
 #  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
 
-import configparser
 # ------------------------------
 #  @Project : upper_computer
 #  @Time    : 2024 - 12-22 14:55
@@ -17,34 +16,12 @@ import configparser
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-
+import configparser
 import pytz
 
-#  Copyright (c) 2025 UF4OVER
-#   All rights reserved.
-
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 print(f"当前路径: {BASE_DIR}")
-
-
-class CONFIG(Enum):
-    PATH_CONFIG: Path = BASE_DIR / "config" / "config.ini"
-    PATH_PNG: Path = BASE_DIR / "pic"
-    PATH_MUSIC: Path = BASE_DIR / "music"
-    PATH_HTML: Path = BASE_DIR / "parts" / "html"
-    PATH_USER_INFO: Path = BASE_DIR / "config" / "user_info"
-
-
-CONFIG_PATH: Path = CONFIG.PATH_CONFIG.value
-PNG_PATH: Path = CONFIG.PATH_PNG.value
-MUSIC_PATH: Path = CONFIG.PATH_MUSIC.value
-HTML_PATH: Path = CONFIG.PATH_HTML.value
-USER_INFO_PATH: Path = CONFIG.PATH_USER_INFO.value
-
-print(f"全局配置文件路径: {CONFIG_PATH}")
-print(f"全局图片文件路径: {PNG_PATH}")
-print(f"全局音乐文件路径: {MUSIC_PATH}")
+CONFIG_PATH: Path = BASE_DIR / "config" / "config.ini"
 
 
 def READ_CONFIG(cls: str, name: str) -> str | int | bool | list:
@@ -70,3 +47,25 @@ if READ_CONFIG("date", "time") != today:
     WRITE_CONFIG("Email", "email_send", "True")
 else:
     print("时间未更新")
+
+TODAY = today
+
+
+class CONFIG(Enum):
+    PATH_PNG: Path = BASE_DIR / "pic"
+    PATH_MUSIC: Path = BASE_DIR / "music"
+    PATH_HTML: Path = BASE_DIR / "parts" / "html"
+    PATH_USER_INFO: Path = BASE_DIR / "config" / "user_info"
+    VERSION: str = READ_CONFIG("version", "version")
+    AUTHOR: str = READ_CONFIG("version", "author")
+
+
+PNG_PATH: Path = CONFIG.PATH_PNG.value
+MUSIC_PATH: Path = CONFIG.PATH_MUSIC.value
+HTML_PATH: Path = CONFIG.PATH_HTML.value
+USER_INFO_PATH: Path = CONFIG.PATH_USER_INFO.value
+VERSION: str = CONFIG.VERSION.value
+AUTHOR: str = CONFIG.AUTHOR.value
+
+print(f"全局图片文件路径: {PNG_PATH}")
+print(f"全局音乐文件路径: {MUSIC_PATH}")

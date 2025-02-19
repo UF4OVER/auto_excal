@@ -1,13 +1,15 @@
 #  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
 
-from PyQt5.QtCore import Qt, QEventLoop, QTimer, QRectF
-from PyQt5.QtGui import QIcon, QKeySequence, QPixmap, QPainter, QColor, QPen, QBrush, QPainterPath, QRegion
-from PyQt5.QtWidgets import QDesktopWidget, QShortcut, QSystemTrayIcon, QAction, QMenu, QWidget, QSplashScreen, \
-    QScrollArea, QLabel, QTextEdit, QVBoxLayout
+from PyQt5.QtCore import Qt, QEventLoop, QTimer, QRectF, pyqtProperty, QPropertyAnimation, QEasingCurve, QRect
+from PyQt5.QtGui import QIcon, QKeySequence, QPixmap, QPainter, QColor, QBrush, QPainterPath, QRegion, QFont, \
+    QLinearGradient
+from PyQt5.QtWidgets import QDesktopWidget, QShortcut, QSystemTrayIcon, QAction, QMenu, QWidget, QLabel, \
+    QGraphicsOpacityEffect
 from siui.core import SiGlobal
 from siui.templates.application.application import SiliconApplication
 
+import config.CONFIG as F
 from parts.component.DynamicIsland import DynamicIsland
 from parts.component.layer_left_global import LayerLeftGlobalDrawer
 from parts.page import (AboutPage,
@@ -17,7 +19,6 @@ from parts.page import (AboutPage,
                         MusicPage,
                         SettingPage,
                         UpdatePage)
-import config.CONFIG as F
 
 PATH_CONFIG = F.CONFIG_PATH
 PATH_PIC = F.PNG_PATH
@@ -58,7 +59,6 @@ class MySiliconApp(My_SiliconApplication):
         self.slashScreen = SplashScreen()
         self.slashScreen.show()
         self.createSubInterface()
-
         print("$" * 50)
 
         self.ShortcutKey()
@@ -141,8 +141,18 @@ class MySiliconApp(My_SiliconApplication):
 
     def createSubInterface(self):
         loop = QEventLoop(self)
-        QTimer.singleShot(1000, loop.quit)
+        QTimer.singleShot(1200, loop.quit)
         loop.exec()
+
+
+class Label(QLabel):
+    def __init__(self, p=None, text=None, size=None):
+        super().__init__(p)
+        self._text = text
+        self._size = size
+        self.setText(self._text)
+        self.setStyleSheet("color: #ffffff;")
+        self.setFont(QFont("Microsoft YaHei", self._size, QFont.Bold))
 
 
 class SplashScreen(QWidget):
@@ -156,9 +166,46 @@ class SplashScreen(QWidget):
         # 设置窗口透明背景
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.resize(800, 600)
+        # 获取屏幕尺寸
+        screen_geo = QDesktopWidget().screenGeometry()
+
         # 初始设置圆角区域
         self.updateMask()
         self.setup_labels()
+
+        self.scale_animation = QPropertyAnimation(self, b"geometry")
+        self.scale_animation.setDuration(400)
+        # 计算屏幕底部中央的起始位置
+        start_x = (screen_geo.width() - self.width()) // 2
+        start_y = screen_geo.height() - 100  # 起始时距离屏幕底部100像素
+        start_width = self.width()
+        start_height = 100  # 初始高度较小
+
+        # 设置起始值为屏幕底部中央的小窗口
+        self.scale_animation.setStartValue(QRect(start_x, start_y, start_width, start_height))
+
+        # 计算屏幕中心的目标位置
+        end_x = (screen_geo.width() - 800) // 2
+        end_y = (screen_geo.height() - 600) // 2
+        end_width = 800
+        end_height = 600
+
+        # 设置结束值为目标窗口大小
+        self.scale_animation.setEndValue(QRect(end_x, end_y, end_width, end_height))
+        self.scale_animation.setEasingCurve(QEasingCurve.OutBack)  # 反弹效果
+        self.scale_animation.start()
+
+
+        self._radius = 55
+
+        # 创建动画
+        self.animation = QPropertyAnimation(self, b"radius")
+        self.animation.setDuration(600)  # 动画持续时间
+        self.animation.setStartValue(0)
+        self.animation.setEndValue(500)  # 扩散的最大半径
+        self.animation.setLoopCount(1)  # 无限循环
+        self.animation.setEasingCurve(QEasingCurve.InOutSine)
+        self.animation.start()
 
     def updateMask(self):
         path = QPainterPath()
@@ -174,31 +221,57 @@ class SplashScreen(QWidget):
         super().resizeEvent(event)
 
     def paintEvent(self, event):
-        from PyQt5.QtGui import QPainter, QColor, QBrush
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
 
-        painter.setBrush(QBrush(QColor(87, 63, 101)))
+        # 绘制窗口背景
+        painter.setBrush(QBrush(QColor(37, 34, 42)))
         painter.setPen(Qt.NoPen)
         painter.drawRoundedRect(self.rect(), 20, 20)
+        # 绘制扩散效果
+        painter.setBrush(QBrush(QColor(51, 46, 56)))  # 半透明白色
+        painter.setPen(Qt.NoPen)
+        painter.drawEllipse(self.width() // 2 - self._radius, self.height() // 2 - self._radius, 2 * self._radius,
+                            2 * self._radius)
 
-        # pixmap = QPixmap(f"{PATH_PIC}\\default.jpg")
-        # pixmap = pixmap.scaledToHeight(self.height(), Qt.SmoothTransformation)
-        # # 计算图片的绘制位置以使其垂直居中
-        # # x = (self.width() - pixmap.width()) // 2 居中
-        # x = 0
-        # y = 0  # 垂直居中
-        #
-        # # 绘制背景图片
-        # painter.drawPixmap(x, y, pixmap)
+        # 加载图片并缩放
+        pixmap = QPixmap(f"{PATH_PIC}\\default.jpg")
+        pixmap = pixmap.scaledToHeight(self.height(), Qt.SmoothTransformation)
+        # 计算图片的绘制位置以使其垂直居中
+        # x = (self.width() - pixmap.width()) // 2 居中
+        x = 0
+        y = 0  # 垂直居中
+
+        # 绘制背景图片
+        painter.drawPixmap(x, y, pixmap)
+        # 创建一个矩形模板
+        gradient = QLinearGradient(0, 0, self.height(), 0)
+        gradient.setColorAt(0, QColor(255, 255, 255, 0))  # 透明
+        gradient.setColorAt(0.7, QColor(51, 46, 56, 128))
+        gradient.setColorAt(1, QColor(51, 46, 56))
+
+        painter.setBrush(QBrush(gradient))
+        painter.drawRect(0, 0, self.height() + 20, self.height())
+
+        painter.end()
+
+    @pyqtProperty(int)
+    def radius(self):
+        return self._radius
+
+    @radius.setter
+    def radius(self, value):
+        self._radius = value
+        self.update()
 
     def setup_labels(self):
-        self.label_1 = QLabel(self)
-        self.label_1.setText("Wedding Invitation")
-        self.label_1.setStyleSheet("""
-            color: #ffffff;
-            font-size: 12px;
-            font-weight: bold;
-        """)
-        self.label_1.move(700, 20)
-
+        self.label_1 = Label(self, "Loot Hearts 系列", 11)
+        self.label_1.move(610, 100)
+        self.label_2 = Label(self, "Wedding Invitation", 9)
+        self.label_2.move(610, 150)
+        self.label_3 = Label(self, f"VERSION : {F.VERSION}", 8)
+        self.label_3.move(610, 370)
+        self.label_4 = Label(self, f"AUTHOR : {F.AUTHOR}", 8)
+        self.label_4.move(610, 400)
+        self.label_5 = Label(self, f"TODAY : {F.TODAY}", 8)
+        self.label_5.move(610, 430)

@@ -8,9 +8,9 @@ import argparse
 import configparser
 import sys
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication
-from ui import MySiliconApp, SplashScreen
+from ui import MySiliconApp
 from parts.event.send_message import send_custom_message, show_message
 
 import config.CONFIG as F
