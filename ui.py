@@ -14,7 +14,7 @@ from siui.templates.application.application import SiliconApplication
 #     ).icons
 # )
 import config.CONFIG as F
-from parts.page.page_aipage import AI
+from parts.page.page_userpage import AI
 from parts.component.DynamicIsland import DynamicIsland
 from parts.component.layer_left_global import LayerLeftGlobalDrawer
 
@@ -75,9 +75,9 @@ class MySiliconApp(My_SiliconApplication):
         self.layerMain().addPage(PageMusicPage(self),
                                  icon=SiGlobal.siui.iconpack.get("ic_fluent_music_note_2_play_filled"),
                                  hint="音乐", side="top")
-        # self.layerMain().addPage(AI(self),
-        #                          icon=SiGlobal.siui.iconpack.get("ic_fluent_content_view_gallery_lightning_regular"),
-        #                          hint="CHAT_AI", side="top")
+        self.layerMain().addPage(AI(self),
+                                 icon=SiGlobal.siui.iconpack.get("ic_fluent_content_view_gallery_lightning_regular"),
+                                 hint="我的", side="bottom")
         #
         # self.layerMain().addPage(PageElectronicComputing(self),
         #                          icon=SiGlobal.siui.iconpack.get("ic_fluent_content_view_gallery_lightning_regular"),

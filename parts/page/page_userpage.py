@@ -6,7 +6,7 @@
 # -------------------------------
 #  @Project : zip.py
 #  @Time    : 2025 - 01-31 12:08
-#  @FileName: page_aipage.py
+#  @FileName: page_userpage.py
 #  @Software: PyCharm 2024.1.6 (Professional Edition)
 #  @System  : Windows 11 23H2
 #  @Author  : 33974
@@ -37,7 +37,7 @@ class AI(SiPage):
         self.setPadding(64)
         self.setScrollMaximumWidth(1000)
         self.setScrollAlignment(Qt.AlignLeft)
-        self.setTitle("AI")  # 设置标题
+        self.setTitle("个人主页")  # 设置标题
 
         # 创建控件组
         self.titled_widgets_group = SiTitledWidgetGroup(self)
@@ -49,3 +49,6 @@ class AI(SiPage):
         self.titled_widgets_group.addPlaceholder(64)
         # 设置控件组为页面对象
         self.setAttachment(self.titled_widgets_group)
+
+    def login_button_container(self):
+        login_button_container = SiDenseContainer()
