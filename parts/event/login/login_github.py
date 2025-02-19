@@ -21,11 +21,15 @@ import os
 import requests
 import webbrowser
 from http.server import BaseHTTPRequestHandler, HTTPServer
+
+from PyQt5.QtCore import pyqtSignal, QThread
+
 from parts.event.send_message import show_message, send_custom_message
 
 import config.CONFIG as F
 
 PATH_CONFIG = F.CONFIG_PATH
+HTML_PATH = F.HTML_PATH
 
 # GitHub OAuth 应用的配置
 CLIENT_ID = "Ov23liihJAbtWX6zyXr9"
@@ -56,9 +60,7 @@ class OAuthHandler(BaseHTTPRequestHandler):
             self.end_headers()
 
             # 从 HTML 文件中读取内容并写入响应
-            base_dir = os.path.dirname(os.path.abspath(__file__))
-            config_dir = os.path.join(os.path.dirname(base_dir), 'config')
-            html_path = os.path.join(config_dir, 'auth_success.html')
+            html_path = HTML_PATH / "auth_success.html"
             with open(html_path, 'rb') as file:
                 self.wfile.write(file.read())
 
@@ -68,9 +70,7 @@ class OAuthHandler(BaseHTTPRequestHandler):
             self.end_headers()
 
             # 从 HTML 文件中读取内容并写入响应
-            base_dir = os.path.dirname(os.path.abspath(__file__))
-            config_dir = os.path.join(os.path.dirname(base_dir), 'config')
-            html_path = os.path.join(config_dir, 'auth_failed.html')
+            html_path = F.CONFIG_PATH / "auth_fail.html"
             with open(html_path, 'rb') as file:
                 self.wfile.write(file.read())
 
@@ -93,13 +93,13 @@ def main():
             server.handle_request()
             server.server_close()
         except Exception as e:
-            show_message(4, "Error", "错误：未收到授权码或登陆失败！！请重试", "ic_fluent_error_circle_regular")
+            show_message(4, "Error", "错误，回调出错！！请重试", "ic_fluent_error_circle_regular")
             print(e)
             return False
 
         if not auth_code:
-            show_message(4, "Error", "错误：未收到授权码或登陆失败！！请重试", "ic_fluent_error_circle_regular")
-            print("错误：未收到授权码或登陆失败！！请重试")
+            show_message(4, "Error", "错误：未收到授权码！请重试", "ic_fluent_error_circle_regular")
+            print("错误：未收到授权码！请重试")
             return False
 
         # 4. 用授权码交换访问令牌
@@ -132,36 +132,21 @@ def main():
         user_data = user_response.json()
 
         if user_response.status_code == 200:
-            print("login scuss!!!!!!!!!!!!!!!!!!!!")
+            print("登录成功")
             # 将 user_data 保存为 JSON 文件
-            base_dir = os.path.dirname(os.path.abspath(__file__))
-            config_dir = os.path.join(os.path.dirname(base_dir), 'config')
-            user_info_path = os.path.join(config_dir, 'user_info.json')
-            user_info_path_copy = os.path.join(config_dir, 'copy_user_info.json')
+            user_info_path = F.USER_INFO_PATH / "user_info.json"
             with open(user_info_path, 'w') as json_file:
                 json.dump(user_data, json_file, indent=4)
-            with open(user_info_path_copy, 'w') as json_file:
-                json.dump(user_data, json_file, indent=4)
-            try:
-                base_dir = os.path.dirname(os.path.abspath(__file__))
-                png_dir = os.path.join(os.path.dirname(base_dir), 'pic')
-                pic_path = os.path.join(png_dir, 'avatar.png')
-                print(pic_path)
-                send_custom_message(1, pic_path, user_data['login'], user_data['html_url'])
-            except Exception as e:
-                show_message(1, "成矣", "可关否？在启？", "ic_fluent_checkmark_filled")
-
-                print(e)
-
             return True
         else:
-            show_message(4, "Error", "错误：未收到授权码或登陆失败！！请重试", "ic_fluent_error_circle_regular")
+            show_message(4, "Error", "错误：获取用户信息错误！请重试", "ic_fluent_error_circle_regular")
             print(f"Error fetching user info: {user_response.text}")
             return False
     except Exception as E:
-        show_message(4, "Error", "错误：未收到授权码或登陆失败！！请重试", "ic_fluent_error_circle_regular")
+        show_message(4, "Error", "错误：登陆失败！！请重试", "ic_fluent_error_circle_regular")
         print(E)
         return False
+
 
 
 if __name__ == "__main__":

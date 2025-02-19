@@ -13,3 +13,20 @@
 #  @Contact : 
 #  @Python  : 
 # -------------------------------
+
+# 注册页面
+from .page_aboutpage import About
+from .page_autoexcalpage import Autoexcal
+from .page_homepage import Homepage
+from .page_musicpage import PageMusicPage
+from .page_settingpage import PageSettingPage
+from .page_updatepage import UpDatePage
+from .page_userpage import User
+
+UpdatePage = UpDatePage
+SettingPage = PageSettingPage
+AutoFormPage = Autoexcal
+MusicPage = PageMusicPage
+HomePage = Homepage
+UserPage = User
+AboutPage = About

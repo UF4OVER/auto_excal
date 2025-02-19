@@ -1,0 +1,9 @@
+POST /oauth2/v3/token HTTP/1.1
+Host: oauth-login.cloud.huawei.com
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=authorization_code&
+code=EAEEAIZXwbldJLWBTL7pAfaHgCDoo9hjVmWXqlEiM%2Fm0ouqq6OICK967jwaVXvaz%2F7wiy2pBj7pYHkoq7Qa%2BGb%2BZsCCyRNkWRODD8AJS4XE9j3zcCsszFt%2FLjJT3kULqzdLlfGakmenU2ClHe4q7xhqFYo2uVK4r77s%2BFJb7S%2FVCZptIpLFV26CglgjrUo%2FcMbq9gW0hwbuOXxHL430NG%2BRNWd7V2WeuLOg7rdqJT3Diahz0KtwoMqeH0ek%2FMYWGTzzoA%2F1F%2BkqoQaINNxbFq7Ry3vMA&
+client_id=113508585&
+client_secret=91b305924de7697596c71a880263a02a1e96307f74f611321c7754b22afb4561&
+redirect_uri=http://localhost:8080/callback

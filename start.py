@@ -1,5 +1,6 @@
 #  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
+
 from sys_stdio import setup_logging
 setup_logging(False)  # 配置日志
 
@@ -7,9 +8,9 @@ import argparse
 import configparser
 import sys
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import QApplication
-from ui import MySiliconApp
+from ui import MySiliconApp, SplashScreen
 from parts.event.send_message import send_custom_message, show_message
 
 import config.CONFIG as F

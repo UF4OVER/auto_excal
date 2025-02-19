@@ -13,28 +13,20 @@
 #  @Contact : 
 #  @Python  : 
 # -------------------------------
-import os
 import config.CONFIG as F
 
 PIC_PATH = F.PNG_PATH
 from PyQt5.QtCore import Qt, pyqtSignal
-from siui.components import SiPixLabel
-from siui.components.option_card import SiOptionCardLinear
 from siui.components.page import SiPage
 from siui.components.titled_widget_group import SiTitledWidgetGroup
 from siui.components.widgets import (
-    SiDenseHContainer,
-    SiDenseVContainer,
-    SiLabel,
     SiPixLabel,
-    SiPushButton,
 )
-from siui.components.container import SiDenseContainer, SiTriSectionPanelCard
-from siui.core import GlobalFont, Si, SiColor, SiGlobal
-from siui.gui import SiFont
+from siui.components.container import SiDenseContainer
+from siui.core import Si, SiGlobal
 
 
-class AI(SiPage):
+class User(SiPage):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -70,6 +62,7 @@ class AI(SiPage):
             github_logom_pixlabel.setFixedSize(100, 100)
             github_logom_pixlabel.setBorderRadius(5)
             github_logom_pixlabel.load(f"{PIC_PATH}\\login_pix\\github.jpg")
+            github_logom_pixlabel.clilked.connect(lambda: self.github_login())
 
             login_button_container.addWidget(huawei_logom_pixlabel)
             login_button_container.addWidget(github_logom_pixlabel)
@@ -78,8 +71,14 @@ class AI(SiPage):
             g.addWidget(login_button_container)
 
     def huawei_login(self):
-        from parts.event.login.login_huawei import main
-        main()
+        from parts.event.login import LoginHuawei
+        login = LoginHuawei()
+        login.run()
+
+    def github_login(self):
+        from parts.event.login import LoginGithub
+        login = LoginGithub()
+        login.run()
 
 
 class PixButton(SiPixLabel):

@@ -699,8 +699,6 @@ class Autoexcal(SiPage):
                     info_pwrd = self.browser.latest_tab.ele("@id=User_Pass")
                     info_pwrd.input(F.READ_CONFIG("info", "password").format())
 
-                    # rank_code_info = self.browser.latest_tab.ele("@id=txtyzm")
-                    # # 等待验证码用户输入
                     self.browser.latest_tab.wait.doc_loaded()
 
                     login_info_button = self.browser.latest_tab.ele("@id=btnLogin")
@@ -715,11 +713,6 @@ class Autoexcal(SiPage):
 
                 else:
                     show_message(1, "警告", "验证码识别失败\r\n请手动输入", "ic_fluent_task_list_ltr_filled")
-
-                # except Exception as e:
-                #     print(f"无法找到元素: {e}")
-                #     show_message(3, "提示", f"无法找到元素: {e}", "ic_fluent_task_list_ltr_filled")
-                #     return
 
         except Exception as e:
             print(f"无法启动浏览器: {e}")
