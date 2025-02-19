@@ -18,10 +18,10 @@ import json
 import os
 import webbrowser
 from http.server import BaseHTTPRequestHandler, HTTPServer
-
+from urllib.parse import urlencode
 import requests
-
-from parts.event.send_message import show_message, send_custom_message
+from parts.event.send_message import show_message
+import config.CONFIG as F
 
 # 使用环境变量来存储敏感信息
 CLIENT_ID = os.getenv('HUWEI_CLIENT_ID', '113508585')
@@ -52,9 +52,7 @@ class OAuthHandler(BaseHTTPRequestHandler):
             self.end_headers()
 
             # 从 HTML 文件中读取内容并写入响应
-            base_dir = os.path.dirname(os.path.abspath(__file__))
-            config_dir = os.path.join(os.path.dirname(base_dir), 'config')
-            html_path = os.path.join(config_dir, 'auth_success.html')
+            html_path = f"{F.HTML_PATH}\\auth_success.html"
             with open(html_path, 'rb') as file:
                 self.wfile.write(file.read())
 
@@ -64,26 +62,35 @@ class OAuthHandler(BaseHTTPRequestHandler):
             self.end_headers()
 
             # 从 HTML 文件中读取内容并写入响应
-            base_dir = os.path.dirname(os.path.abspath(__file__))
-            config_dir = os.path.join(os.path.dirname(base_dir), 'config')
-            html_path = os.path.join(config_dir, 'auth_failed.html')
+            html_path = f"{F.HTML_PATH}\\auth_failed.html"
             with open(html_path, 'rb') as file:
                 self.wfile.write(file.read())
+
+
+def generate_auth_url():
+    params = {
+        'response_type': 'code',
+        'client_id': CLIENT_ID,
+        'redirect_uri': REDIRECT_URI,
+        'scope': 'openid profile email'  # 添加所需的scope
+    }
+    auth_url = f"{AUTH_URL}?{urlencode(params)}"
+    return auth_url
 
 
 def main():
     global auth_code
     try:
-        # 1. 构建 GitHub 授权 URL
-        auth_url = f"{AUTH_URL}?client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}&scope=user"
+        # 1. 构建授权 URL
+        auth_url = generate_auth_url()
 
-        # 2. 打开默认浏览器，跳转到 GitHub 授权页面
-        print(f"Opening GitHub login page: {auth_url}")
+        # 2. 打开默认浏览器，跳转到授权页面
+        print(f"Opening authorization page: {auth_url}")
         webbrowser.open(auth_url)
 
-        # 3. 创建一个 HTTP 服务器以捕获 GitHub 的回调
+        # 3. 创建一个 HTTP 服务器以捕获回调
         server = HTTPServer(("localhost", 8080), OAuthHandler)
-        server.socket.settimeout(10)
+        server.socket.settimeout(60)
         print("Waiting for authorization response...")
         try:
             server.handle_request()
@@ -104,6 +111,7 @@ def main():
             TOKEN_URL,
             headers={"Accept": "application/json"},
             data={
+                "grant_type": "authorization_code",
                 "client_id": CLIENT_ID,
                 "client_secret": CLIENT_SECRET,
                 "code": auth_code,
@@ -128,27 +136,14 @@ def main():
         user_data = user_response.json()
 
         if user_response.status_code == 200:
-            print("login scuss!!!!!!!!!!!!!!!!!!!!")
+            print("login success!!!!!!!!!!!!!!!!!!!!")
             # 将 user_data 保存为 JSON 文件
-            base_dir = os.path.dirname(os.path.abspath(__file__))
-            config_dir = os.path.join(os.path.dirname(base_dir), 'config')
-            user_info_path = os.path.join(config_dir, 'user_info.json')
-            user_info_path_copy = os.path.join(config_dir, 'copy_user_info.json')
+            user_info_path = f"{F.USER_INFO_PATH}\\HUAWEI_user_info.json"
+            user_info_path_copy = f"{F.USER_INFO_PATH}\\HUAWEI_user_info_copy.json"
             with open(user_info_path, 'w') as json_file:
                 json.dump(user_data, json_file, indent=4)
             with open(user_info_path_copy, 'w') as json_file:
                 json.dump(user_data, json_file, indent=4)
-            try:
-                base_dir = os.path.dirname(os.path.abspath(__file__))
-                png_dir = os.path.join(os.path.dirname(base_dir), 'pic')
-                pic_path = os.path.join(png_dir, 'avatar.png')
-                print(pic_path)
-                send_custom_message(1, pic_path, user_data['login'], user_data['html_url'])
-            except Exception as e:
-                show_message(1, "成矣", "可关否？在启？", "ic_fluent_checkmark_filled")
-
-                print(e)
-
             return True
         else:
             show_message(4, "Error", "错误：未收到授权码或登陆失败！！请重试", "ic_fluent_error_circle_regular")
@@ -161,4 +156,4 @@ def main():
 
 
 if __name__ == "__main__":
-    print(CLIENT_ID)
+    main()

@@ -14,8 +14,10 @@
 #  @Python  : 
 # -------------------------------
 import os
+import config.CONFIG as F
 
-from PyQt5.QtCore import Qt
+PIC_PATH = F.PNG_PATH
+from PyQt5.QtCore import Qt, pyqtSignal
 from siui.components import SiPixLabel
 from siui.components.option_card import SiOptionCardLinear
 from siui.components.page import SiPage
@@ -24,8 +26,10 @@ from siui.components.widgets import (
     SiDenseHContainer,
     SiDenseVContainer,
     SiLabel,
+    SiPixLabel,
     SiPushButton,
 )
+from siui.components.container import SiDenseContainer, SiTriSectionPanelCard
 from siui.core import GlobalFont, Si, SiColor, SiGlobal
 from siui.gui import SiFont
 
@@ -43,6 +47,8 @@ class AI(SiPage):
         self.titled_widgets_group = SiTitledWidgetGroup(self)
         self.titled_widgets_group.setSiliconWidgetFlag(Si.EnableAnimationSignals)
 
+        self.login_button_container()
+
         SiGlobal.siui.reloadStyleSheetRecursively(self)
 
         # 添加页脚的空白以增加美观性
@@ -51,4 +57,36 @@ class AI(SiPage):
         self.setAttachment(self.titled_widgets_group)
 
     def login_button_container(self):
-        login_button_container = SiDenseContainer()
+        with self.titled_widgets_group as g:
+            login_button_container = SiDenseContainer(self)
+
+            huawei_logom_pixlabel = PixButton(self)
+            huawei_logom_pixlabel.setFixedSize(100, 100)
+            huawei_logom_pixlabel.setBorderRadius(5)
+            huawei_logom_pixlabel.load(f"{PIC_PATH}\\login_pix\\huawei.png")
+            huawei_logom_pixlabel.clilked.connect(lambda: self.huawei_login())
+
+            github_logom_pixlabel = PixButton(self)
+            github_logom_pixlabel.setFixedSize(100, 100)
+            github_logom_pixlabel.setBorderRadius(5)
+            github_logom_pixlabel.load(f"{PIC_PATH}\\login_pix\\github.jpg")
+
+            login_button_container.addWidget(huawei_logom_pixlabel)
+            login_button_container.addWidget(github_logom_pixlabel)
+            login_button_container.adjustSize()
+
+            g.addWidget(login_button_container)
+
+    def huawei_login(self):
+        from parts.event.login.login_huawei import main
+        main()
+
+
+class PixButton(SiPixLabel):
+    clilked = pyqtSignal()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def mousePressEvent(self, ev):
+        self.clilked.emit()
