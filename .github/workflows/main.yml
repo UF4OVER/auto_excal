@@ -1,0 +1,34 @@
+name: Security Check
+
+on:
+  push:
+    branches:
+      - siui
+
+jobs:
+  check-sensitive-info:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run security check on specific file
+        run: |
+          if grep -qE 'API_KEY|TOKEN|api_key|api_smtp_code|api_token|password|token|' config.ini; then
+            sed -i '/API_KEY\|TOKEN\|api_key\|api_smtp_code\|api_token\|password\|token/s/\(.*\(API_KEY\|TOKEN\|api_key\|api_smtp_code\|api_token\|password\|token\).*\)/\[REDACTED\]/g' config.js
+          else
+            echo "No sensitive information found in config.ini."
+          fi
+
+      - name: Commit and push changes if any
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "uf4hp@foxmail.com"
+          git add .
+          if [ -z "$(git status --porcelain)" ]; then 
+            echo "No changes detected."
+          else 
+            git commit -m "Redact sensitive information in config.js"
+            git push origin HEAD:${{ github.ref }}
+          fi
