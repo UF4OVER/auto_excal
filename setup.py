@@ -32,7 +32,8 @@ def build_exe_cx_freeze():
                 "pycaw",
                 "wmi",
                 "comtypes",
-                "pic"
+                "pic",
+                "cryptography"
             ],
         "include_files":  # 包含文件
             [

@@ -12,7 +12,7 @@ from siui.templates.application.application import SiliconApplication
 
 from parts.event.send_message import show_message
 from parts.component import DynamicIsland, QuickActions
-from parts.component.layer_left_global import LayerLeftGlobalDrawer
+from parts.component.GlobalLeftWindow import LayerLeftGlobalDrawer
 from parts.page import (AboutPage,
                         HomePage,
                         AutoFormPage,
@@ -61,6 +61,7 @@ class My_SiliconApplication(SiliconApplication):
 class MySiliconApp(My_SiliconApplication):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.setWindowIcon(QIcon(f"{PATH_PIC}/圆角-default.jpg"))
 
         screen_geo = QDesktopWidget().screenGeometry()
         self.stu = False
@@ -77,7 +78,6 @@ class MySiliconApp(My_SiliconApplication):
         print("-" * 20 + "slash_finish" + "-" * 20)
 
         self.ShortcutKey()
-        self.setWindowIcon(QIcon(f"{PATH_PIC}/圆角-default.jpg"))
 
         self.layerMain().addPage(HomePage(self),
                                  icon=SiGlobal.siui.iconpack.get("ic_fluent_home_filled"),
@@ -175,6 +175,7 @@ class SplashScreen(QWidget):
     def __init__(self):
         super().__init__()
         # 去除系统边框
+        self.setWindowIcon(QIcon(f"{PATH_PIC}/圆角-default.jpg"))
         self.setWindowFlags(Qt.FramelessWindowHint)
         # 确保此时窗口在最顶层
         self.setWindowFlag(Qt.WindowStaysOnTopHint)

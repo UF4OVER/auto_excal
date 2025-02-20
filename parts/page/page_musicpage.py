@@ -18,7 +18,7 @@ from siui.core import Si, SiGlobal
 from typing_extensions import Union
 
 import config.CONFIG
-from parts.component.music_displayer import SiMusicDisplayer, MusicManager
+from parts.component.MusicPresenter import SiMusicDisplayer, MusicManager
 
 PATH_MUSIC = config.CONFIG.MUSIC_PATH
 

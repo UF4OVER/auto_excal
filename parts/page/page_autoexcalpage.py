@@ -6,8 +6,8 @@ import os
 import time
 
 from DrissionPage import ChromiumOptions, Chromium
-from PyQt5.QtCore import QThread, pyqtSignal, Qt
-from PyQt5.QtWidgets import QTableWidget, QFileDialog, QTableWidgetItem, QAbstractItemView
+from PyQt5.QtCore import QThread, pyqtSignal, Qt, QLine
+from PyQt5.QtWidgets import QTableWidget, QFileDialog, QTableWidgetItem, QAbstractItemView, QLabel
 from openpyxl.reader.excel import load_workbook
 from siui.components import (SiLabel,
                              SiTitledWidgetGroup,
@@ -19,6 +19,7 @@ from siui.components import (SiLabel,
                              SiPushButton)
 from siui.components.button import (SiSwitchRefactor,
                                     SiPushButtonRefactor)
+from siui.components.container import SiTriSectionPanelCard, SiDenseContainer
 from siui.components.editbox import SiLineEdit
 from siui.components.page import SiPage
 from siui.components.spinbox.spinbox import SiIntSpinBox
@@ -41,10 +42,10 @@ except Exception as e:
     browser_path = "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
     broswer_address = "127.0.0.1:9222"
 finally:
-    print("*"*20 + "broswer" + "*"*20)
+    print("*" * 20 + "broswer" + "*" * 20)
     print(f"浏览器路径:{browser_path}")
     print(f"浏览器地址:{broswer_address}")
-    print("*"*20 + "finish" + "*"*20)
+    print("*" * 20 + "finish" + "*" * 20)
 
 
 class MainLoopThread(QThread):
@@ -264,22 +265,22 @@ class Autoexcal(SiPage):
             group.addWidget(customize_the_input_box)
 
         with self.titled_widgets_group as group:
-            table_widget_height = 900
-            table_widget_width = 500
+            table_widget_height = 600
+            table_widget_width = 900
 
-            new_table_widget_height = 700
-            new_table_widget_width = 500
+            new_table_widget_height = 600
+            new_table_widget_width = 600
             group.addTitle("表格数据")
 
             auto_input_widget_box = SiOptionCardPlane(self)
             auto_input_widget_box.adjustSize()
             auto_input_widget_box.setTitle("原始表格数据")
-            auto_input_widget_box.body().setFixedSize(table_widget_height + 40, table_widget_width + 40)
+            auto_input_widget_box.body().setFixedSize(table_widget_width + 40, table_widget_height + 40)
             auto_input_widget_box.footer().setFixedHeight(40)
 
             self.table_widget = QTableWidget(self)
             self.table_widget.setStyleSheet(qss.TabelQss)
-            self.table_widget.setFixedSize(table_widget_height, table_widget_width)
+            self.table_widget.setFixedSize(table_widget_width, table_widget_height)
 
             self.clear_data_btu = SiLongPressButton(self)
             self.clear_data_btu.resize(80, 32)
@@ -295,34 +296,94 @@ class Autoexcal(SiPage):
             auto_input_widget_box.footer().addWidget(Label(self, "使用表格数据时，请确保表格数据与输入框对应"))
             auto_input_widget_box.footer().addWidget(self.clear_data_btu, "right")
 
-            new_input_widget_box = SiOptionCardPlane(self)
+            insert_table_widget_box = SiTriSectionPanelCard(self)
+            insert_table_widget_box.adjustSize()
+            insert_table_widget_box.setTitle("待插入原始表格")
+
+            self.insert_table_widget = QTableWidget(self)
+            self.insert_table_widget.setStyleSheet(qss.TabelQss)
+            self.insert_table_widget.setFixedSize(table_widget_width, table_widget_height - 400)
+
+            choose_insert_file_btu = SiPushButtonRefactor(self)
+            choose_insert_file_btu.setText("选择文件")
+
+            btu_container_for_h_container = SiDenseContainer(self)
+            # insert data
+            self.data1_input = SiLineEdit(self)
+            self.data1_input.setTitleWidth(50)
+            self.data1_input.setTitle("姓名")
+            self.data1_input.setText("何平")
+            self.data1_input.resize(150, 32)
+
+            self.data2_input = SiLineEdit(self)
+            self.data2_input.setTitleWidth(50)
+            self.data2_input.setTitle("学号")
+            self.data2_input.setText("2023303010311")
+            self.data2_input.resize(150, 32)
+
+            self.data3_input = SiLineEdit(self)
+            self.data3_input.setTitle("分数")
+            self.data3_input.setTitleWidth(50)
+            self.data3_input.setText("3")
+            self.data3_input.resize(150, 32)
+
+            self.new_delete_btu = SiPushButton(self)
+            self.new_delete_btu.attachment().setText("删除")
+            self.new_delete_btu.setFixedSize(128, 32)
+            self.new_delete_btu.clicked.connect(self.del_data_for_new_table)
+
+            self.new_insert_btu = SiPushButton(self)
+            self.new_insert_btu.attachment().setText("插入")
+            self.new_insert_btu.setFixedSize(128, 32)
+            self.new_insert_btu.clicked.connect(self.insert_data_for_new_table)
+
+            btu_container_for_h_container.setFixedHeight(60)
+            btu_container_for_h_container.addWidget(self.data1_input)
+            btu_container_for_h_container.addWidget(self.data2_input)
+            btu_container_for_h_container.addWidget(self.data3_input)
+            btu_container_for_h_container.addWidget(self.new_insert_btu)
+            btu_container_for_h_container.addWidget(self.new_delete_btu)
+
+            insert_table_widget_box.header().addWidget(choose_insert_file_btu, Qt.RightEdge)
+            insert_table_widget_box.body().addWidget(self.insert_table_widget)
+            insert_table_widget_box.body().setFixedSize(table_widget_width + 40, table_widget_height - 400 + 40)
+            insert_table_widget_box.footer().addWidget(btu_container_for_h_container, Qt.RightEdge)
+            insert_table_widget_box.footer().adjustSize()
+
+            new_input_widget_box = SiTriSectionPanelCard(self)
             new_input_widget_box.adjustSize()
             new_input_widget_box.setTitle("自定义表格数据")
-            new_input_widget_box.body().setFixedSize(new_table_widget_height + 40, new_table_widget_width + 70)
-            new_input_widget_box.footer().setFixedHeight(40)
 
             reload_the_data_btu = SiPushButtonRefactor(self)
             reload_the_data_btu.setText("加载数据")
             reload_the_data_btu.clicked.connect(self.reload_data_for_new_table_widget)
 
-            new_input_widget_box.header().addWidget(reload_the_data_btu, "right")
+            new_input_widget_box.header().addWidget(reload_the_data_btu, Qt.RightEdge)
 
             self.new_table_widget = QTableWidget(self)
             self.new_table_widget.setStyleSheet(qss.TabelQss)
             self.new_table_widget.setSelectionBehavior(QAbstractItemView.SelectRows)
             self.new_table_widget.setFixedSize(int(new_table_widget_height * 0.7), new_table_widget_width)
-            # 设置第一列的宽度为100，第二行为200，第三行为80
+
             self.new_table_widget.setColumnWidth(0, 100)
             self.new_table_widget.setColumnWidth(1, 300)
             self.new_table_widget.setColumnWidth(2, 100)
 
+            self.new_insert_table_widget = QTableWidget(self)
+            self.new_insert_table_widget.setStyleSheet(qss.TabelQss)
+            self.new_insert_table_widget.setSelectionBehavior(QAbstractItemView.SelectRows)
+            self.new_insert_table_widget.setFixedSize(int(new_table_widget_height * 0.7), new_table_widget_width)
+
+            self.new_insert_table_widget.setColumnWidth(0, 100)
+            self.new_insert_table_widget.setColumnWidth(1, 300)
+            self.new_insert_table_widget.setColumnWidth(2, 100)
+
             # 此容器左侧用于放置表格数据，右侧放置按钮
             operate_the_container_h = SiDenseHContainer(self)
-            # 此容器用于放置表格数据
-            vertical_container_for_tabular_data = SiDenseVContainer(self)
-            vertical_container_for_tabular_data.addWidget(self.new_table_widget)
+            operate_the_container_h.addWidget(self.new_table_widget)
+            operate_the_container_h.addWidget(self.new_insert_table_widget)
             # 此容器用于放置按钮
-            btu_container_for_vertical_container = SiDenseVContainer(self)
+            # btu_container_for_vertical_container = SiDenseVContainer(self)
 
             self.open_web_btu = SiPushButton(self)
             self.open_web_btu.attachment().setText("打开浏览器")
@@ -341,58 +402,41 @@ class Autoexcal(SiPage):
 
             self.delete_btu = SiPushButton(self)
             self.delete_btu.attachment().setText("删除")
-            self.delete_btu.setFixedSize(210, 32)
+            self.delete_btu.setFixedSize(128, 32)
             self.delete_btu.clicked.connect(self.del_data_for_new_table)
 
             self.insert_btu = SiPushButton(self)
             self.insert_btu.attachment().setText("插入")
-            self.insert_btu.setFixedSize(210, 32)
+            self.insert_btu.setFixedSize(128, 32)
             self.insert_btu.clicked.connect(self.insert_data_for_new_table)
-            # insert data
-            self.data1_input = SiLineEdit(self)
-            self.data1_input.setTitleWidth(50)
-            self.data1_input.setTitle("姓名")
-            self.data1_input.setText("何平")
-            self.data1_input.resize(210, 32)
 
-            self.data2_input = SiLineEdit(self)
-            self.data2_input.setTitleWidth(50)
-            self.data2_input.setTitle("学号")
-            self.data2_input.setText("2023303010311")
-            self.data2_input.resize(210, 32)
+            temp_line = QLabel(self)
+            temp_line.setFixedSize(2, 28)
+            temp_line.setStyleSheet("background-color: rgba(255, 255, 255, 128);")
 
-            self.data3_input = SiLineEdit(self)
-            # self.data3_input.setLabelWidth(100)
-            self.data3_input.setTitle("分数")
-            self.data3_input.setTitleWidth(50)
-            self.data3_input.setText("3")
-            self.data3_input.resize(210, 32)
-
-            btu_container_for_vertical_container.addWidget(self.data1_input)
-            btu_container_for_vertical_container.addWidget(self.data2_input)
-            btu_container_for_vertical_container.addWidget(self.data3_input)
-            btu_container_for_vertical_container.addWidget(self.insert_btu)
-            btu_container_for_vertical_container.addWidget(self.delete_btu)
-
-            temp_h = SiDenseHContainer(self)
-
+            temp_h = SiDenseContainer(self)
+            temp_h.resize(table_widget_height, 32)
             temp_h.addWidget(self.open_web_btu)
             temp_h.addWidget(self.start_btu)
             temp_h.addWidget(self.stop_btu)
+            temp_h.addWidget(temp_line)
+            temp_h.addWidget(self.insert_btu, Qt.RightEdge)
+            temp_h.addWidget(self.delete_btu, Qt.RightEdge)
 
-            vertical_container_for_tabular_data.addWidget(temp_h)
-
-            operate_the_container_h.addWidget(vertical_container_for_tabular_data)
-            operate_the_container_h.addWidget(btu_container_for_vertical_container)
+            # operate_the_container_h.addWidget(btu_container_for_vertical_container)
 
             new_input_widget_box.body().addWidget(operate_the_container_h)
-            new_input_widget_box.footer().addWidget(Label(self, "使用表格数据时，请确保表格数据与输入框对应"))
+            new_input_widget_box.body().adjustSize()
+            new_input_widget_box.footer().addWidget(temp_h)
+            new_input_widget_box.footer().adjustSize()
 
             group.addWidget(auto_input_widget_box)
+            group.addWidget(insert_table_widget_box)
             group.addWidget(new_input_widget_box)
 
             # 调整父部件大小
             auto_input_widget_box.adjustSize()
+            insert_table_widget_box.adjustSize()
             new_input_widget_box.adjustSize()
             group.adjustSize()
             self.adjustSize()
@@ -633,16 +677,17 @@ class Autoexcal(SiPage):
         """
         将数据插入到新表格中
         """
-
-        name = self.data1_input.text()
-        xuehao = self.data2_input.text()
-        score = self.data3_input.text()
-        # 插入到新表格中
-        self.new_table_widget.insertRow(self.new_table_widget.rowCount())
-        self.new_table_widget.setItem(self.new_table_widget.rowCount() - 1, 0, QTableWidgetItem(name))
-        self.new_table_widget.setItem(self.new_table_widget.rowCount() - 1, 1, QTableWidgetItem(xuehao))
-        self.new_table_widget.setItem(self.new_table_widget.rowCount() - 1, 2, QTableWidgetItem(score))
-        show_message(1, "提示", f"已添加: {name}, {xuehao}, {score}", "ic_fluent_task_list_ltr_filled")
+        # todo
+        pass
+        # name = self.data1_input.text()
+        # xuehao = self.data2_input.text()
+        # score = self.data3_input.text()
+        # # 插入到新表格中
+        # self.new_table_widget.insertRow(self.new_table_widget.rowCount())
+        # self.new_table_widget.setItem(self.new_table_widget.rowCount() - 1, 0, QTableWidgetItem(name))
+        # self.new_table_widget.setItem(self.new_table_widget.rowCount() - 1, 1, QTableWidgetItem(xuehao))
+        # self.new_table_widget.setItem(self.new_table_widget.rowCount() - 1, 2, QTableWidgetItem(score))
+        # show_message(1, "提示", f"已添加: {name}, {xuehao}, {score}", "ic_fluent_task_list_ltr_filled")
         self.save_to_json()
 
     @limit_for_table
@@ -673,7 +718,8 @@ class Autoexcal(SiPage):
                 self.browser = Chromium(broswer_address)
                 self.browser.latest_tab.get(F.READ_CONFIG("vpn", "vpn_url"))
                 if F.READ_CONFIG("ocr", "ocr_api_token") == "":
-                    show_message(3, "VPN", "请先设置OCR_Token来自动进入网站\r\n或者\r\n手动进入网站", "ic_fluent_emoji_edit_filled")
+                    show_message(3, "VPN", "请先设置OCR_Token来自动进入网站\r\n或者\r\n手动进入网站",
+                                 "ic_fluent_emoji_edit_filled")
                     return
 
                 # try:
