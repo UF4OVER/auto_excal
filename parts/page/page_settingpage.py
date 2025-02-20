@@ -16,7 +16,7 @@ from siui.core import SiGlobal, Si, SiColor
 
 import config.CONFIG as F
 from parts.page.page_autoexcalpage import show_message
-
+import re
 PATH_CONFIG = F.CONFIG_PATH
 PATH_PNG = F.PNG_PATH
 
@@ -219,12 +219,12 @@ class PageSettingPage(SiPage):
             group.addWidget(self.background_options)
 
         with self.titled_widgets_group as group:
-            group.addTitle("Access_Token")
+            group.addTitle("OCR识别Token")
             self.key_code_input = SiLineEdit(self)
             self.key_code_input.resize(500, 36)
             self.key_code_input.setTitleWidth(100)
-            self.key_code_input.setTitle("ColaKey")
-            self.key_code_input.setText("")
+            self.key_code_input.setTitle("百度云Token")
+            self.key_code_input.setText("请不要将这个Token交给别人")
 
             self.change_api_key_btu = SiPushButtonRefactor(self)
             self.change_api_key_btu.setText("确认")
@@ -232,19 +232,50 @@ class PageSettingPage(SiPage):
             self.change_api_key_btu.clicked.connect(self.save_api_key)
 
             self.api_key_options = SiOptionCardLinear(self)
-            self.api_key_options.setTitle("LuckyColaAI手动更新", "LuckyColaAI的ColaKey")
+            self.api_key_options.setTitle("填写您的OCR识别Token", "百度云的OCR_Token")
             self.api_key_options.load(SiGlobal.siui.iconpack.get("ic_fluent_mail_edit_filled"))
             self.api_key_options.addWidget(self.change_api_key_btu)
             self.api_key_options.addWidget(self.key_code_input)
-
             group.addWidget(self.api_key_options)
+        with self.titled_widgets_group as g:
+            g.addTitle("VPN账号密码")
+            self.vpn_account_input = SiLineEdit(self)
+            self.vpn_account_input.resize(200, 36)
+            self.vpn_account_input.setTitleWidth(60)
+            self.vpn_account_input.setTitle("账号")
+
+            self.vpn_password_input = SiLineEdit(self)
+            self.vpn_password_input.resize(200, 36)
+            self.vpn_password_input.setTitleWidth(60)
+            self.vpn_password_input.setTitle("密码")
+
+            self.save_vpn_btu = SiPushButtonRefactor(self)
+            self.save_vpn_btu.setText("保存")
+            self.save_vpn_btu.resize(96, 32)
+            self.save_vpn_btu.clicked.connect(self.save_vpn)
+
+            self.vpn_options = SiOptionCardLinear(self)
+            self.vpn_options.setTitle("VPN账号密码", "VPN账号密码")
+            self.vpn_options.load(SiGlobal.siui.iconpack.get("ic_fluent_mail_edit_filled"))
+            self.vpn_options.addWidget(self.vpn_password_input)
+            self.vpn_options.addWidget(self.vpn_account_input)
+
+            g.addWidget(self.vpn_options)
+
+    def save_vpn(self):
+        if len(self.vpn_account_input.text()) > 10 and len(self.vpn_password_input.text()) > 1:
+            F.WRITE_CONFIG("vpn", "vpn_name", self.vpn_account_input.text())
+            F.WRITE_CONFIG("vpn", "vpn_password", self.vpn_password_input.text())
+            show_message(1, "VPN更新成功", "下次重启生效", "ic_fluent_emoji_hand_filled")
+        else:
+            show_message(3, "不合理", "请合理输入", "ic_fluent_emoji_hand_filled")
 
     def save_api_key(self):
         if len(self.key_code_input.text()) > 10:
-            # F.WRITE_CONFIG("LuckyColaAI", "ColaKey", self.key_code_input.text())
-            show_message(1, "ColaKey更新成功", "下次重启生效", "ic_fluent_emoji_hand_filled")
+            F.WRITE_CONFIG("ocr", "ocr_api_token", self.key_code_input.text())
+            show_message(1, "Token更新成功", "下次重启生效", "ic_fluent_emoji_hand_filled")
         else:
-            show_message(3, "ColaKey不合理", "请输入合理的ColaKey", "ic_fluent_emoji_hand_filled")
+            show_message(3, "Token不合理", "请输入合理的Token", "ic_fluent_emoji_hand_filled")
 
     def change_background(self):
         png_file_path = QFileDialog.getOpenFileName(self, "选择PNG文件", "", "JPG(嘿嘿嘿) Files (*.jpg)")[0]
@@ -271,5 +302,5 @@ class PageSettingPage(SiPage):
         else:
             dpi_policy = 'PassThrough'
 
-        use_hdpi_pixmaps = True  # todo
+        use_hdpi_pixmaps = True
         save_config(dpi_policy, self.enable_dpi_staus, use_hdpi_pixmaps)

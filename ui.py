@@ -10,7 +10,7 @@ from siui.core import SiGlobal
 from siui.templates.application.application import SiliconApplication
 
 import config.CONFIG as F
-from parts.component.DynamicIsland import DynamicIsland
+from parts.component import DynamicIsland, QuickActions
 from parts.component.layer_left_global import LayerLeftGlobalDrawer
 from parts.page import (AboutPage,
                         UserPage,
@@ -29,14 +29,20 @@ class My_SiliconApplication(SiliconApplication):
         super().__init__(*args, **kwargs)
         self.layer_left_global_drawer = LayerLeftGlobalDrawer(self)
         self.dynamic_island = DynamicIsland(self)
+        self.quick_actions = QuickActions(self)
         self.layerMain().container_title.addWidget(self.dynamic_island)
+        self.layerMain().container_title.addWidget(self.quick_actions, "right")
 
     def Dynamic_Island(self):
         return self.dynamic_island
 
+    def QuickActions(self):
+        return self.quick_actions
+
     def showEvent(self, event):
         super().showEvent(event)
         self.dynamic_island.move(self.size().width() // 2 - 200, 15)
+        self.quick_actions.move(self.size().width() - 200, 15)
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
@@ -73,9 +79,9 @@ class MySiliconApp(My_SiliconApplication):
         self.layerMain().addPage(MusicPage(self),
                                  icon=SiGlobal.siui.iconpack.get("ic_fluent_music_note_2_play_filled"),
                                  hint="音乐", side="top")
-        self.layerMain().addPage(UserPage(self),
-                                 icon=SiGlobal.siui.iconpack.get("ic_fluent_content_view_gallery_lightning_regular"),
-                                 hint="我的", side="bottom")
+        # self.layerMain().addPage(UserPage(self),
+        #                          icon=SiGlobal.siui.iconpack.get("ic_fluent_content_view_gallery_lightning_regular"),
+        #                          hint="我的", side="bottom")
 
         self.layerMain().addPage(AboutPage(self),
                                  icon=SiGlobal.siui.iconpack.get("ic_fluent_info_filled"),
@@ -192,9 +198,8 @@ class SplashScreen(QWidget):
 
         # 设置结束值为目标窗口大小
         self.scale_animation.setEndValue(QRect(end_x, end_y, end_width, end_height))
-        self.scale_animation.setEasingCurve(QEasingCurve.OutBack)  # 反弹效果
+        self.scale_animation.setEasingCurve(QEasingCurve.InOutExpo)  # 反弹效果
         self.scale_animation.start()
-
 
         self._radius = 55
 
@@ -275,3 +280,9 @@ class SplashScreen(QWidget):
         self.label_4.move(610, 400)
         self.label_5 = Label(self, f"TODAY : {F.TODAY}", 8)
         self.label_5.move(610, 430)
+
+        self.label_6 = Label(self, "Loading...", 11)
+        self.label_6.move(630, 500)
+
+        self.label_7 = Label(self, "Copyright © 2025 UF4OVER", 7)
+        self.label_7.move(610, 570)

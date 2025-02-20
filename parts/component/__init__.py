@@ -13,3 +13,7 @@
 #  @Contact : 
 #  @Python  : 
 # -------------------------------
+
+
+from .DynamicIsland import DynamicIsland
+from .QuickActions import quick_action as QuickActions

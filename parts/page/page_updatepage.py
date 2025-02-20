@@ -2,12 +2,13 @@
 #   All rights reserved.
 
 import os
-import requests
 
+import requests
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject
 from PyQt5.QtWidgets import QFileDialog
 from siui.components import SiLongPressButton
 from siui.components.button import SiProgressPushButton
+from siui.components.combobox import SiComboBox
 from siui.components.option_card import SiOptionCardLinear
 from siui.components.page import SiPage
 from siui.components.titled_widget_group import SiTitledWidgetGroup
@@ -158,6 +159,7 @@ class UpDatePage(SiPage):
         self.setScrollMaximumWidth(1000)
         self.setScrollAlignment(Qt.AlignLeft)
         self.setTitle("更新")  # 设置标题
+        self.file_suffix_f = ".exe"
 
         # 创建控件组
         self.titled_widgets_group = SiTitledWidgetGroup(self)
@@ -176,15 +178,15 @@ class UpDatePage(SiPage):
             self.choose_btu = SiLongPressButton(self)
             self.choose_btu.resize(128, 32)
             self.choose_btu.setHint("长按选择文件夹")
-            self.choose_btu.attachment().setText("选择文件夹")
+            self.choose_btu.attachment().setText("选择下载位置")
             self.choose_btu.longPressed.connect(self.choose_folder)
 
-            boswer_filter = SiOptionCardLinear(self)
-            boswer_filter.setTitle("新版本所在文件夹", "选择文件夹来储存新版本")
-            boswer_filter.load(SiGlobal.siui.iconpack.get("ic_fluent_folder_add_filled"))
-            boswer_filter.addWidget(self.choose_btu)
+            self.boswer_filter = SiOptionCardLinear(self)
+            self.boswer_filter.setTitle("新版本所在文件夹", "选择文件夹来储存新版本")
+            self.boswer_filter.load(SiGlobal.siui.iconpack.get("ic_fluent_folder_add_filled"))
+            self.boswer_filter.addWidget(self.choose_btu)
 
-            group.addWidget(boswer_filter)
+            group.addWidget(self.boswer_filter)
 
         with self.titled_widgets_group as group:
             group.addTitle("检查更新")
@@ -196,9 +198,18 @@ class UpDatePage(SiPage):
             boswer_filter = SiOptionCardLinear(self)
             boswer_filter.setTitle("检查更新", "检测是否发布了新版本")
             boswer_filter.load(SiGlobal.siui.iconpack.get("ic_fluent_cloud_checkmark_filled"))
-            boswer_filter.addWidget(self.check_btu)
 
-            group.addWidget(boswer_filter)
+            self.type_selection = SiComboBox(self)
+            self.type_selection.resize(150, 32)
+            self.type_selection.addOption("压缩文件（.7z）")
+            self.type_selection.addOption("分发文件（.exe）")
+            self.type_selection.menu().setShowIcon(False)
+            self.type_selection.menu().setIndex(0)
+
+            boswer_filter.addWidget(self.check_btu)
+            boswer_filter.addWidget(self.type_selection)
+
+        group.addWidget(boswer_filter)
 
     def start_version_check(self):
         self.version_check_thread = VersionCheckThread()
@@ -229,7 +240,7 @@ class UpDatePage(SiPage):
             show_message(1, "下载错误", "未选择文件夹", "ic_fluent_globe_error_filled")
             return
 
-        self.destination_path = os.path.join(self.destination_folder, "Wedding Invitation.7z")
+        self.destination_path = os.path.join(self.destination_folder, "Wedding Invitation" + self.file_suffix_f)
 
         self.download_thread = DownloadThread(self.download_url, self.destination_path)
         self.download_thread.progress.connect(self.update_progress)
@@ -244,11 +255,17 @@ class UpDatePage(SiPage):
             latest_release = response.json()
             assets = latest_release.get("assets", [])
             for asset in assets:
-                if asset.get("name", "").endswith(".7z"):
+                if self.type_selection.value() == "分发文件（.exe）":
+                    self.file_suffix_f = ".exe"
+                elif self.type_selection.value() == "压缩文件（.7z）":
+                    self.file_suffix_f = ".7z"
+                else:
+                    self.file_suffix_f = ".exe"
+                if asset.get("name", "").endswith(self.file_suffix_f):
                     return asset.get("browser_download_url", "")
-                print(f"未找到 7z 文件: {latest_release['name']}")
-                show_message(1, "下载错误", "未找到 7z 的安装文件，请联系开发者", "ic_fluent_globe_error_filled")
-            return None  # 如果没有找到 7z 文件，返回 None
+                print(f"未找到文件: {latest_release['name']}")
+                show_message(1, "下载错误", "未找到安装文件", "ic_fluent_globe_error_filled")
+            return None
         except requests.exceptions.RequestException as e:
             show_message(1, "请求出错", f"请求出错: {e}", "ic_fluent_globe_error_filled")
             print(f"请求出错: {e}")
@@ -256,9 +273,11 @@ class UpDatePage(SiPage):
 
     def choose_folder(self):
         folder_path = QFileDialog.getExistingDirectory(self, "选择文件夹")
+
         if folder_path:
             F.WRITE_CONFIG("version", "path", folder_path)
             print(f"路径已更改为:{folder_path}")
+            self.boswer_filter.setTitle("新版本所在文件夹", "选择文件夹来储存新版本")
         else:
             pass
 
