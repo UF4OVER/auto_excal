@@ -33,10 +33,8 @@ def set_brightness(brightness_level):  # 屏幕亮度设置
 def get_current_brightness() -> int:
     wmi_instance = wmi.WMI(namespace='root\\WMI')
     brightness = wmi_instance.WmiMonitorBrightness()[0]
+    print(f"当前屏幕亮度:{int(brightness.CurrentBrightness)}")
     return int(brightness.CurrentBrightness)
-
-
-print(f"当前屏幕亮度: {get_current_brightness()}%")
 
 
 def get_current_volume() -> int:
@@ -45,14 +43,9 @@ def get_current_volume() -> int:
         IAudioEndpointVolume._iid_, CLSCTX_ALL, None
     )
     volume = interface.QueryInterface(IAudioEndpointVolume)
-    # 获取当前音量（比例值）
     current_volume = volume.GetMasterVolumeLevelScalar()
-    print(f"当前系统音量: {current_volume * 100}%")
-    # 转换为百分比
+    print(f"当前系统音量: {int(round(current_volume * 100, 2))}%")
     return int(round(current_volume * 100, 2))
-
-
-# print(f"当前系统音量: {get_current_volume()}%")
 
 
 class LayerLeftGlobalDrawer(SiLayerDrawer):

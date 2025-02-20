@@ -28,7 +28,9 @@ def get_mp3_info(mp3_path):
     album = audio.tags.get('TALB', [None])[0] or 'Unknown Album'
 
     # 打印信息，使用 repr 函数处理特殊字符
+    print("*"*20 + "music" + "*"*20)
     print(f'标题:, {repr(title)}, 作者:, {repr(artist)}, 专辑:{repr(album)}')
+    print("*"*20 + "finish" + "*"*20)
 
     # 获取封面图片
     cover_path = None

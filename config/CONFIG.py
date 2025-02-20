@@ -65,6 +65,14 @@ HTML_PATH: Path = CONFIG.PATH_HTML.value
 USER_INFO_PATH: Path = CONFIG.PATH_USER_INFO.value
 VERSION: str = CONFIG.VERSION.value
 AUTHOR: str = CONFIG.AUTHOR.value
-
+print("-"*20 + "info" + "-"*20)
+print(f"全局版本: {VERSION}")
+print(f"全局作者: {AUTHOR}")
+print("-"*20 + "file" + "-"*20)
 print(f"全局图片文件路径: {PNG_PATH}")
 print(f"全局音乐文件路径: {MUSIC_PATH}")
+print(f"全局HTML文件路径: {HTML_PATH}")
+print(f"全局用户文件路径: {USER_INFO_PATH}")
+print("-"*20 + "start" + "-"*20)
+
+

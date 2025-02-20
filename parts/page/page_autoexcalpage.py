@@ -41,8 +41,10 @@ except Exception as e:
     browser_path = "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
     broswer_address = "127.0.0.1:9222"
 finally:
+    print("*"*20 + "broswer" + "*"*20)
     print(f"浏览器路径:{browser_path}")
     print(f"浏览器地址:{broswer_address}")
+    print("*"*20 + "finish" + "*"*20)
 
 
 class MainLoopThread(QThread):

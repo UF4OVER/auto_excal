@@ -15,5 +15,5 @@
 # -------------------------------
 
 
-from .DynamicIsland import DynamicIsland
+from .DynamicIsland import DynamicIsland as DynamicIsland
 from .QuickActions import quick_action as QuickActions

@@ -219,7 +219,9 @@ class PageSettingPage(SiPage):
             group.addWidget(self.background_options)
 
         with self.titled_widgets_group as group:
+
             group.addTitle("OCR识别Token")
+
             self.key_code_input = SiLineEdit(self)
             self.key_code_input.resize(500, 36)
             self.key_code_input.setTitleWidth(100)
@@ -234,18 +236,21 @@ class PageSettingPage(SiPage):
             self.api_key_options = SiOptionCardLinear(self)
             self.api_key_options.setTitle("填写您的OCR识别Token", "百度云的OCR_Token")
             self.api_key_options.load(SiGlobal.siui.iconpack.get("ic_fluent_mail_edit_filled"))
+
             self.api_key_options.addWidget(self.change_api_key_btu)
             self.api_key_options.addWidget(self.key_code_input)
+
             group.addWidget(self.api_key_options)
         with self.titled_widgets_group as g:
             g.addTitle("VPN账号密码")
+
             self.vpn_account_input = SiLineEdit(self)
-            self.vpn_account_input.resize(200, 36)
+            self.vpn_account_input.resize(240, 36)
             self.vpn_account_input.setTitleWidth(60)
             self.vpn_account_input.setTitle("账号")
 
             self.vpn_password_input = SiLineEdit(self)
-            self.vpn_password_input.resize(200, 36)
+            self.vpn_password_input.resize(240, 36)
             self.vpn_password_input.setTitleWidth(60)
             self.vpn_password_input.setTitle("密码")
 
@@ -257,6 +262,7 @@ class PageSettingPage(SiPage):
             self.vpn_options = SiOptionCardLinear(self)
             self.vpn_options.setTitle("VPN账号密码", "VPN账号密码")
             self.vpn_options.load(SiGlobal.siui.iconpack.get("ic_fluent_mail_edit_filled"))
+            self.vpn_options.addWidget(self.save_vpn_btu)
             self.vpn_options.addWidget(self.vpn_password_input)
             self.vpn_options.addWidget(self.vpn_account_input)
 

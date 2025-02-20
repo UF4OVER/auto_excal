@@ -1,25 +1,25 @@
 #  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
+import subprocess
 
 from PyQt5.QtCore import Qt, QEventLoop, QTimer, QRectF, pyqtProperty, QPropertyAnimation, QEasingCurve, QRect
 from PyQt5.QtGui import QIcon, QKeySequence, QPixmap, QPainter, QColor, QBrush, QPainterPath, QRegion, QFont, \
     QLinearGradient
-from PyQt5.QtWidgets import QDesktopWidget, QShortcut, QSystemTrayIcon, QAction, QMenu, QWidget, QLabel, \
-    QGraphicsOpacityEffect
+from PyQt5.QtWidgets import QDesktopWidget, QShortcut, QSystemTrayIcon, QAction, QMenu, QWidget, QLabel
 from siui.core import SiGlobal
 from siui.templates.application.application import SiliconApplication
 
-import config.CONFIG as F
+
+from parts.event.send_message import show_message
 from parts.component import DynamicIsland, QuickActions
 from parts.component.layer_left_global import LayerLeftGlobalDrawer
 from parts.page import (AboutPage,
-                        UserPage,
                         HomePage,
                         AutoFormPage,
                         MusicPage,
                         SettingPage,
                         UpdatePage)
-
+import config.CONFIG as F
 PATH_CONFIG = F.CONFIG_PATH
 PATH_PIC = F.PNG_PATH
 
@@ -30,8 +30,17 @@ class My_SiliconApplication(SiliconApplication):
         self.layer_left_global_drawer = LayerLeftGlobalDrawer(self)
         self.dynamic_island = DynamicIsland(self)
         self.quick_actions = QuickActions(self)
+        self.quick_actions.btu().clicked.connect(self.open_ini)
         self.layerMain().container_title.addWidget(self.dynamic_island)
         self.layerMain().container_title.addWidget(self.quick_actions, "right")
+
+    def open_ini(self):
+        # 使用记事本打开config.ini文件
+        try:
+            subprocess.Popen(['notepad.exe', PATH_CONFIG])
+        except Exception as e:
+            print(f"打开文件时出错: {e}")
+            show_message(3, "警告", f"打开文件时出错: {e}", "ic_fluent_task_list_ltr_filled")
 
     def Dynamic_Island(self):
         return self.dynamic_island
@@ -61,11 +70,11 @@ class MySiliconApp(My_SiliconApplication):
         self.move((screen_geo.width() - self.width()) // 2, (screen_geo.height() - self.height()) // 2)
         self.layerMain().setTitle("Loot Hearts系列")
         self.setWindowTitle("Wedding Invitation")
-        print("$" * 50)
+        print("-" * 20 + "slash_start" + "-" * 20)
         self.slashScreen = SplashScreen()
         self.slashScreen.show()
         self.createSubInterface()
-        print("$" * 50)
+        print("-" * 20 + "slash_finish" + "-" * 20)
 
         self.ShortcutKey()
         self.setWindowIcon(QIcon(f"{PATH_PIC}/圆角-default.jpg"))

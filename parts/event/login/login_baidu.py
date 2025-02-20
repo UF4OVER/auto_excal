@@ -4,9 +4,9 @@
 #   All rights reserved.
 
 # -------------------------------
-#  @Project : siui
-#  @Time    : 2025 - 01-27 16:57
-#  @FileName: login_github.py
+#  @Project : 11.py
+#  @Time    : 2025 - 02-20 17:45
+#  @FileName: login_baidu.py
 #  @Software: PyCharm 2024.1.6 (Professional Edition)
 #  @System  : Windows 11 23H2
 #  @Author  : 33974
@@ -27,7 +27,7 @@ from parts.event.send_message import show_message
 PATH_CONFIG = F.CONFIG_PATH
 HTML_PATH = F.HTML_PATH
 
-# GitHub OAuth 应用的配置
+# 百度 OAuth 应用的配置
 CLIENT_ID = "Ov23liihJAbtWX6zyXr9"
 CLIENT_SECRET = "22c66bfe6d83d341c787eadc5ca0a0218b3b6a75"
 
@@ -142,6 +142,7 @@ def main():
         show_message(4, "Error", "错误：登陆失败！！请重试", "ic_fluent_error_circle_regular")
         print(E)
         return False
+
 
 
 if __name__ == "__main__":

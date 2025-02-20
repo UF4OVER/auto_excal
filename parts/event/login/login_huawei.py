@@ -123,7 +123,7 @@ def main():
                     print(f"Picture URL: {picture_url}")
                     picture_response = requests.get(picture_url)
                     picture_response.raise_for_status()
-                    picture_path = os.path.join(F.PNG_PATH, 'avatar.png')
+                    picture_path = os.path.join(F.USER_INFO_PATH, 'avatar.png')
                     with open(picture_path, 'wb') as picture_file:
                         picture_file.write(picture_response.content)
                     print(f"Picture saved to: {picture_path}")

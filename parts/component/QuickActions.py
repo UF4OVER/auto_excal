@@ -51,6 +51,8 @@ class quick_action(SiWidget):
         self.login_info = SiLabel(self)
         self.login_info.resize(120, 28)
         self.login_info.setText("未登录用户")
+        self.login_info.setHint("后续可提供登录方式\r\n"
+                                "HUAWEI和GitHub")
         self.login_info.setStyleSheet("color: #1ff1f1")
         self.login_info.setFont(QFont("Microsoft YaHei", 8))
         self.base_container.addWidget(self.login_info, Qt.RightEdge)
@@ -63,5 +65,8 @@ class quick_action(SiWidget):
         self.flat_button.adjustSize()
 
         self.base_container.addWidget(self.flat_button, Qt.RightEdge)
+
+    def btu(self):
+        return self.flat_button
 
 
