@@ -2,7 +2,10 @@
 #   All rights reserved.
 
 from sys_stdio import setup_logging
-setup_logging(True)  # 配置日志
+setup_logging(False)  # 配置日志
+
+# 你的网怎么折磨差？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？
+
 
 import argparse
 import configparser

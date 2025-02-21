@@ -73,4 +73,4 @@ def handle_exception(exc_type, exc_value, exc_traceback):
 
 
 # 设置全局异常处理
-sys.excepthook = handle_exception
+# sys.excepthook = handle_exception

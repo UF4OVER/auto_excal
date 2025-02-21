@@ -31,7 +31,6 @@ from parts.event.ocr.ocr_recognize import get_rand_code
 from parts.event.send_message import show_message
 
 PATH_CONFIG = F.CONFIG_PATH
-co = ChromiumOptions(read_file=True, ini_path=PATH_CONFIG)
 
 try:
     broswer_address = F.READ_CONFIG("chromium_options", "address")
@@ -46,6 +45,10 @@ finally:
     print(f"浏览器路径:{browser_path}")
     print(f"浏览器地址:{broswer_address}")
     print("*" * 20 + "finish" + "*" * 20)
+
+co = ChromiumOptions()
+co.set_browser_path(browser_path)
+co.set_address(broswer_address)
 
 
 class MainLoopThread(QThread):
@@ -782,18 +785,18 @@ class Autoexcal(SiPage):
 
     @limit_for_table
     def open_broswer(self):
-        try:
-            if self.choose_boswer_sw.isChecked():
-                self.browser = Chromium(int(self.port_int_spin_box.value()))
-            else:
-                self.browser = Chromium(broswer_address)
-                self.browser.latest_tab.get(F.READ_CONFIG("vpn", "vpn_url"))
-                if F.READ_CONFIG("ocr", "ocr_api_token") == "":
-                    show_message(3, "VPN", "请先设置OCR_Token来自动进入网站\r\n或者\r\n手动进入网站",
-                                 "ic_fluent_emoji_edit_filled")
-                    return
+        # try:
+        if self.choose_boswer_sw.isChecked():
+            self.browser = Chromium(co)
+        else:
+            self.browser = Chromium(co)
+            self.browser.latest_tab.get(F.READ_CONFIG("vpn", "vpn_url"))
+            if F.READ_CONFIG("ocr", "ocr_api_token") == "":
+                show_message(3, "VPN", "请先设置OCR_Token来自动进入网站\r\n或者\r\n手动进入网站",
+                             "ic_fluent_emoji_edit_filled")
+                return
 
-                # try:
+            try:
                 name = F.READ_CONFIG("vpn", "vpn_name")
                 pwrd = F.READ_CONFIG("vpn", "vpn_password")
                 name_input = self.browser.latest_tab.ele("@tabindex=1")
@@ -829,14 +832,16 @@ class Autoexcal(SiPage):
                     label_href_1 = self.browser.latest_tab.ele("id=subtree3").ele("新增操行成绩")
                     label_href_1.click()
 
-
                 else:
                     show_message(1, "警告", "验证码识别失败\r\n请手动输入", "ic_fluent_task_list_ltr_filled")
-
-        except Exception as e:
-            print(f"无法启动浏览器: {e}")
-            show_message(3, "提示", f"无法启动浏览器: {e}", "ic_fluent_task_list_ltr_filled")
-            return
+            except Exception as e:
+                print(f"无法登录: {e}")
+                show_message(3, "提示", f"无法登录: {e}", "ic_fluent_task_list_ltr_filled")
+                return
+        # except Exception as e:
+        #     print(f"无法启动浏览器: {e}")
+        #     show_message(3, "提示", f"无法启动浏览器: {e}", "ic_fluent_task_list_ltr_filled")
+        #     return
 
     def read_to_json(self) -> list:
         """

@@ -20,8 +20,9 @@ import configparser
 import pytz
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-print(f"当前路径: {BASE_DIR}")
+print(f"配置路径: {BASE_DIR}")
 CONFIG_PATH: Path = BASE_DIR / "config" / "config.ini"
+print(f"配置文件路径: {CONFIG_PATH}")
 
 
 def READ_CONFIG(cls: str, name: str) -> str | int | bool | list:
