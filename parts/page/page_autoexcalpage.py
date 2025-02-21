@@ -631,6 +631,7 @@ class Autoexcal(SiPage):
                     item = self.table_widget.item(i, 6)
                     if item:
                         self.new_table_widget.setItem(i - 8, 2, QTableWidgetItem(item.text()))
+                self.save_to_json()
 
             # ---------------------表2到表4---------------------
             self.new_insert_table_widget.clear()
@@ -763,6 +764,7 @@ class Autoexcal(SiPage):
                 item = self.new_insert_table_widget.item(row.row(), col)
                 self.new_table_widget.setItem(self.new_table_widget.rowCount() - 1, col, QTableWidgetItem(item.text()))
         show_message(1, "提示", f"已添加: {a}个数据", "ic_fluent_task_list_ltr_filled")
+        self.save_to_json()
 
     @limit_for_table
     def del_data_for_new_table(self):
@@ -785,63 +787,63 @@ class Autoexcal(SiPage):
 
     @limit_for_table
     def open_broswer(self):
-        # try:
-        if self.choose_boswer_sw.isChecked():
-            self.browser = Chromium(co)
-        else:
-            self.browser = Chromium(co)
-            self.browser.latest_tab.get(F.READ_CONFIG("vpn", "vpn_url"))
-            if F.READ_CONFIG("ocr", "ocr_api_token") == "":
-                show_message(3, "VPN", "请先设置OCR_Token来自动进入网站\r\n或者\r\n手动进入网站",
-                             "ic_fluent_emoji_edit_filled")
-                return
+        try:
+            if self.choose_boswer_sw.isChecked():
+                self.browser = Chromium(co)
+            else:
+                self.browser = Chromium(co)
+                self.browser.latest_tab.get(F.READ_CONFIG("vpn", "vpn_url"))
+                if F.READ_CONFIG("ocr", "ocr_api_token") == "":
+                    show_message(3, "VPN", "请先设置OCR_Token来自动进入网站\r\n或者\r\n手动进入网站",
+                                 "ic_fluent_emoji_edit_filled")
+                    return
 
-            try:
-                name = F.READ_CONFIG("vpn", "vpn_name")
-                pwrd = F.READ_CONFIG("vpn", "vpn_password")
-                name_input = self.browser.latest_tab.ele("@tabindex=1")
-                pwrd_input = self.browser.latest_tab.ele("@id=loginPwd")
-                rank_code = self.browser.latest_tab.ele("@tabindex=3")
-                name_input.input(name)
-                pwrd_input.input(pwrd)
+                try:
+                    name = F.READ_CONFIG("vpn", "vpn_name")
+                    pwrd = F.READ_CONFIG("vpn", "vpn_password")
+                    name_input = self.browser.latest_tab.ele("@tabindex=1")
+                    pwrd_input = self.browser.latest_tab.ele("@id=loginPwd")
+                    rank_code = self.browser.latest_tab.ele("@tabindex=3")
+                    name_input.input(name)
+                    pwrd_input.input(pwrd)
 
-                captcha_img = self.browser.latest_tab.ele("@class=password__code__image pointer")
-                result = get_rand_code(captcha_img.get_screenshot(as_base64="jpg"))
-                if result:
-                    rank_code.input(result)
+                    captcha_img = self.browser.latest_tab.ele("@class=password__code__image pointer")
+                    result = get_rand_code(captcha_img.get_screenshot(as_base64="jpg"))
+                    if result:
+                        rank_code.input(result)
 
-                    login_button = self.browser.latest_tab.ele("@class=button button--normal")
-                    login_button.click()
+                        login_button = self.browser.latest_tab.ele("@class=button button--normal")
+                        login_button.click()
 
-                    comprehensive_information_portal = self.browser.latest_tab.ele("@title=综合信息门户")
-                    comprehensive_information_portal.click()
+                        comprehensive_information_portal = self.browser.latest_tab.ele("@title=综合信息门户")
+                        comprehensive_information_portal.click()
 
-                    info_name = self.browser.latest_tab.ele("@id=User_ID")
-                    info_name.input(F.READ_CONFIG("info", "name"))
-                    info_pwrd = self.browser.latest_tab.ele("@id=User_Pass")
-                    info_pwrd.input(F.READ_CONFIG("info", "password").format())
+                        info_name = self.browser.latest_tab.ele("@id=User_ID")
+                        info_name.input(F.READ_CONFIG("info", "name"))
+                        info_pwrd = self.browser.latest_tab.ele("@id=User_Pass")
+                        info_pwrd.input(F.READ_CONFIG("info", "password").format())
 
-                    self.browser.latest_tab.wait.doc_loaded()
+                        self.browser.latest_tab.wait.doc_loaded()
 
-                    login_info_button = self.browser.latest_tab.ele("@id=btnLogin")
-                    login_info_button.click()
+                        login_info_button = self.browser.latest_tab.ele("@id=btnLogin")
+                        login_info_button.click()
 
-                    label_href = self.browser.latest_tab.ele("@class=nav").ele("教务系统")
-                    label_href.click()
+                        label_href = self.browser.latest_tab.ele("@class=nav").ele("教务系统")
+                        label_href.click()
 
-                    label_href_1 = self.browser.latest_tab.ele("id=subtree3").ele("新增操行成绩")
-                    label_href_1.click()
+                        label_href_1 = self.browser.latest_tab.ele("id=subtree3").ele("新增操行成绩")
+                        label_href_1.click()
 
-                else:
-                    show_message(1, "警告", "验证码识别失败\r\n请手动输入", "ic_fluent_task_list_ltr_filled")
-            except Exception as e:
-                print(f"无法登录: {e}")
-                show_message(3, "提示", f"无法登录: {e}", "ic_fluent_task_list_ltr_filled")
-                return
-        # except Exception as e:
-        #     print(f"无法启动浏览器: {e}")
-        #     show_message(3, "提示", f"无法启动浏览器: {e}", "ic_fluent_task_list_ltr_filled")
-        #     return
+                    else:
+                        show_message(1, "警告", "验证码识别失败\r\n请手动输入", "ic_fluent_task_list_ltr_filled")
+                except Exception as e:
+                    print(f"无法登录: {e}")
+                    show_message(3, "提示", f"无法登录: {e}", "ic_fluent_task_list_ltr_filled")
+                    return
+        except Exception as e:
+            print(f"无法启动浏览器: {e}")
+            show_message(3, "提示", f"无法启动浏览器: {e}", "ic_fluent_task_list_ltr_filled")
+            return
 
     def read_to_json(self) -> list:
         """

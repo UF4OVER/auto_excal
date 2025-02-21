@@ -32,7 +32,6 @@ def build_exe_cx_freeze():
                 "wmi",
                 "comtypes",
                 "pic",
-                "cryptography"
             ],
         "include_files":  # 包含文件
             [
@@ -47,6 +46,8 @@ def build_exe_cx_freeze():
                 "tkinter",
                 "unittest",
                 "email",
+                "cryptography",
+
                 "pydoc",
             ],
         "optimize": 2  # 优化级别
