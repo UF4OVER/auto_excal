@@ -4,8 +4,7 @@
 
 from cx_Freeze import setup, Executable
 
-
-VERSION_A = "1.1.5"
+VERSION_A = "1.2.0"
 import config.CONFIG as F
 F.WRITE_CONFIG("version", "version", VERSION_A)  # 写入配置文件版本号
 
@@ -44,7 +43,6 @@ def build_exe_cx_freeze():
                 "backports",
                 "PIL",
                 "lib2to3",
-                "cryptography",
                 "setuptools",
                 "tkinter",
                 "unittest",

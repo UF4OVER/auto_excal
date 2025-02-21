@@ -7,7 +7,7 @@ import time
 
 from DrissionPage import ChromiumOptions, Chromium
 from PyQt5.QtCore import QThread, pyqtSignal, Qt, QLine
-from PyQt5.QtWidgets import QTableWidget, QFileDialog, QTableWidgetItem, QAbstractItemView, QLabel
+from PyQt5.QtWidgets import QTableWidget, QFileDialog, QTableWidgetItem, QAbstractItemView, QLabel, QBoxLayout
 from openpyxl.reader.excel import load_workbook
 from siui.components import (SiLabel,
                              SiTitledWidgetGroup,
@@ -111,8 +111,12 @@ class Autoexcal(SiPage):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        self.main_loop_thread = None
         self.last_tab = None
         self.browser = None
+        self.sheet = None
+        self.new_sheet = None
+
         self.index_current_data: int = 0
         self.lenth: int = 0
         self.data: list = []
@@ -120,8 +124,6 @@ class Autoexcal(SiPage):
         self.setScrollMaximumWidth(1000)
         self.setScrollAlignment(Qt.AlignLeft)
         self.setTitle("AUTOEXCAL")
-
-        self.sheet = None
 
         # 创建控件组
         self.titled_widgets_group = SiTitledWidgetGroup(self)
@@ -306,31 +308,27 @@ class Autoexcal(SiPage):
 
             choose_insert_file_btu = SiPushButtonRefactor(self)
             choose_insert_file_btu.setText("选择文件")
+            choose_insert_file_btu.clicked.connect(self.import_file_for_new_table_widget)
 
-            btu_container_for_h_container = SiDenseContainer(self)
+            btu_container_for_h_container = SiDenseContainer(self, QBoxLayout.LeftToRight)
             # insert data
             self.data1_input = SiLineEdit(self)
             self.data1_input.setTitleWidth(50)
             self.data1_input.setTitle("姓名")
             self.data1_input.setText("何平")
-            self.data1_input.resize(150, 32)
+            self.data1_input.resize(150, 50)
 
             self.data2_input = SiLineEdit(self)
             self.data2_input.setTitleWidth(50)
             self.data2_input.setTitle("学号")
             self.data2_input.setText("2023303010311")
-            self.data2_input.resize(150, 32)
+            self.data2_input.resize(150, 50)
 
             self.data3_input = SiLineEdit(self)
             self.data3_input.setTitle("分数")
             self.data3_input.setTitleWidth(50)
             self.data3_input.setText("3")
-            self.data3_input.resize(150, 32)
-
-            self.new_delete_btu = SiPushButton(self)
-            self.new_delete_btu.attachment().setText("删除")
-            self.new_delete_btu.setFixedSize(128, 32)
-            self.new_delete_btu.clicked.connect(self.del_data_for_new_table)
+            self.data3_input.resize(150, 50)
 
             self.new_insert_btu = SiPushButton(self)
             self.new_insert_btu.attachment().setText("插入")
@@ -342,11 +340,11 @@ class Autoexcal(SiPage):
             btu_container_for_h_container.addWidget(self.data2_input)
             btu_container_for_h_container.addWidget(self.data3_input)
             btu_container_for_h_container.addWidget(self.new_insert_btu)
-            btu_container_for_h_container.addWidget(self.new_delete_btu)
 
             insert_table_widget_box.header().addWidget(choose_insert_file_btu, Qt.RightEdge)
             insert_table_widget_box.body().addWidget(self.insert_table_widget)
-            insert_table_widget_box.body().setFixedSize(table_widget_width + 40, table_widget_height - 400 + 40)
+            insert_table_widget_box.body().setFixedSize(table_widget_width + 40, table_widget_height - 400)
+            insert_table_widget_box.footer().setFixedHeight(80)
             insert_table_widget_box.footer().addWidget(btu_container_for_h_container, Qt.RightEdge)
             insert_table_widget_box.footer().adjustSize()
 
@@ -365,18 +363,18 @@ class Autoexcal(SiPage):
             self.new_table_widget.setSelectionBehavior(QAbstractItemView.SelectRows)
             self.new_table_widget.setFixedSize(int(new_table_widget_height * 0.7), new_table_widget_width)
 
-            self.new_table_widget.setColumnWidth(0, 100)
+            self.new_table_widget.setColumnWidth(0, 70)
             self.new_table_widget.setColumnWidth(1, 300)
-            self.new_table_widget.setColumnWidth(2, 100)
+            self.new_table_widget.setColumnWidth(2, 70)
 
             self.new_insert_table_widget = QTableWidget(self)
             self.new_insert_table_widget.setStyleSheet(qss.TabelQss)
             self.new_insert_table_widget.setSelectionBehavior(QAbstractItemView.SelectRows)
             self.new_insert_table_widget.setFixedSize(int(new_table_widget_height * 0.7), new_table_widget_width)
 
-            self.new_insert_table_widget.setColumnWidth(0, 100)
+            self.new_insert_table_widget.setColumnWidth(0, 70)
             self.new_insert_table_widget.setColumnWidth(1, 300)
-            self.new_insert_table_widget.setColumnWidth(2, 100)
+            self.new_insert_table_widget.setColumnWidth(2, 70)
 
             # 此容器左侧用于放置表格数据，右侧放置按钮
             operate_the_container_h = SiDenseHContainer(self)
@@ -408,7 +406,7 @@ class Autoexcal(SiPage):
             self.insert_btu = SiPushButton(self)
             self.insert_btu.attachment().setText("插入")
             self.insert_btu.setFixedSize(128, 32)
-            self.insert_btu.clicked.connect(self.insert_data_for_new_table)
+            self.insert_btu.clicked.connect(self.insert_new_data_for_new_table)
 
             temp_line = QLabel(self)
             temp_line.setFixedSize(2, 28)
@@ -458,12 +456,25 @@ class Autoexcal(SiPage):
         return wrapper
 
     def delete_data_for_table_widget(self):
+        self.new_sheet = None
+        self.sheet = None
+
         self.table_widget.clear()
         self.table_widget.setRowCount(0)
         self.table_widget.setColumnCount(0)
+
         self.new_table_widget.clear()
         self.new_table_widget.setRowCount(0)
         self.new_table_widget.setColumnCount(0)
+
+        self.insert_table_widget.clear()
+        self.insert_table_widget.setRowCount(0)
+        self.insert_table_widget.setColumnCount(0)
+
+        self.new_insert_table_widget.clear()
+        self.new_insert_table_widget.setRowCount(0)
+        self.new_insert_table_widget.setColumnCount(0)
+
         self.index_current_data = 0
         if os.path.exists('data.json'):
             os.remove('data.json')
@@ -474,29 +485,49 @@ class Autoexcal(SiPage):
     def import_file_for_table_widget(self):
         file_path = QFileDialog.getOpenFileName(self, "选择文件", "", "Excel Files (*.xlsx)")[0]
         if file_path:
-            self.load_data_for_table_widget(file_path)
-            show_message(2, "成功", "表格数据已导入", "ic_fluent_emoji_meme_filled")
+            try:
+                workbook = load_workbook(file_path)
+                self.sheet = workbook.active
+                rows = self.sheet.max_row
+                cols = self.sheet.max_column
 
-    def load_data_for_table_widget(self, file_path):
-        try:
-            workbook = load_workbook(file_path)
-            self.sheet = workbook.active
-            rows = self.sheet.max_row
-            cols = self.sheet.max_column
+                self.table_widget.setRowCount(rows)
+                self.table_widget.setColumnCount(cols)
+                for row in range(rows):
+                    for col in range(cols):
+                        cell_value = self.sheet.cell(row=row + 1, column=col + 1).value
+                        item = QTableWidgetItem(str(cell_value))
+                        self.table_widget.setItem(row, col, item)
+                show_message(2, "成功", "表格数据已导入", "ic_fluent_emoji_meme_filled")
 
-            self.table_widget.setRowCount(rows)
-            self.table_widget.setColumnCount(cols)
-            for row in range(rows):
-                for col in range(cols):
-                    cell_value = self.sheet.cell(row=row + 1, column=col + 1).value
-                    item = QTableWidgetItem(str(cell_value))
-                    self.table_widget.setItem(row, col, item)
-        except Exception as e:
-            print(e)
+            except Exception as e:
+                show_message(4, "错误", "文件导入失败", "ic_fluent_error_circle_regular")
+                print(e)
+
+    def import_file_for_new_table_widget(self):
+        file_path = QFileDialog.getOpenFileName(self, "选择文件", "", "Excel Files (*.xlsx)")[0]
+        if file_path:
+            try:
+                workbook = load_workbook(file_path)
+                self.new_sheet = workbook.active
+                rows = self.new_sheet.max_row
+                cols = self.new_sheet.max_column
+                self.insert_table_widget.setRowCount(rows)
+                self.insert_table_widget.setColumnCount(cols)
+                for row in range(rows):
+                    for col in range(cols):
+                        cell_value = self.new_sheet.cell(row=row + 1, column=col + 1).value
+                        item = QTableWidgetItem(str(cell_value))
+                        self.insert_table_widget.setItem(row, col, item)
+                show_message(2, "成功", "表格数据已导入", "ic_fluent_emoji_meme_filled")
+            except Exception as e:
+                show_message(4, "错误", "文件导入失败", "ic_fluent_error_circle_regular")
+                print(e)
 
     @limit_for_table
     def reload_data_for_new_table_widget(self):
         self.new_table_widget.clear()
+
         try:
             if self.choose_switch.isChecked():
                 self.name_start_strtuple = self.start_input.text()  # "(0,3)"
@@ -520,10 +551,6 @@ class Autoexcal(SiPage):
                 self.new_table_widget.clear()
                 self.new_table_widget.setRowCount(0)
                 self.new_table_widget.setColumnCount(0)
-
-                # 获取 table_widget 的行数和列数
-                table_widget_row_count = self.table_widget.rowCount()
-                table_widget_col_count = self.table_widget.columnCount()
 
                 # 获取起始和结束的行和列索引
                 name_start_row = int(self.name_start_int_row) - 1
@@ -602,10 +629,37 @@ class Autoexcal(SiPage):
                     if item:
                         self.new_table_widget.setItem(i - 8, 2, QTableWidgetItem(item.text()))
 
+            # ---------------------表2到表4---------------------
+            self.new_insert_table_widget.clear()
+            self.new_insert_table_widget.setRowCount(self.insert_table_widget.rowCount())
+            self.new_insert_table_widget.setColumnCount(3)
+            self.new_insert_table_widget.setHorizontalHeaderLabels(["姓名", "学号", "分数"])
+            # 第5列是姓名
+            for i in range(8, self.insert_table_widget.rowCount()):
+                item = self.insert_table_widget.item(i, 4)
+                if item:
+                    self.new_insert_table_widget.setItem(i - 8, 0, QTableWidgetItem(item.text()))
+            # 第6列是学号
+            for i in range(8, self.insert_table_widget.rowCount()):
+                item = self.insert_table_widget.item(i, 5)
+                if item:
+                    self.new_insert_table_widget.setItem(i - 8, 1, QTableWidgetItem(item.text()))
+            # 第7列是分数
+            for i in range(8, self.insert_table_widget.rowCount()):
+                item = self.insert_table_widget.item(i, 6)
+                if item:
+                    self.new_insert_table_widget.setItem(i - 8, 2, QTableWidgetItem(item.text()))
+
+            for i in range(self.new_insert_table_widget.rowCount() - 1, -1, -1):
+                if (self.new_insert_table_widget.item(i, 0) is None
+                        and self.new_insert_table_widget.item(i, 1) is None
+                        and self.new_insert_table_widget.item(i, 2) is None):
+                    self.new_insert_table_widget.removeRow(i)
+
             for i in range(self.new_table_widget.rowCount() - 1, -1, -1):
-                if self.new_table_widget.item(i, 0) is None and self.new_table_widget.item(i,
-                                                                                           1) is None and self.new_table_widget.item(
-                    i, 2) is None:
+                if (self.new_table_widget.item(i, 0) is None
+                        and self.new_table_widget.item(i, 1) is None
+                        and self.new_table_widget.item(i, 2) is None):
                     self.new_table_widget.removeRow(i)
 
             self.save_to_json()
@@ -676,19 +730,36 @@ class Autoexcal(SiPage):
     def insert_data_for_new_table(self):
         """
         将数据插入到新表格中
+        输入框到表3的插入
         """
         # todo
         pass
-        # name = self.data1_input.text()
-        # xuehao = self.data2_input.text()
-        # score = self.data3_input.text()
-        # # 插入到新表格中
-        # self.new_table_widget.insertRow(self.new_table_widget.rowCount())
-        # self.new_table_widget.setItem(self.new_table_widget.rowCount() - 1, 0, QTableWidgetItem(name))
-        # self.new_table_widget.setItem(self.new_table_widget.rowCount() - 1, 1, QTableWidgetItem(xuehao))
-        # self.new_table_widget.setItem(self.new_table_widget.rowCount() - 1, 2, QTableWidgetItem(score))
-        # show_message(1, "提示", f"已添加: {name}, {xuehao}, {score}", "ic_fluent_task_list_ltr_filled")
+        name = self.data1_input.text()
+        xuehao = self.data2_input.text()
+        score = self.data3_input.text()
+        # 插入到新表格中
+        self.new_table_widget.insertRow(self.new_table_widget.rowCount())
+        self.new_table_widget.setItem(self.new_table_widget.rowCount() - 1, 0, QTableWidgetItem(name))
+        self.new_table_widget.setItem(self.new_table_widget.rowCount() - 1, 1, QTableWidgetItem(xuehao))
+        self.new_table_widget.setItem(self.new_table_widget.rowCount() - 1, 2, QTableWidgetItem(score))
+        show_message(1, "提示", f"已添加: {name}, {xuehao}, {score}", "ic_fluent_task_list_ltr_filled")
         self.save_to_json()
+
+    @limit_for_table
+    def insert_new_data_for_new_table(self):
+        """ 表4到表3的插入"""
+        selected_rows = self.new_insert_table_widget.selectionModel().selectedRows()
+        if not selected_rows:
+            show_message(3, "提示", "没有选中任何行", "ic_fluent_task_list_ltr_filled")
+            return
+        a = 0  # 统计添加的行数
+        for row in sorted(selected_rows, reverse=True):
+            self.new_table_widget.insertRow(self.new_table_widget.rowCount())
+            a += 1
+            for col in range(self.new_insert_table_widget.columnCount()):
+                item = self.new_insert_table_widget.item(row.row(), col)
+                self.new_table_widget.setItem(self.new_table_widget.rowCount() - 1, col, QTableWidgetItem(item.text()))
+        show_message(1, "提示", f"已添加: {a}个数据", "ic_fluent_task_list_ltr_filled")
 
     @limit_for_table
     def del_data_for_new_table(self):

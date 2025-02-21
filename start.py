@@ -73,16 +73,17 @@ def main():
         QtWidgets.QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
 
     app = QApplication(sys.argv)
-    window = MySiliconApp()
-    window.show()
-    send_custom_message()
+    try:
+        window = MySiliconApp()
+        window.show()
+        send_custom_message()
+    except Exception as e:
+        show_message(0, "注意，注意！！！！", '假如这个出现了，就是出现了我也不知道的BUG，请截图联系开发者或者发送根目录下的app.log文件到开发者的邮箱，并且说明BUG复现步骤', "error")
+        print(e)
     sys.exit(app.exec_())
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    except Exception as e:
-        print(e)
-        show_message(0, "注意，注意！！！！", '假如这个出现了，就是出现了我也不知道的BUG，请截图联系开发者或者发送根目录下的app.log文件到开发者的邮箱，并且说明BUG复现步骤', "error")
+    main()
+
 
