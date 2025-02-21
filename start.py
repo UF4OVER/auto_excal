@@ -2,11 +2,12 @@
 #   All rights reserved.
 
 from sys_stdio import setup_logging
-setup_logging(False)  # 配置日志
+setup_logging(True)  # 配置日志
 
 import argparse
 import configparser
 import sys
+import logging
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication
@@ -78,12 +79,13 @@ def main():
         window.show()
         send_custom_message()
     except Exception as e:
-        show_message(0, "注意，注意！！！！", '假如这个出现了，就是出现了我也不知道的BUG，请截图联系开发者或者发送根目录下的app.log文件到开发者的邮箱，并且说明BUG复现步骤', "error")
+        logging.error("Exception in main", exc_info=True)
+        show_message(0, "注意，注意！！！！",
+                     '假如这个出现了，就是出现了我也不知道的BUG，请截图联系开发者或者发送根目录下的app.log文件到开发者的邮箱，并且说明BUG复现步骤',
+                     "error")
         print(e)
     sys.exit(app.exec_())
 
 
 if __name__ == "__main__":
     main()
-
-
