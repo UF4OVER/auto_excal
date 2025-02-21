@@ -19,7 +19,7 @@ import sys
 import logging
 from typing import overload
 
-from parts.event.send_message import show_message
+
 
 
 class StreamToLogger:
@@ -45,7 +45,7 @@ def setup_logging(arg: bool):
     if arg:
         print("Logging is enabled.")
         logging.basicConfig(filename='debug.log',
-                            level=logging.INFO,
+                            level=logging.ERROR,
                             format='%(asctime)s - %(levelname)s - %(message)s',
                             filemode="w")
 
@@ -65,6 +65,7 @@ def handle_exception(exc_type, exc_value, exc_traceback):
         return
 
     logging.error("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
+    from parts.event.send_message import show_message
     show_message(0, "注意，注意！！！！",
                  '假如这个出现了，就是出现了我也不知道的BUG，请截图联系开发者或者发送根目录下的app.log文件到开发者的邮箱，并且说明BUG复现步骤',
                  "error")
