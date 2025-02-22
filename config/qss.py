@@ -64,3 +64,16 @@ QHeaderView::section:vertical {
     border-right: 1px solid #44475a;
 }
 """
+
+LoginBtuQss = """
+            AnimatedButton {
+                background-color: #FFFFFF;
+                border: 1px solid #ccc;
+                border-radius: 25px;
+                font-size: 16px;
+                padding-left: 10px;
+            }
+            AnimatedButton:hover {
+                background-color: #F0F0F0;
+            }
+        """

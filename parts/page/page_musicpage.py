@@ -15,7 +15,6 @@ from siui.components.widgets import (
     SiSimpleButton,
     SiLineEdit)
 from siui.core import Si, SiGlobal
-from typing_extensions import Union
 
 import config.CONFIG
 from parts.component.MusicPresenter import SiMusicDisplayer, MusicManager

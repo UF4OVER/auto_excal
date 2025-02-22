@@ -20,7 +20,7 @@ from siui.core import Si, SiGlobal
 from siui.core import SiColor
 
 import config.CONFIG as F
-from event.send_message import show_message
+from parts.event.send import show_message
 
 
 class PageElectronicComputing(SiPage):

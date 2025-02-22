@@ -10,7 +10,7 @@ from siui.core import SiGlobal
 from siui.templates.application.application import SiliconApplication
 
 
-from parts.event.send_message import show_message
+from parts.event.send import show_message
 from parts.component import DynamicIsland, QuickActions
 from parts.component.GlobalLeftWindow import LayerLeftGlobalDrawer
 from parts.page import (AboutPage,
@@ -18,7 +18,7 @@ from parts.page import (AboutPage,
                         AutoFormPage,
                         MusicPage,
                         SettingPage,
-                        UpdatePage)
+                        UserPage)
 import config.CONFIG as F
 PATH_CONFIG = F.CONFIG_PATH
 PATH_PIC = F.PNG_PATH
@@ -88,9 +88,9 @@ class MySiliconApp(My_SiliconApplication):
         self.layerMain().addPage(MusicPage(self),
                                  icon=SiGlobal.siui.iconpack.get("ic_fluent_music_note_2_play_filled"),
                                  hint="音乐", side="top")
-        # self.layerMain().addPage(UserPage(self),
-        #                          icon=SiGlobal.siui.iconpack.get("ic_fluent_content_view_gallery_lightning_regular"),
-        #                          hint="我的", side="bottom")
+        self.layerMain().addPage(UserPage(self),
+                                 icon=SiGlobal.siui.iconpack.get("ic_fluent_person_filled"),
+                                 hint="我的", side="bottom")
 
         self.layerMain().addPage(AboutPage(self),
                                  icon=SiGlobal.siui.iconpack.get("ic_fluent_info_filled"),
@@ -98,9 +98,7 @@ class MySiliconApp(My_SiliconApplication):
         self.layerMain().addPage(SettingPage(self),
                                  icon=SiGlobal.siui.iconpack.get("ic_fluent_settings_filled"),
                                  hint="设置", side="bottom")
-        self.layerMain().addPage(UpdatePage(self),
-                                 icon=SiGlobal.siui.iconpack.get("ic_fluent_cloud_sync_filled"),
-                                 hint="更新", side="bottom")
+
 
         self.layerMain().setPage(0)
 

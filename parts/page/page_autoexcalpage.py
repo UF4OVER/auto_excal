@@ -27,8 +27,8 @@ from siui.core import SiGlobal, SiColor, Si
 
 import config.CONFIG as F
 from config import qss
-from parts.event.ocr.ocr_recognize import get_rand_code
-from parts.event.send_message import show_message
+from parts.event.ocr import get_rand_code
+from parts.event.send import show_message
 
 PATH_CONFIG = F.CONFIG_PATH
 

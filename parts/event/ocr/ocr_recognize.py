@@ -24,7 +24,6 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-
 def get_rand_code(base64_img: str) -> Optional[str]:
     request_url = F.READ_CONFIG("ocr", "ocr_api_url")
     access_token = F.READ_CONFIG("ocr", "ocr_api_token")

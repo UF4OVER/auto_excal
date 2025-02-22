@@ -13,3 +13,5 @@
 #  @Contact : 
 #  @Python  : 
 # -------------------------------
+
+from .ocr_recognize import get_rand_code

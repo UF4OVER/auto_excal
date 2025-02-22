@@ -52,14 +52,15 @@ TODAY = today
 
 
 class CONFIG(Enum):
-    PATH_PNG: Path = BASE_DIR / "pic"
+    PATH_LOGIN_PIC: Path = BASE_DIR / "pic" / "login_pix"
+    PATH_PNG: Path = BASE_DIR / "pic" / "res"
     PATH_MUSIC: Path = BASE_DIR / "music"
     PATH_HTML: Path = BASE_DIR / "parts" / "html"
     PATH_USER_INFO: Path = BASE_DIR / "config" / "user_info"
     VERSION: str = READ_CONFIG("version", "version")
     AUTHOR: str = READ_CONFIG("version", "author")
 
-
+PIC_LOGIN_PATH: Path = CONFIG.PATH_LOGIN_PIC.value
 PNG_PATH: Path = CONFIG.PATH_PNG.value
 MUSIC_PATH: Path = CONFIG.PATH_MUSIC.value
 HTML_PATH: Path = CONFIG.PATH_HTML.value

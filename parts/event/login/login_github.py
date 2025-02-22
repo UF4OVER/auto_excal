@@ -22,7 +22,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import requests
 
 import config.CONFIG as F
-from parts.event.send_message import show_message
+from parts.event.send import show_message
 
 PATH_CONFIG = F.CONFIG_PATH
 HTML_PATH = F.HTML_PATH

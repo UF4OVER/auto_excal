@@ -10,9 +10,8 @@ from urllib.parse import urlencode, urlparse, parse_qs
 
 import jwt
 import requests
-from PyQt5.QtCore import QThread, pyqtSignal
 
-from parts.event.send_message import show_message
+from parts.event.send import show_message
 import config.CONFIG as F
 
 # 使用环境变量来存储敏感信息

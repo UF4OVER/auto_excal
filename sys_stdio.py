@@ -11,15 +11,12 @@
 #  @Contact :
 #  @Python  :
 # -------------------------------
+import logging
 import sys
+
 
 # sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 # sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
-
-import logging
-from typing import overload
-
-
 
 
 class StreamToLogger:
@@ -36,16 +33,11 @@ class StreamToLogger:
         pass
 
 
-@overload
-def setup_logging(arg: bool):
-    pass
-
-
 def setup_logging(arg: bool):
     if arg:
         print("Logging is enabled.")
         logging.basicConfig(filename='debug.log',
-                            level=logging.ERROR,
+                            level=logging.DEBUG,
                             format='%(asctime)s - %(levelname)s - %(message)s',
                             filemode="w")
 
@@ -73,4 +65,4 @@ def handle_exception(exc_type, exc_value, exc_traceback):
 
 
 # 设置全局异常处理
-# sys.excepthook = handle_exception
+sys.excepthook = handle_exception

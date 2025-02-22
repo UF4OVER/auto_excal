@@ -4,9 +4,6 @@
 from sys_stdio import setup_logging
 setup_logging(False)  # 配置日志
 
-# 你的网怎么折磨差？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？
-
-
 import argparse
 import configparser
 import sys
@@ -15,7 +12,7 @@ from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication
 from ui import MySiliconApp
-from parts.event.send_message import send_custom_message, show_message
+from parts.event.send import send_custom_message, show_message
 
 import config.CONFIG as F
 
