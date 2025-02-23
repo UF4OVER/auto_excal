@@ -66,6 +66,7 @@ def generate_auth_url():
 
 
 def main():
+    print("Starting HUAWEI OAuth login...")
     global auth_code
     try:
         # 1. 构建授权 URL
@@ -77,14 +78,19 @@ def main():
 
         # 3. 创建 HTTP 服务器以捕获回调
         server = HTTPServer(("localhost", 8080), OAuthHandler)
-        server.socket.settimeout(60)
+        server.socket.settimeout(25)
         print("Waiting for authorization response...")
+
         try:
             server.handle_request()
             server.server_close()
         except Exception as e:
-            show_message(4, "Error", "错误：未收到授权码或登陆失败！！请重试", "ic_fluent_error_circle_regular")
-            print(e)
+            if isinstance(e, TimeoutError):
+                show_message(4, "Error", "错误：未收到授权码或登录失败！请确保在浏览器中完成授权流程。", "ic_fluent_error_circle_regular")
+                print("错误：未收到授权码或登录失败！请确保在浏览器中完成授权流程。")
+            else:
+                show_message(4, "Error", f"错误：未收到授权码或登录失败！！请重试\n{str(e)}", "ic_fluent_error_circle_regular")
+                print(f"错误：未收到授权码或登录失败！！请重试\n{str(e)}")
             return False
 
         if not auth_code:
@@ -137,14 +143,14 @@ def main():
                 print("无效的 ID Token")
                 return False
         else:
-            show_message(4, "Error", "错误：未收到授权码或登陆失败！！请重试", "ic_fluent_error_circle_regular")
+            show_message(4, "Error", "错误：未收到授权码或登录失败！！请重试", "ic_fluent_error_circle_regular")
             return False
 
         return True
 
     except Exception as E:
-        show_message(4, "Error", "错误：未收到授权码或登陆失败！！请重试", "ic_fluent_error_circle_regular")
-        print(E)
+        show_message(4, "Error", f"错误：未收到授权码或登录失败！！请重试\n{str(E)}", "ic_fluent_error_circle_regular")
+        print(f"错误：未收到授权码或登录失败！！请重试\n{str(E)}")
         return False
 
 

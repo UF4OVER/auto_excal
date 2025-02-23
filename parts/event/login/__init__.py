@@ -1,52 +1,62 @@
-# -*- coding: utf-8 -*-
-
-#  Copyright (c) 2025 UF4OVER
-#   All rights reserved.
-
-# -------------------------------
-#  @Project : 11.py
-#  @Time    : 2025 - 02-19 14:14
-#  @FileName: __init__.py.py
-#  @Software: PyCharm 2024.1.6 (Professional Edition)
-#  @System  : Windows 11 23H2
-#  @Author  : 33974
-#  @Contact : 
-#  @Python  : 
-# -------------------------------
-
 from PyQt5.QtCore import QThread, pyqtSignal
+import importlib.util
 
 
 class Login(QThread):  # 登录线程的基类
     loginStarted = pyqtSignal()
     loginFinished = pyqtSignal()
-    loginError = pyqtSignal(str)
+    loginErrored = pyqtSignal(str)
 
     def __init__(self, parent=None, main=None):
         super().__init__(parent)
+        print("Login")
         self.main_login = main
+        print(f"main_login is set to: {self.main_login}")
 
     def run(self):
         self.loginStarted.emit()
         try:
-            success = self.main_login()
-            if success:
-                self.loginFinished.emit()
+            print("Login_start")
+            if callable(self.main_login):
+                success = self.main_login()
+                if success:
+                    self.loginFinished.emit()
+                else:
+                    self.loginErrored.emit("登录失败，请重试")
             else:
-                self.loginError.emit("登录失败，请重试")
+                self.loginErrored.emit("main_login is not callable")
         except Exception as e:
-            self.loginError.emit(str(e))
+            self.loginErrored.emit(str(e))
+        finally:
+            print("Login_end")
 
 
 class LoginGithub(Login):
-    from .login_github import main
-
     def __init__(self, parent=None):
-        super().__init__(parent, self.main)
+        print("LoginGithub")
+        main = self._import_main('login_github')
+        super().__init__(parent, main)
+
+    def _import_main(self, module_name):
+        spec = importlib.util.spec_from_file_location(module_name, f"./parts/event/login/{module_name}.py")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module.main
 
 
 class LoginHuawei(Login):
-    from .login_huawei import main
-
     def __init__(self, parent=None):
-        super().__init__(parent, self.main)
+        print("LoginHuawei")
+        main = self._import_main('login_huawei')
+        super().__init__(parent, main)
+
+    def _import_main(self, module_name):
+        spec = importlib.util.spec_from_file_location(module_name, f"./parts/event/login/{module_name}.py")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module.main
+
+
+if __name__ == "__main__":
+    login = LoginGithub()
+    login.start()
