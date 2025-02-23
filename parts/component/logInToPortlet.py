@@ -21,7 +21,7 @@ from PyQt5.QtWidgets import (
     QStyle
 )
 from PyQt5.QtGui import QPainter, QBrush, QColor, QIcon, QPixmap, QPainterPath, QFont
-from PyQt5.QtCore import Qt, QSize, QTimer, QPropertyAnimation, QRect, pyqtProperty
+from PyQt5.QtCore import Qt, QSize, QTimer, QPropertyAnimation, QRect, pyqtProperty, pyqtSignal
 
 from config.qss import LoginBtuQss
 import config.CONFIG as F
@@ -29,6 +29,7 @@ import config.CONFIG as F
 
 # 自定义按钮，实现按下/抬起的缩放动画
 class AnimatedButton(QLabel):
+    clicked = pyqtSignal()
     def __init__(self, text="", parent=None):
         # 为了方便使用样式和图标，这里继承自 QLabel 并模拟按钮效果
         super(AnimatedButton, self).__init__(parent)
@@ -68,18 +69,8 @@ class AnimatedButton(QLabel):
 
     def mouseReleaseEvent(self, event):
         self.start_release_animation()
-        # 发射 clicked 信号，方便外部连接槽函数
-        self.clicked()
+        self.clicked.emit()
         super(AnimatedButton, self).mouseReleaseEvent(event)
-
-    # 自定义信号的模拟，这里直接调用函数
-    def clicked(self):
-        # 可重载或通过外部赋值实现
-        if hasattr(self, "_click_callback") and self._click_callback:
-            self._click_callback()
-
-    def setClickedCallback(self, callback):
-        self._click_callback = callback
 
     def getScale(self):
         return self._scale
@@ -196,6 +187,9 @@ class CarouselWidget(QWidget):
 
 
 class LoginWindow(QMainWindow):
+    huawei_login_start_ed = pyqtSignal()
+    github_login_start_ed = pyqtSignal()
+
     def __init__(self, parent=None):
         super(LoginWindow, self).__init__(parent)
         self.setWindowTitle("第三方登录")
@@ -244,15 +238,24 @@ class LoginWindow(QMainWindow):
         self.btnHUAWEI = AnimatedButton("  HUAWEI登录")
         self.btnHUAWEI.setIcon(f"{F.PIC_LOGIN_PATH}\\login_huawei.png")  # 请确保该图片存在
         self.btnHUAWEI.setIconSize(QSize(30, 30))
+        self.btnHUAWEI.clicked.connect(self.huawei_login_start)
         loginLayout.addWidget(self.btnHUAWEI)
 
         # Facebook 登录按钮
         self.btnGITHUB = AnimatedButton("  GitHub登录")
         self.btnGITHUB.setIcon(f"{F.PIC_LOGIN_PATH}\\logo_github.png")
         self.btnGITHUB.setIconSize(QSize(30, 30))
+        self.btnGITHUB.clicked.connect(self.github_login_start)
         loginLayout.addWidget(self.btnGITHUB)
 
         mainLayout.addWidget(loginWidget)
+
+    def huawei_login_start(self):
+        self.huawei_login_start_ed.emit()
+
+    def github_login_start(self):
+        self.github_login_start_ed.emit()
+
 
     def paintEvent(self, event):
         painter = QPainter(self)
@@ -262,11 +265,6 @@ class LoginWindow(QMainWindow):
         painter.setPen(Qt.NoPen)
         painter.drawRoundedRect(rect, 15, 15)
 
-    def HuaweiBtn(self):
-        return self.btnHUAWEI
-
-    def GithubBtn(self):
-        return self.btnGITHUB
 
 
 if __name__ == '__main__':

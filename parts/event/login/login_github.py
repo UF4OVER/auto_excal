@@ -31,10 +31,10 @@ HTML_PATH = F.HTML_PATH
 CLIENT_ID = "Ov23liihJAbtWX6zyXr9"
 CLIENT_SECRET = "22c66bfe6d83d341c787eadc5ca0a0218b3b6a75"
 
-REDIRECT_URI = F.READ_CONFIG("login", "REDIRECT_URI")
-AUTH_URL = F.READ_CONFIG("login", "AUTH_URL")
-TOKEN_URL = F.READ_CONFIG("login", "TOKEN_URL")
-USER_API_URL = F.READ_CONFIG("login", "USER_API_URL")
+REDIRECT_URI = F.READ_CONFIG("login", "redirect_uri")
+AUTH_URL = F.READ_CONFIG("login", "auth_url")
+TOKEN_URL = F.READ_CONFIG("login", "token_url")
+USER_API_URL = F.READ_CONFIG("login", "user_api_url")
 
 # 全局变量存储授权码
 auth_code = None
@@ -72,6 +72,7 @@ class OAuthHandler(BaseHTTPRequestHandler):
 
 
 def main():
+    print("Starting GitHub OAuth login...")
     global auth_code
     try:
         # 1. 构建 GitHub 授权 URL
@@ -133,6 +134,13 @@ def main():
             user_info_path = F.USER_INFO_PATH / "user_info.json"
             with open(user_info_path, 'w') as json_file:
                 json.dump(user_data, json_file, indent=4)
+
+            avatar_path = user_data.get('avatar_url')
+            picture_response = requests.get(avatar_path)
+            picture_response.raise_for_status()
+            picture_path = F.USER_INFO_PATH / 'avatar.png'
+            with open(picture_path, 'wb') as picture_file:
+                picture_file.write(picture_response.content)
             return True
         else:
             show_message(4, "Error", "错误：获取用户信息错误！请重试", "ic_fluent_error_circle_regular")
