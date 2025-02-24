@@ -59,8 +59,8 @@ class quick_action(SiWidget):
 
     def setup_btu(self):
         self.flat_button = SiFlatButton(self)
-        self.flat_button.resize(120, 28)
-        self.flat_button.setText("Open ini")
+        self.flat_button.resize(60, 28)
+        self.flat_button.setText("ini")
         self.flat_button.setSvgIcon(SiGlobal.siui.iconpack.get("ic_fluent_wrench_settings_filled"))
         self.flat_button.adjustSize()
 
@@ -69,4 +69,6 @@ class quick_action(SiWidget):
     def btu(self):
         return self.flat_button
 
-
+    def set_login_info(self, text):
+        self.login_info.setText(text)
+        self.login_info.adjustSize()

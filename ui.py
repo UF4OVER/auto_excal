@@ -88,9 +88,9 @@ class MySiliconApp(My_SiliconApplication):
         self.layerMain().addPage(MusicPage(self),
                                  icon=SiGlobal.siui.iconpack.get("ic_fluent_music_note_2_play_filled"),
                                  hint="音乐", side="top")
-        self.layerMain().addPage(UserPage(self),
-                                 icon=SiGlobal.siui.iconpack.get("ic_fluent_person_filled"),
-                                 hint="我的", side="bottom")
+        # self.layerMain().addPage(UserPage(self),
+        #                          icon=SiGlobal.siui.iconpack.get("ic_fluent_person_filled"),
+        #                          hint="我的", side="bottom")
 
         self.layerMain().addPage(AboutPage(self),
                                  icon=SiGlobal.siui.iconpack.get("ic_fluent_info_filled"),

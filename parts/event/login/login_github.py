@@ -135,6 +135,8 @@ def main():
             with open(user_info_path, 'w') as json_file:
                 json.dump(user_data, json_file, indent=4)
 
+            show_message(3, "Success", "登录成功", "ic_fluent_shield_task_filled")
+
             avatar_path = user_data.get('avatar_url')
             picture_response = requests.get(avatar_path)
             picture_response.raise_for_status()

@@ -9,22 +9,17 @@ class Login(QThread):  # 登录线程的基类
 
     def __init__(self, parent=None, main=None):
         super().__init__(parent)
-        print("Login")
         self.main_login = main
-        print(f"main_login is set to: {self.main_login}")
 
     def run(self):
         self.loginStarted.emit()
         try:
             print("Login_start")
-            if callable(self.main_login):
-                success = self.main_login()
-                if success:
-                    self.loginFinished.emit()
-                else:
-                    self.loginErrored.emit("登录失败，请重试")
+            success = self.main_login()
+            if success:
+                self.loginFinished.emit()
             else:
-                self.loginErrored.emit("main_login is not callable")
+                self.loginErrored.emit("登录失败，请重试")
         except Exception as e:
             self.loginErrored.emit(str(e))
         finally:

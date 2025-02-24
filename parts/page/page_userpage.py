@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 
 #  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
@@ -21,12 +22,24 @@ from siui.components.page import SiPage
 from siui.core import SiGlobal
 from siui.components.container import SiDenseContainer
 
+from component import QuickActions
 from parts.component import LoginToPortlet
 from parts.event.login import LoginGithub, LoginHuawei
 
 import config.CONFIG as F
 
 PIC_PATH = F.PNG_PATH
+USER_INFO_PATH = F.USER_INFO_PATH / "user_info.json"
+
+
+# 读取json文件
+def read_json_file(name):
+    try:
+        with open(USER_INFO_PATH, 'r') as file:
+            data = json.load(file)
+        return data[f'{name}']
+    except FileNotFoundError:
+        return ""
 
 
 class User(SiPage):
@@ -62,4 +75,9 @@ class User(SiPage):
     def github_login(self):
         print("github登录")
         self.github_login_thread = LoginGithub(self)
-        self.github_login_thread.start()
+        try:
+            self.github_login_thread.start()
+            self.github_login_thread.loginFinished.connect(lambda:
+                 SiGlobal.siui.windows["MAIN_WINDOW"].QuickActions.set_login_info(read_json_file("name")))
+        except Exception as e:
+            print(e)

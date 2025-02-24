@@ -30,6 +30,7 @@ import config.CONFIG as F
 # 自定义按钮，实现按下/抬起的缩放动画
 class AnimatedButton(QLabel):
     clicked = pyqtSignal()
+
     def __init__(self, text="", parent=None):
         # 为了方便使用样式和图标，这里继承自 QLabel 并模拟按钮效果
         super(AnimatedButton, self).__init__(parent)
@@ -213,7 +214,8 @@ class LoginWindow(QMainWindow):
         mainLayout.setSpacing(20)
 
         # 左侧轮播图区域
-        image_paths = [f"{F.PIC_LOGIN_PATH}\\1.jpg", f"{F.PIC_LOGIN_PATH}\\2.jpg", f"{F.PIC_LOGIN_PATH}\\3.jpg"]  # 替换为实际图片路径
+        image_paths = [f"{F.PIC_LOGIN_PATH}\\1.jpg", f"{F.PIC_LOGIN_PATH}\\2.jpg",
+                       f"{F.PIC_LOGIN_PATH}\\3.jpg"]  # 替换为实际图片路径
         carousel = CarouselWidget(image_paths)
         carousel.setFixedSize(300, 300)
         mainLayout.addWidget(carousel)
@@ -256,7 +258,6 @@ class LoginWindow(QMainWindow):
     def github_login_start(self):
         self.github_login_start_ed.emit()
 
-
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
@@ -266,12 +267,8 @@ class LoginWindow(QMainWindow):
         painter.drawRoundedRect(rect, 15, 15)
 
 
-
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = LoginWindow()
     window.show()
     sys.exit(app.exec_())
-
-
-

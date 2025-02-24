@@ -122,6 +122,8 @@ def main():
                 with open(user_info_path, 'w') as json_file:
                     json.dump(decoded_id_token, json_file, indent=4)
 
+                show_message(4, "Success", "登录成功！", "ic_fluent_shield_task_filled")
+
                 # 提取 picture URL
                 picture_url = decoded_id_token.get('picture')
                 if picture_url:
