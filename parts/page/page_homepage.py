@@ -88,14 +88,14 @@ class Homepage(SiPage):
         self.option_card.setURL("https://space.bilibili.com/1000215778?spm_id_from=333.1007.0.0")
 
         self.option_card_demo = ThemedOptionCardPlane(self)
-        self.option_card_demo.setTitle("Home Page")
+        self.option_card_demo.setTitle("My Home Page")
         self.option_card_demo.setFixedSize(218, 270)
         self.option_card_demo.setThemeColor("#58A6FF")
         self.option_card_demo.setDescription(
-            "connect to my github\r\n"
-            "home page.you can click\r\n"
+            "connect to my home \r\n"
+            "page.you can click\r\n"
             "btu to my page .")  # noqa: E501
-        self.option_card_demo.setURL("https://github.com/UF4OVER")
+        self.option_card_demo.setURL("https://uf4.top")
 
 
         self.option_card_collaborator = ThemedOptionCardPlane(self)

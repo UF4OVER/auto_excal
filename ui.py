@@ -71,11 +71,11 @@ class MySiliconApp(My_SiliconApplication):
         self.move((screen_geo.width() - self.width()) // 2, (screen_geo.height() - self.height()) // 2)
         self.layerMain().setTitle("Loot Hearts系列")
         self.setWindowTitle("Wedding Invitation")
-        print("-" * 20 + "slash_start" + "-" * 20)
-        self.slashScreen = SplashScreen()
-        self.slashScreen.show()
-        self.createSubInterface()
-        print("-" * 20 + "slash_finish" + "-" * 20)
+        # print("-" * 20 + "slash_start" + "-" * 20)
+        # self.slashScreen = SplashScreen()
+        # self.slashScreen.show()
+        # self.createSubInterface()
+        # print("-" * 20 + "slash_finish" + "-" * 20)
 
         self.ShortcutKey()
 
@@ -85,12 +85,12 @@ class MySiliconApp(My_SiliconApplication):
         self.layerMain().addPage(AutoFormPage(self),
                                  icon=SiGlobal.siui.iconpack.get("ic_fluent_table_stack_right_filled"),
                                  hint="表单", side="top")
-        self.layerMain().addPage(MusicPage(self),
-                                 icon=SiGlobal.siui.iconpack.get("ic_fluent_music_note_2_play_filled"),
-                                 hint="音乐", side="top")
-        self.layerMain().addPage(UserPage(self),
-                                 icon=SiGlobal.siui.iconpack.get("ic_fluent_person_filled"),
-                                 hint="我的", side="bottom")
+        # self.layerMain().addPage(MusicPage(self),
+        #                          icon=SiGlobal.siui.iconpack.get("ic_fluent_music_note_2_play_filled"),
+        #                          hint="音乐", side="top")
+        # self.layerMain().addPage(UserPage(self),
+        #                          icon=SiGlobal.siui.iconpack.get("ic_fluent_person_filled"),
+        #                          hint="我的", side="bottom")
 
         self.layerMain().addPage(AboutPage(self),
                                  icon=SiGlobal.siui.iconpack.get("ic_fluent_info_filled"),
@@ -135,7 +135,7 @@ class MySiliconApp(My_SiliconApplication):
 
         # 显示托盘图标
         self.tray_icon.show()
-        self.slashScreen.close()
+        # self.slashScreen.close()
 
     def GlobalLeft(self):
         SiGlobal.siui.windows["MAIN_WINDOW"].layerLeftGlobalDrawer().showLayer()

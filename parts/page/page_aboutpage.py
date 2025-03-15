@@ -1,8 +1,6 @@
 #  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
 
-import os
-
 from PyQt5.QtCore import Qt, QUrl
 from PyQt5.QtGui import QDesktopServices
 from siui.components import (
@@ -18,7 +16,7 @@ from siui.components.widgets import (
 )
 from siui.core import GlobalFont, Si, SiColor, SiGlobal, SiQuickEffect
 from siui.gui import SiFont
-
+import config.CONFIG as F
 
 class About(SiPage):
     def __init__(self, *args, **kwargs):
@@ -33,16 +31,14 @@ class About(SiPage):
 
         version_picture_container = SiDenseVContainer(self)
         version_picture_container.setAlignment(Qt.AlignCenter)
-        version_picture_container.setFixedHeight(128 + 48)
+        version_picture_container.setFixedHeight(256 + 48)
         SiQuickEffect.applyDropShadowOn(version_picture_container, color=(28, 25, 31, 255), blur_radius=48)
 
         self.version_picture = SiPixLabel(self)
-        self.version_picture.setFixedSize(128, 128)
-        self.version_picture.setBorderRadius(64)
-
-        path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "pic", "avatar.png")
-        print(path)
-        self.version_picture.load(path)
+        self.version_picture.setFixedSize(256, 256)
+        self.version_picture.setBorderRadius(128)
+        print(f'{F.PNG_PATH} / "default.jpg"')
+        self.version_picture.load(f'{F.PNG_PATH / "default.jpg"}')
 
         self.version_label = SiLabel(self)
         self.version_label.setSiliconWidgetFlag(Si.AdjustSizeOnTextChanged)
