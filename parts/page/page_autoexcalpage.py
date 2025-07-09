@@ -1,12 +1,12 @@
 #  Copyright (c) 2025 UF4OVER
-#   All rights reserved.
-
+#  All rights reserved.
+#  逻辑有些糖了，新人刚开始的作品，但是杨东义没选到站长，他也加不了分了，所以应该也不会优化了，2025年7月9日12点38分
 import json
 import os
 import time
 
 from DrissionPage import ChromiumOptions, Chromium
-from PyQt5.QtCore import QThread, pyqtSignal, Qt, QLine
+from PyQt5.QtCore import QThread, pyqtSignal, Qt
 from PyQt5.QtWidgets import QTableWidget, QFileDialog, QTableWidgetItem, QAbstractItemView, QLabel, QBoxLayout
 from openpyxl.reader.excel import load_workbook
 from siui.components import (SiLabel,
@@ -22,7 +22,6 @@ from siui.components.button import (SiSwitchRefactor,
 from siui.components.container import SiTriSectionPanelCard, SiDenseContainer
 from siui.components.editbox import SiLineEdit
 from siui.components.page import SiPage
-from siui.components.spinbox.spinbox import SiIntSpinBox
 from siui.core import SiGlobal, SiColor, Si
 
 import config.CONFIG as F
@@ -40,11 +39,6 @@ except Exception as e:
     print(f"config.ini 配置文件读取失败: {e}")
     browser_path = "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
     broswer_address = "127.0.0.1:9222"
-finally:
-    print("*" * 20 + "broswer" + "*" * 20)
-    print(f"浏览器路径:{browser_path}")
-    print(f"浏览器地址:{broswer_address}")
-    print("*" * 20 + "finish" + "*" * 20)
 
 co = ChromiumOptions()
 co.set_browser_path(browser_path)
@@ -65,7 +59,6 @@ class MainLoopThread(QThread):
         self.terminate()
 
     def run(self):
-        # run 线程
         self.last_tab = self.browser.latest_tab
         self.data = self.parent.read_to_json()
         try:
@@ -132,61 +125,25 @@ class Autoexcal(SiPage):
         self.titled_widgets_group = SiTitledWidgetGroup(self)
         self.titled_widgets_group.setSiliconWidgetFlag(Si.EnableAnimationSignals)
         self.setup_set_widgets()
-        # self.setup_rules_groups()
         self.setup_function_widgets()
 
         SiGlobal.siui.reloadStyleSheetRecursively(self)
 
-        # 添加页脚的空白以增加美观性
         self.titled_widgets_group.addPlaceholder(64)
-        # 设置控件组为页面对象
         self.setAttachment(self.titled_widgets_group)
 
     def setup_set_widgets(self):
         # 密堆积容器
         with self.titled_widgets_group as group:
             group.addTitle("设置")
-            self.choose_boswer_btu = SiLongPressButton(self)
-            self.choose_boswer_btu.resize(128, 32)
-            self.choose_boswer_btu.setHint("长按选择文件夹")
-            self.choose_boswer_btu.attachment().setText("选择文件夹")
-            self.choose_boswer_btu.setEnabled(False)
-            self.choose_boswer_btu.longPressed.connect(self.change_web_path)
-
-            self.choose_boswer_sw = SiSwitchRefactor(self)
-            self.choose_boswer_sw.toggled.connect(lambda checked: self.choose_boswer_btu.setEnabled(checked))
-
-            boswer_filter = SiOptionCardLinear(self)
-            boswer_filter.setTitle("浏览器所在文件夹", "启用以自定义选择浏览器")
-            boswer_filter.load(SiGlobal.siui.iconpack.get("ic_fluent_folder_add_filled"))
-            boswer_filter.addWidget(self.choose_boswer_sw)
-            boswer_filter.addWidget(self.choose_boswer_btu)
-
-            self.port_int_spin_box = SiIntSpinBox(self)
-            self.port_int_spin_box.resize(128, 32)
-            self.port_int_spin_box.setMaximum(65535)
-            self.port_int_spin_box.setMinimum(1024)
-            self.load_web_port()
-            self.port_int_spin_box.setEnabled(False)
-            self.port_int_spin_box.lineEdit().editingFinished.connect(self.change_web_port)
-
-            choose_port_sw = SiSwitchRefactor(self)
-            choose_port_sw.toggled.connect(lambda checked: self.port_int_spin_box.setEnabled(checked))
-
-            choose_port_card = SiOptionCardLinear(self)
-            choose_port_card.setTitle("端口号", "启用以自定义端口号")
-            choose_port_card.load(SiGlobal.siui.iconpack.get("ic_fluent_plug_connected_filled"))
-            choose_port_card.addWidget(choose_port_sw)
-            choose_port_card.addWidget(self.port_int_spin_box)
-
             self.duplicate_filter_btu = SiSwitchRefactor(self)
             duplicate_filter_card = SiOptionCardLinear(self)
             duplicate_filter_card.setTitle("去重", "启用以数据去重")
             duplicate_filter_card.load(SiGlobal.siui.iconpack.get("ic_fluent_poll_off_filled"))
             duplicate_filter_card.addWidget(self.duplicate_filter_btu)
 
-        group.addWidget(boswer_filter)
-        group.addWidget(choose_port_card)
+        # group.addWidget(boswer_filter)
+        # group.addWidget(choose_port_card)
         group.addWidget(duplicate_filter_card)
 
     def setup_function_widgets(self):
@@ -928,32 +885,6 @@ class Autoexcal(SiPage):
         show_message(3, "提示", "数据已全部输入完毕", "ic_fluent_checkmark_starburst_filled")
         self.start_btu.setEnabled(True)
 
-    def change_web_path(self):
-        try:
-            file_path = QFileDialog.getOpenFileName(self, "选择浏览器路径", "", "Executable Files (*.exe)")[0]
-            if file_path:
-                F.WRITE_CONFIG("chromium_options", "browser_path", file_path)
-                show_message(1, "提示", f"浏览器路径已更改\r\n{file_path}", "ic_fluent_wrench_settings_filled")
-            print(file_path)
-        except Exception as e:
-            print(f"发生错误: {e}")
-            show_message(1, "错误", f"发生错误: {e}", "ic_fluent_error_circle_filled")
 
-    def change_web_port(self):
-        try:
-            port = self.port_int_spin_box.value()
-            F.WRITE_CONFIG("chromium_options", "address", f"127.0.0.1:{port}")
-            show_message(1, "提示", "端口已更改", "ic_fluent_wrench_settings_filled")
-        except Exception as e:
-            print(f"发生错误: {e}")
-            show_message(1, "错误", f"发生错误: {e}", "ic_fluent_error_circle_filled")
 
-    def load_web_port(self):
-        try:
-            port = F.READ_CONFIG("chromium_options", "address")
 
-            print(f"浏览器端口: {port}")
-            self.port_int_spin_box.setValue(int(port.split(":")[1]))
-        except Exception as e:
-            print(f"发生错误: {e}")
-            self.port_int_spin_box.setValue(9222)

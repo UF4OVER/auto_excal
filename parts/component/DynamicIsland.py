@@ -21,7 +21,6 @@ H_AUTHOR = F.READ_CONFIG('name', 'H_author')
 M_AUTHOR = F.READ_CONFIG('name', 'M_author')
 
 
-
 class DenseVContainerBG(SiDenseHContainer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -168,7 +167,6 @@ class DynamicIsland(SiHExpandWidget):
         current_time = QTime.currentTime()
         formatted_time = current_time.toString("hh:mm:ss")
         self.time_label.setText(formatted_time)
-
 
     @pyqtProperty(QColor)
     def tipColor(self):

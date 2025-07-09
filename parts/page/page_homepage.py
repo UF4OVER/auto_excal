@@ -95,7 +95,7 @@ class Homepage(SiPage):
             "connect to my home \r\n"
             "page.you can click\r\n"
             "btu to my page .")  # noqa: E501
-        self.option_card_demo.setURL("https://uf4.top")
+        self.option_card_demo.setURL("https://blog.uf4.top")
 
 
         self.option_card_collaborator = ThemedOptionCardPlane(self)
