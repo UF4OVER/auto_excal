@@ -11,35 +11,24 @@
 # -------------------------------
 #  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
-import random
-from contextlib import contextmanager
+import os
 
-from PyQt5.QtCore import QPointF, Qt
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QBoxLayout, QButtonGroup, QWidget, QTableWidget
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QBoxLayout, QTableWidget, QAbstractItemView, QFileDialog
 
 from siui.components import SiDenseHContainer, SiDenseVContainer, SiTitledWidgetGroup, SiOptionCardLinear, \
-    SiOptionCardPlane, SiLabel
+    SiOptionCardPlane, SiLabel, SiLongPressButton
 from siui.components.button import (
-    SiFlatButton,
-    SiFlatButtonWithIndicator,
-    SiLongPressButtonRefactor,
-    SiProgressPushButton,
     SiPushButtonRefactor,
-    SiRadioButtonR,
-    SiRadioButtonWithAvatar,
-    SiRadioButtonWithDescription,
     SiSwitchRefactor,
-    SiToggleButtonRefactor,
 )
-from siui.components.chart import SiTrendChart
-from siui.components.container import SiDenseContainer, SiTriSectionPanelCard, SiTriSectionRowCard
-from siui.components.editbox import SiCapsuleEdit, SiDoubleSpinBox, SiLineEdit, SiSpinBox
-from siui.components.label import SiLinearIndicator, SiLinearPartitionIndicator
+from siui.components.container import SiDenseContainer
+from siui.components.editbox import SiLineEdit
 from siui.components.page import SiPage
-from siui.components.slider_ import SiCoordinatePicker2D, SiCoordinatePicker3D, SiSlider
 from siui.core import SiGlobal
-from siui.gui import SiFont
+
+from parts.component.ShowMessage import show_message
+from parts.component.qss import TabelQss
 
 class Label(SiLabel):
     def __init__(self, parent, text):
@@ -172,5 +161,158 @@ class ExcalPage(SiPage):
             self.choose_switch.toggled.connect(self.start_input.notifyInvalidInput)
             self.choose_switch.toggled.connect(self.start_input2.notifyInvalidInput)
             self.choose_switch.toggled.connect(self.start_input1.notifyInvalidInput)
-
             group.addWidget(customize_the_input_box)
+
+        with self.titled_widgets_group as group:
+            table_widget_height = 900
+            table_widget_width = 500
+
+            new_table_widget_height = 700
+            new_table_widget_width = 500
+            group.addTitle("表格数据")
+
+            auto_input_widget_box = SiOptionCardPlane(self)
+            auto_input_widget_box.adjustSize()
+            auto_input_widget_box.setTitle("原始表格数据")
+            auto_input_widget_box.body().setFixedSize(table_widget_height + 40, table_widget_width + 40)
+            auto_input_widget_box.footer().setFixedHeight(40)
+
+            self.table_widget = QTableWidget(self)
+            self.table_widget.setStyleSheet(TabelQss)
+            self.table_widget.setFixedSize(table_widget_height, table_widget_width)
+
+            self.clear_data_btu = SiLongPressButton(self)
+            self.clear_data_btu.resize(80, 32)
+            self.clear_data_btu.attachment().setText("清除数据")
+            self.clear_data_btu.longPressed.connect(self.delete_data_for_table_widget)
+
+            choose_file_btu = SiPushButtonRefactor(self)
+            choose_file_btu.setText("选择文件")
+            choose_file_btu.clicked.connect(self.import_file_for_table_widget)
+
+            auto_input_widget_box.header().addWidget(choose_file_btu, "right")
+            auto_input_widget_box.body().addWidget(self.table_widget)
+            auto_input_widget_box.footer().addWidget(Label(self, "使用表格数据时，请确保表格数据与输入框对应"))
+            auto_input_widget_box.footer().addWidget(self.clear_data_btu, "right")
+
+            new_input_widget_box = SiOptionCardPlane(self)
+            new_input_widget_box.adjustSize()
+            new_input_widget_box.setTitle("自定义表格数据")
+            new_input_widget_box.body().setFixedSize(new_table_widget_height + 40, new_table_widget_width + 70)
+            new_input_widget_box.footer().setFixedHeight(40)
+
+            reload_the_data_btu = SiPushButtonRefactor(self)
+            reload_the_data_btu.setText("加载数据")
+            # reload_the_data_btu.clicked.connect(self.reload_data_for_new_table_widget)
+
+            new_input_widget_box.header().addWidget(reload_the_data_btu, "right")
+
+            self.new_table_widget = QTableWidget(self)
+            self.new_table_widget.setStyleSheet(TabelQss)
+            self.new_table_widget.setSelectionBehavior(QAbstractItemView.SelectRows)
+            self.new_table_widget.setFixedSize(int(new_table_widget_height * 0.7), new_table_widget_width)
+            # 设置第一列的宽度为100，第二行为200，第三行为80
+            self.new_table_widget.setColumnWidth(0, 100)
+            self.new_table_widget.setColumnWidth(1, 300)
+            self.new_table_widget.setColumnWidth(2, 100)
+
+            # 此容器左侧用于放置表格数据，右侧放置按钮
+            operate_the_container_h = SiDenseHContainer(self)
+            # 此容器用于放置表格数据
+            vertical_container_for_tabular_data = SiDenseVContainer(self)
+            vertical_container_for_tabular_data.addWidget(self.new_table_widget)
+            # 此容器用于放置按钮
+            btu_container_for_vertical_container = SiDenseVContainer(self)
+
+            self.open_web_btu = SiPushButtonRefactor(self)
+            self.open_web_btu.setText("打开浏览器")
+            self.open_web_btu.setFixedSize(128, 32)
+            # self.open_web_btu.clicked.connect(self.open_broswer)
+
+            self.start_btu = SiPushButtonRefactor(self)
+            self.start_btu.setText("开始")
+            self.start_btu.setFixedSize(128, 32)
+            # self.start_btu.clicked.connect(self.start_main_loop_in_thread)
+
+            self.stop_btu = SiPushButtonRefactor(self)
+            self.stop_btu.setText("停止")
+            self.stop_btu.setFixedSize(128, 32)
+            # self.stop_btu.clicked.connect(self.stop_main_loop_in_thread)
+
+            self.delete_btu = SiPushButtonRefactor(self)
+            self.delete_btu.setText("删除")
+            self.delete_btu.setFixedSize(210, 32)
+            # self.delete_btu.clicked.connect(self.del_data_for_new_table)
+
+            self.insert_btu = SiPushButtonRefactor(self)
+            self.insert_btu.setText("插入")
+            self.insert_btu.setFixedSize(210, 32)
+            # self.insert_btu.clicked.connect(self.insert_data_for_new_table)
+            # insert data
+            self.data1_input = SiLineEdit(self)
+            self.data1_input.setTitleWidth(50)
+            self.data1_input.setTitle("姓名")
+            self.data1_input.setText("何平")
+            self.data1_input.resize(210, 32)
+
+            self.data2_input = SiLineEdit(self)
+            self.data2_input.setTitleWidth(50)
+            self.data2_input.setTitle("学号")
+            self.data2_input.setText("2023303010311")
+            self.data2_input.resize(210, 32)
+
+            self.data3_input = SiLineEdit(self)
+            # self.data3_input.setLabelWidth(100)
+            self.data3_input.setTitle("分数")
+            self.data3_input.setTitleWidth(50)
+            self.data3_input.setText("3")
+            self.data3_input.resize(210, 32)
+
+            btu_container_for_vertical_container.addWidget(self.data1_input)
+            btu_container_for_vertical_container.addWidget(self.data2_input)
+            btu_container_for_vertical_container.addWidget(self.data3_input)
+            btu_container_for_vertical_container.addWidget(self.insert_btu)
+            btu_container_for_vertical_container.addWidget(self.delete_btu)
+
+            temp_h = SiDenseHContainer(self)
+
+            temp_h.addWidget(self.open_web_btu)
+            temp_h.addWidget(self.start_btu)
+            temp_h.addWidget(self.stop_btu)
+
+            vertical_container_for_tabular_data.addWidget(temp_h)
+
+            operate_the_container_h.addWidget(vertical_container_for_tabular_data)
+            operate_the_container_h.addWidget(btu_container_for_vertical_container)
+
+            new_input_widget_box.body().addWidget(operate_the_container_h)
+            new_input_widget_box.footer().addWidget(Label(self, "使用表格数据时，请确保表格数据与输入框对应"))
+
+            group.addWidget(auto_input_widget_box)
+            group.addWidget(new_input_widget_box)
+
+            # 调整父部件大小
+            auto_input_widget_box.adjustSize()
+            new_input_widget_box.adjustSize()
+            group.adjustSize()
+            self.adjustSize()
+    def delete_data_for_table_widget(self):
+        self.table_widget.clear()
+        self.table_widget.setRowCount(0)
+        self.table_widget.setColumnCount(0)
+        self.new_table_widget.clear()
+        self.new_table_widget.setRowCount(0)
+        self.new_table_widget.setColumnCount(0)
+        self.index_current_data = 0
+        if os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data.json')):
+            os.remove(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data.json'))
+        # 去实例化线程
+        self.main_loop_thread = None
+
+        show_message(2, "成功", "表格数据已清空", "ic_fluent_eraser_medium_filled")
+
+    def import_file_for_table_widget(self):
+        file_path = QFileDialog.getOpenFileName(self, "选择文件", "", "Excel Files (*.xlsx)")[0]
+        if file_path:
+            self.load_data_for_table_widget(file_path)
+            show_message(2, "成功", "表格数据已导入", "ic_fluent_emoji_meme_filled")
