@@ -12,22 +12,18 @@
 #  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
 
-import time
-
 from PyQt5.QtCore import Qt
-from siui.components import SiPixLabel, Si, SiOptionCardLinear
-from siui.components.button import SiPushButtonRefactor
+from siui.components import SiPixLabel, Si
 from siui.components.page import SiPage
 from siui.components.titled_widget_group import SiTitledWidgetGroup
 from siui.components.widgets import (
     SiDenseHContainer,
-    SiDenseVContainer,
     SiLabel,
 )
 from siui.core import GlobalFont, SiColor, SiGlobal
 from siui.gui import SiFont
 
-from parts.component.task import TaskCardLinear, Task
+from config import Settings
 from parts.component.themed_option_card import ThemedOptionCardPlane
 
 
@@ -43,7 +39,7 @@ class Homepage(SiPage):
         self.background_image = SiPixLabel(self.head_area)
         self.background_image.setFixedSize(1366, 300)
         self.background_image.setBorderRadius(6)
-        # self.background_image.load(f"{PATH_PNG}\\back.jpg")
+        self.background_image.load(f"{Settings.png_dir}" + "/homepage_background.png")
 
         self.background_fading_transition = SiLabel(self.head_area)
         self.background_fading_transition.setGeometry(0, 100, 0, 200)
@@ -102,7 +98,7 @@ class Homepage(SiPage):
             "connect to my home \r\n"
             "page.you can click\r\n"
             "btu to my page .")  # noqa: E501
-        self.option_card_demo.setURL("https://uf4.top")
+        self.option_card_demo.setURL("https://blog.uf4.top")
 
 
         self.option_card_collaborator = ThemedOptionCardPlane(self)
@@ -136,9 +132,6 @@ class Homepage(SiPage):
         self.titled_widget_group.resized.connect(lambda size: self.body_area.setFixedHeight(size[1]))
         self.titled_widget_group.move(64, 0)
 
-        # 开始搭建界面
-        # 控件的线性选项卡
-
         self.titled_widget_group.setSpacing(16)
 
         self.titled_widget_group.addPlaceholder(64)
@@ -146,8 +139,6 @@ class Homepage(SiPage):
         # 添加到滚动区域容器
         self.body_area.setFixedHeight(self.titled_widget_group.height())
         self.scroll_container.addWidget(self.body_area)
-
-        # 添加到页面
 
         self.setAttachment(self.scroll_container)
         self.scroll_container.adjustSize()

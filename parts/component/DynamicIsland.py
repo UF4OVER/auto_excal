@@ -1,5 +1,6 @@
 #  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
+import time
 
 import psutil
 from PyQt5.QtCore import QTimer, QRect, Qt, pyqtProperty, QPropertyAnimation, QEasingCurve, QTime
@@ -11,15 +12,11 @@ from siui.core import Si
 from siui.core import SiColor, SiGlobal
 from siui.gui import SiFont
 
-import config.CONFIG as F
+from config import AUTHER_NAME, WORKER_NAME, SOFTWARE_NAME, VERSION
 
-PATH_CONFIG = F.CONFIG_PATH
-
-VERSION = F.READ_CONFIG('version', 'version')
-L_AUTHOR = F.READ_CONFIG('name', 'L_author')
-H_AUTHOR = F.READ_CONFIG('name', 'H_author')
-M_AUTHOR = F.READ_CONFIG('name', 'M_author')
-
+L_AUTHOR = AUTHER_NAME
+H_AUTHOR = WORKER_NAME
+M_AUTHOR = SOFTWARE_NAME
 
 
 class DenseVContainerBG(SiDenseHContainer):
@@ -133,7 +130,7 @@ class DynamicIsland(SiHExpandWidget):
         self.time_label.setAlignment(Qt.AlignCenter)
         self.time_label.resize(70, self.size().height())
         self.time_label.moveTo(350, 0)
-        self.time_label.setText(f"{F.READ_CONFIG('date', 'time')}")
+        self.time_label.setText(f"{time.strftime('%Y-%m-%d', time.localtime())}")
 
         self.container.setSpacing(0)
         self.container.addPlaceholder(10)
@@ -169,7 +166,6 @@ class DynamicIsland(SiHExpandWidget):
         formatted_time = current_time.toString("hh:mm:ss")
         self.time_label.setText(formatted_time)
 
-
     @pyqtProperty(QColor)
     def tipColor(self):
         return self._color
@@ -180,20 +176,6 @@ class DynamicIsland(SiHExpandWidget):
         palette = self.tip.palette()
         palette.setColor(QPalette.WindowText, self._color)
         self.tip.setPalette(palette)
-
-    def enterEvent(self, a0):
-        super().enterEvent(a0)
-        self.tip.setText(L_AUTHOR)
-        self.tip_color_animation.setStartValue(self.tipColor)
-        self.tip_color_animation.setEndValue(QColor(255, 0, 0))  # 鼠标进入时颜色变为红色
-        self.tip_color_animation.start()
-
-    def leaveEvent(self, a0):
-        super().leaveEvent(a0)
-        self.tip.setText(H_AUTHOR)
-        self.tip_color_animation.setStartValue(self.tipColor)
-        self.tip_color_animation.setEndValue(QColor(235, 235, 235))  # 鼠标离开时颜色变为白色
-        self.tip_color_animation.start()
 
     def send_default(self):
 

@@ -1,26 +1,23 @@
 #  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
-
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QDesktopWidget
 from siui.core import SiGlobal
 from siui.templates.application.application import SiliconApplication
 
 from parts.component.DynamicIsland import DynamicIsland
-from parts.component.GlobalLeftWindow import LayerLeftGlobalDrawer
 from parts.page.page_home import Homepage
-from parts.page.page_excal import Excal
+from parts.page.page_excal import ExcalPage
+
+from config import Settings
 class My_SiliconApplication(SiliconApplication):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.layer_left_global_drawer = LayerLeftGlobalDrawer(self)
         self.dynamic_island = DynamicIsland(self)
         self.layerMain().container_title.addWidget(self.dynamic_island)
 
     def Dynamic_Island(self):
         return self.dynamic_island
-
-    def QuickActions(self):
-        return self.quick_actions
 
     def showEvent(self, event):
         super().showEvent(event)
@@ -34,7 +31,7 @@ class My_SiliconApplication(SiliconApplication):
 class MySiliconApp(My_SiliconApplication):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # self.setWindowIcon(QIcon(f"{PATH_PIC}/圆角-default.jpg"))
+        self.setWindowIcon(QIcon(f"{Settings.png_dir}/default.jpg"))
 
         screen_geo = QDesktopWidget().screenGeometry()
         self.stu = False
@@ -48,7 +45,7 @@ class MySiliconApp(My_SiliconApplication):
         self.layerMain().addPage(Homepage(self),
                                  icon=SiGlobal.siui.iconpack.get("ic_fluent_home_filled"),
                                  hint="主页", side="top")
-        self.layerMain().addPage(Excal(self),
+        self.layerMain().addPage(ExcalPage(self),
                                  icon=SiGlobal.siui.iconpack.get("ic_fluent_text_bullet_list_square_search_filled"),
                                  hint="Excal",side="top")
 
