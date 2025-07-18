@@ -12,13 +12,12 @@
 #  @Contact :
 #  @Python  : 3.10
 # -------------------------------
-from datetime import datetime
 from pathlib import Path
 from typing import Union
-import sys
-import pytz
+
 from PyQt5.QtCore import QSettings
 
+import sys
 
 class SettingsManager:
     def __init__(self, config_path: Path):
@@ -57,9 +56,4 @@ class SettingsManager:
     def png_dir(self) -> Path:
         return self.base_dir / "assets"
 
-
-utc_now = datetime.utcnow()
-eastern = pytz.timezone('Asia/Shanghai')
-today = utc_now.replace(tzinfo=pytz.utc).astimezone(eastern).strftime("%Y-%m-%d")
-TODAY = today
 
