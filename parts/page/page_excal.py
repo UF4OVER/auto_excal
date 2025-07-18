@@ -11,15 +11,9 @@
 # -------------------------------
 #  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
-import json
-import os
-import time
 
-from DrissionPage._base.chromium import Chromium
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QBoxLayout, QTableWidget, QAbstractItemView, QFileDialog, QTableWidgetItem
-from openpyxl.reader.excel import load_workbook
-
+from PyQt5.QtWidgets import QBoxLayout, QTableWidget, QAbstractItemView
 from siui.components import SiDenseHContainer, SiDenseVContainer, SiTitledWidgetGroup, SiOptionCardLinear, \
     SiOptionCardPlane, SiLabel, SiLongPressButton
 from siui.components.button import (
@@ -33,7 +27,7 @@ from siui.core import SiGlobal
 
 from config import Settings
 from parts.component.ShowMessage import show_message
-from parts.component.qss import TabelQss
+from parts.component.Qss import TabelQss
 from parts.event.parser import delete_data_for_table_widget, import_file_for_table_widget, \
     reload_data_for_new_table_widget, insert_data_for_new_table, del_data_for_new_table
 

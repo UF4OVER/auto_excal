@@ -4,13 +4,12 @@
 #   All rights reserved.
 
 # -------------------------------
-#  @Project : siui
+#  @Project : siui_refacter
 #  @Time    : 2025 - 01-05 20:20
-#  @FileName: qss.py
+#  @FileName: Qss.py
 #  @Software: PyCharm 2024.1.6 (Professional Edition)
 #  @System  : Windows 11 23H2
 #  @Author  : 33974
-#  @Contact : 
 #  @Python  : 3.10
 # -------------------------------
 TabelQss = """

@@ -73,7 +73,7 @@ class DownloaderThread(QObject):
             return
         thread = QThread()
         task.moveToThread(thread)
-        Logger.info(f"启动任务,任务ID:{task.__id__()}")
+        Logger.debug(f"启动任务,任务ID:{task.__id__()}")
         thread.started.connect(task.run)
 
         task.finished.connect(thread.quit)
