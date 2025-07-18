@@ -21,6 +21,7 @@ from parts.component.ShowMessage import show_message
 
 file_path = os.path.join(Settings.png_dir, "data.json")
 
+
 def reload_data_for_new_table_widget(new_table_widget, table_widget,
                                      choose_switch,
                                      start_input, finish_input,
@@ -132,7 +133,6 @@ def reload_data_for_new_table_widget(new_table_widget, table_widget,
             if (new_table_widget.item(i, 0) is None and
                     new_table_widget.item(i, 1) is None and
                     new_table_widget.item(i, 2) is None):
-
                 new_table_widget.removeRow(i)
 
         save_table_data_to_json(new_table_widget)
@@ -140,6 +140,8 @@ def reload_data_for_new_table_widget(new_table_widget, table_widget,
         show_message(1, "默认数据", "数据复制成功", "ic_fluent_emoji_edit_filled")
     except Exception as e:
         show_message(3, "默认数据", f"数据复制失败{e}", "ic_fluent_emoji_edit_filled")
+
+
 def save_table_data_to_json(table_widget):
     """
     保存表格中的数据到json
@@ -177,7 +179,11 @@ def save_table_data_to_json(table_widget):
             if Settings.duplicate_filter:
                 to_remove.append(data)
                 widget.removeRow(data_list.index(data))
-                show_message(1, "提示", f"已删除重复项: {data}", "ic_fluent_search_filled")
+                show_message(3,
+                             "提示",
+                             f"已删除重复项: "
+                             f"{data['name']}",
+                             "ic_fluent_search_filled")
             else:
                 pass
 
@@ -191,7 +197,7 @@ def save_table_data_to_json(table_widget):
     # 删除重复项
     for data in to_remove:
         data_list.remove(data)
-        Logger.info(f"已删除: {data}")
+        Logger.info(f"已删除: {data['name']}")
 
     # 重新为数据列表中的内容生成唯一编号
     for idx, data in enumerate(data_list):
@@ -204,7 +210,8 @@ def save_table_data_to_json(table_widget):
 
     Logger.info("数据已保存")
 
-def read_json_data() ->list:
+
+def read_json_data() -> list:
     """
     从指定的JSON文件中读取数据并返回一个列表
     :return: 包含JSON数据的列表
@@ -220,6 +227,7 @@ def read_json_data() ->list:
         Logger.error(f"JSON解码错误: {file_path}")
         return []
 
+
 def get_data_by_order(data, order) -> list:
     """
     根据指定的order值筛选数据
@@ -229,6 +237,7 @@ def get_data_by_order(data, order) -> list:
     """
     filtered_data = [item for item in data if item.get('unique_id') == order]
     return filtered_data
+
 
 def del_data_for_new_table(new_table_widget):
     """
@@ -240,13 +249,17 @@ def del_data_for_new_table(new_table_widget):
         return
 
     for row in sorted(selected_rows, reverse=True):
+        item = new_table_widget.item(row.row(), 0)
+        if item:
+            Logger.info(f"已删除: {item.text()}")  # 先打印，后删除
         new_table_widget.removeRow(row.row())
-        Logger.info(f"已删除: {row.row()}")
 
-    # 使用最后一个删除的行来显示消息
+    # 使用最后一个删除的行来显示消
     last_deleted_row = selected_rows[-1]
-    show_message(3, "提示", f"已删除: {last_deleted_row.row() + 1}", "ic_fluent_task_list_ltr_filled")
+    show_message(3, "提示", f"已删除: {new_table_widget.item(last_deleted_row.row(), 0).text()}", "ic_fluent_task_list_ltr_filled")
     save_table_data_to_json(new_table_widget)
+
+
 def insert_data_for_new_table(new_table_widget,  # 新表格对象
                               data1_input,  # 数据输入框对象1
                               data2_input,  # 数据输入框对象2
@@ -266,11 +279,13 @@ def insert_data_for_new_table(new_table_widget,  # 新表格对象
     show_message(1, "提示", f"已添加: {name}, {xuehao}, {score}", "ic_fluent_task_list_ltr_filled")
     save_table_data_to_json(new_table_widget)
 
+
 def import_file_for_table_widget(table_widget):
     file_path = QFileDialog.getOpenFileName(table_widget, "选择文件", "", "Excel Files (*.xlsx)")[0]
     if file_path:
-        load_data_for_table_widget(table_widget,file_path)
+        load_data_for_table_widget(table_widget, file_path)
         show_message(2, "成功", "表格数据已导入", "ic_fluent_emoji_meme_filled")
+
 
 def load_data_for_table_widget(table_widget, file_path):
     try:
@@ -288,6 +303,8 @@ def load_data_for_table_widget(table_widget, file_path):
                 table_widget.setItem(row, col, item)
     except Exception as e:
         Logger.info(f"load_data_for_table_widget:{e}")
+
+
 def delete_data_for_table_widget(table_widget, new_table_widget):
     table_widget.clear()
     table_widget.setRowCount(0)

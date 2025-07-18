@@ -35,7 +35,7 @@ from config import Settings
 from parts.component.ShowMessage import show_message
 from parts.component.qss import TabelQss
 from parts.event.parser import delete_data_for_table_widget, import_file_for_table_widget, \
-    reload_data_for_new_table_widget
+    reload_data_for_new_table_widget, insert_data_for_new_table, del_data_for_new_table
 
 
 def limit_for_table(func):
@@ -275,12 +275,15 @@ class ExcalPage(SiPage):
             self.delete_btu = SiPushButtonRefactor(self)
             self.delete_btu.setText("删除")
             self.delete_btu.setFixedSize(210, 32)
-            # self.delete_btu.clicked.connect(self.del_data_for_new_table)
+            self.delete_btu.clicked.connect(lambda:
+                                            del_data_for_new_table(
+                                                self.new_table_widget
+                                            ))
 
             self.insert_btu = SiPushButtonRefactor(self)
             self.insert_btu.setText("插入")
             self.insert_btu.setFixedSize(210, 32)
-            # self.insert_btu.clicked.connect(self.insert_data_for_new_table)
+
             # insert data
             self.data1_input = SiLineEdit(self)
             self.data1_input.setTitleWidth(50)
@@ -300,6 +303,14 @@ class ExcalPage(SiPage):
             self.data3_input.setTitleWidth(50)
             self.data3_input.setText("3")
             self.data3_input.resize(210, 32)
+
+            self.insert_btu.clicked.connect(lambda:
+                                            insert_data_for_new_table(
+                                                self.new_table_widget,  # 新表格对象
+                                                self.data1_input,  # 数据输入框对象1
+                                                self.data2_input,  # 数据输入框对象2
+                                                self.data3_input)
+                                            )
 
             btu_container_for_vertical_container.addWidget(self.data1_input)
             btu_container_for_vertical_container.addWidget(self.data2_input)
