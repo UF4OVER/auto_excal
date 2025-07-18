@@ -24,7 +24,7 @@ from siui.core import GlobalFont, SiColor, SiGlobal
 from siui.gui import SiFont
 
 from config import Settings
-from parts.component.themed_option_card import ThemedOptionCardPlane
+from parts.component.ThemedOptionCard import ThemedOptionCardPlane
 
 
 class Homepage(SiPage):

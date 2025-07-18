@@ -23,7 +23,7 @@ class SettingsManager:
     def __init__(self, config_path: Path):
         self.config_path = str(config_path.resolve())
         self.settings = QSettings(self.config_path, QSettings.IniFormat)
-
+        self.duplicate_filter: bool = False
     def get(self, section: str, option: str, fallback: Union[str, int, bool] = None) -> Union[str, int, bool]:
         key = f"{section}/{option}"
         if self.settings.contains(key):

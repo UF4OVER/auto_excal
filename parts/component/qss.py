@@ -15,65 +15,104 @@
 # -------------------------------
 TabelQss = """
 QTableWidget {
-    background-color: rgba(44, 49, 60, 0.9);
-    border: 1px solid #44475a;
-    color: #f8f8f2;
-    gridline-color: #44475a;
-    selection-background-color: #6272a4;
-    selection-color: #f8f8f2;
+    background-color: #332e38;
+    color: white;
+    gridline-color: #39333e;
+    font-size: 14px;
+    border: none;
+    selection-background-color: #1c191f;
+    selection-color: #89539d;
+    alternate-background-color: #2d2931;
+}
+
+QHeaderView::section {
+    background-color: #25222a;
+    color: white;
+    padding: 6px;
+    border: 1px solid #39333e;
+    font-weight: bold;
+    border-radius: 8px;
+}
+
+QTableView QTableCornerButton::section {
+    background-color: transparent;
+    border: none;
+}
+
+QTableView QHeaderView::section {
+    background-color: #25222a;
+    color: white;
+    padding: 6px;
+    border: 1px solid #39333e;
+    font-weight: bold;
+    border-radius: 8px;
+}
+
+QHeaderView::section:pressed {
+    background-color: #1c191f;
+}
+
+QTableWidget::item {
+    padding: 6px;
+    border: none;
     border-radius: 8px;
 }
 
 QTableWidget::item:selected {
-    background-color: #6272a4;
-    color: #f8f8f2;
-}
-
-QTableWidget::item:hover {
-    background-color: #44475a;
-    color: #f8f8f2;
-}
-
-QTableWidget::item {
-    padding: 5px;
-    border-bottom: 1px solid #44475a;
-}
-
-QTableWidget::item:alternate {
-    background-color: #3b4252;
-}
-
-QHeaderView::section {
-    background-color: rgba(68, 71, 90, 0.9);
-    color: #f8f8f2;
-    padding: 5px;
-    border: 1px solid #44475a;
-    border-right: 1px solid #44475a;
+    background-color: #1c191f;
+    color: #89539d;
     border-radius: 8px;
 }
 
-QHeaderView::section:last {
-    border-right: none;
+QTableWidget::item:hover {
+    background-color: #2a2730;
+    border-radius: 8px;
 }
 
-QHeaderView::section:horizontal {
-    border-bottom: 1px solid #44475a;
+QScrollBar:vertical {
+    border: none;
+    background: #25222a;
+    width: 12px;
+    margin: 0px;
 }
 
-QHeaderView::section:vertical {
-    border-right: 1px solid #44475a;
+QScrollBar::handle:vertical {
+    background: #39333e;
+    min-height: 20px;
+    border-radius: 6px;
 }
+
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical {
+    height: 0px;
+}
+
+QScrollBar::add-page:vertical,
+QScrollBar::sub-page:vertical {
+    background: none;
+}
+
+QScrollBar:horizontal {
+    border: none;
+    background: #25222a;
+    height: 12px;
+    margin: 0px;
+}
+
+QScrollBar::handle:horizontal {
+    background: #39333e;
+    min-width: 20px;
+    border-radius: 6px;
+}
+
+QScrollBar::add-line:horizontal,
+QScrollBar::sub-line:horizontal {
+    width: 0px;
+}
+
+QScrollBar::add-page:horizontal,
+QScrollBar::sub-page:horizontal {
+    background: none;
+}
+
 """
-
-LoginBtuQss = """
-            AnimatedButton {
-                background-color: #FFFFFF;
-                border: 1px solid #ccc;
-                border-radius: 25px;
-                font-size: 16px;
-                padding-left: 10px;
-            }
-            AnimatedButton:hover {
-                background-color: #F0F0F0;
-            }
-        """

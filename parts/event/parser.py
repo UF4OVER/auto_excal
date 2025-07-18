@@ -13,7 +13,8 @@
 import json
 import os
 
-from PyQt5.QtWidgets import QTableWidgetItem
+from PyQt5.QtWidgets import QTableWidgetItem, QFileDialog
+from openpyxl.reader.excel import load_workbook
 
 from config import Logger, Settings
 from parts.component.ShowMessage import show_message
@@ -140,6 +141,11 @@ def reload_data_for_new_table_widget(new_table_widget, table_widget,
     except Exception as e:
         show_message(3, "默认数据", f"数据复制失败{e}", "ic_fluent_emoji_edit_filled")
 def save_table_data_to_json(table_widget):
+    """
+    保存表格中的数据到json
+    :param table_widget: 表格
+    :return: None
+    """
     data_list = []
     unique_ids = set()
     to_remove = []
@@ -168,7 +174,7 @@ def save_table_data_to_json(table_widget):
     # 检查重复项并处理
     for data in data_list:
         if data['unique_id'] in unique_ids:
-            if btu.isChecked():
+            if Settings.duplicate_filter:
                 to_remove.append(data)
                 widget.removeRow(data_list.index(data))
                 show_message(1, "提示", f"已删除重复项: {data}", "ic_fluent_search_filled")
@@ -235,8 +241,59 @@ def del_data_for_new_table(new_table_widget):
 
     for row in sorted(selected_rows, reverse=True):
         new_table_widget.removeRow(row.row())
-        print(f"已删除: {row.row()}")
+        Logger.info(f"已删除: {row.row()}")
 
     # 使用最后一个删除的行来显示消息
     last_deleted_row = selected_rows[-1]
     show_message(3, "提示", f"已删除: {last_deleted_row.row() + 1}", "ic_fluent_task_list_ltr_filled")
+    save_table_data_to_json(new_table_widget)
+def insert_data_for_new_table(new_table_widget,  # 新表格对象
+                              data1_input,  # 数据输入框对象1
+                              data2_input,  # 数据输入框对象2
+                              data3_input):  # 数据输入框对象3
+    """
+    将数据插入到新表格中
+    """
+
+    name = data1_input.text()
+    xuehao = data2_input.text()
+    score = data3_input.text()
+    # 插入到新表格中
+    new_table_widget.insertRow(new_table_widget.rowCount())
+    new_table_widget.setItem(new_table_widget.rowCount() - 1, 0, QTableWidgetItem(name))
+    new_table_widget.setItem(new_table_widget.rowCount() - 1, 1, QTableWidgetItem(xuehao))
+    new_table_widget.setItem(new_table_widget.rowCount() - 1, 2, QTableWidgetItem(score))
+    show_message(1, "提示", f"已添加: {name}, {xuehao}, {score}", "ic_fluent_task_list_ltr_filled")
+    save_table_data_to_json(new_table_widget)
+
+def import_file_for_table_widget(table_widget):
+    file_path = QFileDialog.getOpenFileName(table_widget, "选择文件", "", "Excel Files (*.xlsx)")[0]
+    if file_path:
+        load_data_for_table_widget(table_widget,file_path)
+        show_message(2, "成功", "表格数据已导入", "ic_fluent_emoji_meme_filled")
+
+def load_data_for_table_widget(table_widget, file_path):
+    try:
+        workbook = load_workbook(file_path)
+        sheet = workbook.active
+        rows = sheet.max_row
+        cols = sheet.max_column
+
+        table_widget.setRowCount(rows)
+        table_widget.setColumnCount(cols)
+        for row in range(rows):
+            for col in range(cols):
+                cell_value = sheet.cell(row=row + 1, column=col + 1).value
+                item = QTableWidgetItem(str(cell_value))
+                table_widget.setItem(row, col, item)
+    except Exception as e:
+        Logger.info(f"load_data_for_table_widget:{e}")
+def delete_data_for_table_widget(table_widget, new_table_widget):
+    table_widget.clear()
+    table_widget.setRowCount(0)
+    table_widget.setColumnCount(0)
+    new_table_widget.clear()
+    new_table_widget.setRowCount(0)
+    new_table_widget.setColumnCount(0)
+
+    show_message(2, "成功", "表格数据已清空", "ic_fluent_eraser_medium_filled")
