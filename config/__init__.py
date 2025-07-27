@@ -26,5 +26,6 @@ AUTHER_NAME = Settings.get("name", "auther_name")
 WORKER_NAME = Settings.get("name", "worker_name")
 SOFTWARE_NAME = Settings.get("name", "software_name")
 VERSION = Settings.get("version", "version")
+# with open(Path(__file__).resolve().parent / "pyproject.toml", "r", encoding="utf-8"):
 
 

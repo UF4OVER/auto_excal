@@ -2,12 +2,11 @@ import sys
 
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QApplication
+
+from config import Logger
 from refactor_ui import MySiliconApp
 from siui.core import SiGlobal
-
-#
-# siui.gui.set_scale_factor(1)
-
+import time
 
 def show_version_message(window):
     window.LayerRightMessageSidebar().send(
@@ -33,13 +32,21 @@ def show_version_message(window):
     )
 
 
+
+
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
+    try:
+        time_ = time.time()
+        app = QApplication(sys.argv)
 
-    window = MySiliconApp()
-    window.show()
+        window = MySiliconApp()
+        window.show()
+        time_1 = time.time()
+        Logger.info(f"启动时间: {time_1 - time_}s")
 
-    timer = QTimer(window)
-    timer.singleShot(500, lambda: show_version_message(window))
+        timer = QTimer(window)
+        timer.singleShot(500, lambda: show_version_message(window))
 
-    sys.exit(app.exec_())
+        sys.exit(app.exec_())
+    except Exception as e:
+        Logger.error(e)

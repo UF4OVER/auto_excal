@@ -1,8 +1,8 @@
 #  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
 import time
-
 import psutil
+# 判断当前电脑是否有电池
 from PyQt5.QtCore import QTimer, QRect, Qt, pyqtProperty, QPropertyAnimation, QEasingCurve, QTime
 from PyQt5.QtGui import QFont, QColor, QPalette
 from PyQt5.QtGui import QPainter, QFontMetrics

@@ -20,16 +20,20 @@ from siui.components.button import (
     SiPushButtonRefactor,
     SiSwitchRefactor,
 )
+
+from DrissionPage import ChromiumOptions, Chromium
+
 from siui.components.container import SiDenseContainer
 from siui.components.editbox import SiLineEdit
 from siui.components.page import SiPage
 from siui.core import SiGlobal
 
-from config import Settings
+from config import Settings, Logger
 from parts.component.ShowMessage import show_message
 from parts.component.Qss import TabelQss
 from parts.event.parser import delete_data_for_table_widget, import_file_for_table_widget, \
-    reload_data_for_new_table_widget, insert_data_for_new_table, del_data_for_new_table
+    reload_data_for_new_table_widget, insert_data_for_new_table, del_data_for_new_table, read_json_data
+from parts.event.uploader import DownloaderThread, DownloadWorker
 
 
 def limit_for_table(func):
@@ -254,12 +258,12 @@ class ExcalPage(SiPage):
             self.open_web_btu = SiPushButtonRefactor(self)
             self.open_web_btu.setText("打开浏览器")
             self.open_web_btu.setFixedSize(128, 32)
-            # self.open_web_btu.clicked.connect(self.open_broswer)
+            self.open_web_btu.clicked.connect(self.open_broswer)
 
             self.start_btu = SiPushButtonRefactor(self)
             self.start_btu.setText("开始")
             self.start_btu.setFixedSize(128, 32)
-            # self.start_btu.clicked.connect(self.start_main_loop_in_thread)
+            self.start_btu.clicked.connect(lambda: DownloaderThread().addTask(DownloadWorker(read_json_data(), self.browser.latest_tab)))
 
             self.stop_btu = SiPushButtonRefactor(self)
             self.stop_btu.setText("停止")
@@ -336,3 +340,11 @@ class ExcalPage(SiPage):
             self.adjustSize()
     def update_flag(self):
         Settings.duplicate_filter = self.duplicate_filter_btu.isChecked()
+    def open_broswer(self):
+        try:
+            self.browser = Chromium(9002)
+        except Exception as e:
+            self.browser = None
+            Logger.error(f"无法启动浏览器: {e}")
+            show_message(3, "提示", f"无法启动浏览器: {e}", "ic_fluent_task_list_ltr_filled")
+        return
