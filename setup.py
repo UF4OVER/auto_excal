@@ -1,18 +1,13 @@
-import os
-import sys
+
 from cx_Freeze import setup, Executable
 
 
-zlib_dll_path = "E:\\python\\file_asa\\auto_excal\\zlib.dll"
+zlib_dll_path = "zlib.dll"
 
 build_exe_options = {
     "packages": [
-        "json",
         "pyautogui",
         "threading",
-        "time",
-        "sys",
-        "os",
         "re",
 
         "qt_material",
@@ -27,14 +22,16 @@ build_exe_options = {
         ("icon.ico", "icon.ico"),
         (zlib_dll_path, "zlib.dll"),
     ],
-    "excludes": []
+    "excludes": ["numpy"
+                 ""]
 }
 
 base = "Win32GUI"
 
 setup(
     name="原神",
-    version="2.5.0",
+    version="2.5.1",
+    target_name="auto.exe",
     description="AUTO-INPUT",
     options={"build_exe": build_exe_options},
     executables=[
