@@ -1,28 +1,19 @@
-# -*- coding: utf-8 -*-
-
-#  Copyright (c) 2025 UF4OVER
-#   All rights reserved.
-
-import os
-
-#  Copyright (c) 2025 UF4OVER
-#   All rights reserved.
-
-# -------------------------------
 #  @Project : siui
 #  @Time    : 2025 - 01-23 22:01
 #  @FileName: music_displayer_rebuild.py
 #  @Software: PyCharm 2024.1.6 (Professional Edition)
 #  @System  : Windows 11 23H2
 #  @Author  : 33974
-#  @Contact : 
-#  @Python  : 
+#  @Contact :
+#  @Python  :
 # -------------------------------
 
-from PyQt5.QtCore import Qt, QObject, pyqtSignal, QUrl
-from PyQt5.QtGui import QFont
+
+import os
+
+from PyQt5.QtCore import QObject, pyqtSignal, QUrl
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
-from PyQt5.QtWidgets import QFileDialog, QWidget, QLabel, QApplication
+from PyQt5.QtWidgets import QWidget, QLabel, QApplication
 from mutagen.id3 import ID3
 from mutagen.mp3 import MP3
 
@@ -113,9 +104,9 @@ class SiMusicDisplayer(QWidget):
         self.label = QLabel(self)
         self.label.setStyleSheet("background-color: rgba(22, 33, 111, 0);")
         self.label.resize(512, 128)
+
     def showEvent(self, a0):
         pass
-
 
     def resizeEvent(self, event):
         super().resizeEvent(event)

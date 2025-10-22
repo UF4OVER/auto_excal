@@ -1,5 +1,4 @@
 #  Copyright (c) 2025 UF4OVER
-#  All rights reserved.
 #  逻辑有些糖了，新人刚开始的作品，但是杨东义没选到站长，他也加不了分了，所以应该也不会优化了，2025年7月9日12点38分
 import json
 import os
