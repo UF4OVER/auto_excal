@@ -10,10 +10,9 @@ from siui.components.widgets.expands import SiHExpandWidget
 from siui.core import Si
 from siui.core import SiColor, SiGlobal
 from siui.gui import SiFont
-
 import config.CONFIG as F
-
 PATH_CONFIG = F.CONFIG_PATH
+
 
 VERSION = F.READ_CONFIG('version', 'version')
 L_AUTHOR = F.READ_CONFIG('name', 'L_author')
