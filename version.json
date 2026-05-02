@@ -1,0 +1,9 @@
+{
+  "name": "Auto Excal",
+  "version": "1.3.0",
+  "repo": "https://github.com/UF4OVER/auto_excal",
+  "releases": "https://github.com/UF4OVER/auto_excal/releases",
+  "latest": "https://github.com/UF4OVER/auto_excal/releases/latest",
+  "notes": "Stable metadata endpoint for update checks and download links."
+}
+

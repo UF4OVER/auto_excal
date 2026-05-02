@@ -1,0 +1,66 @@
+name: Build and Release Auto Excal
+
+on:
+  push:
+    tags:
+      - "*.*.*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          architecture: "x64"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Sync dependencies
+        run: uv sync --group build
+
+      - name: Build executable with cx_Freeze
+        run: uv run cxfreeze build
+
+      - name: Package build output as zip
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          if ([string]::IsNullOrWhiteSpace($tag)) {
+            $tag = "${{ github.sha }}"
+          }
+          $safeTag = $tag -replace '[^0-9A-Za-z._-]', '-'
+          uv run python zip.py --build-dir "build/AutoExcal" --output-dir "dist" --artifact-name "AutoExcal-$safeTag-windows-amd64.zip" --upx "upx.exe"
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: auto-excal-windows
+          path: dist/*.zip
+
+      - name: Generate release notes from tagged commit
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: pwsh
+        run: |
+          git log -1 --format=%B ${{ github.sha }} | Out-File -FilePath release_notes.txt -Encoding utf8
+
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          body_path: release_notes.txt
+          files: dist/*.zip
+

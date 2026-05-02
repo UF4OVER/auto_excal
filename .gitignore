@@ -1,0 +1,12 @@
+/.venv/
+/build/
+/dist/
+/auto_excal.egg-info/
+/Logs/
+/__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.idea/
+

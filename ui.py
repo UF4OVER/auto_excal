@@ -4,19 +4,18 @@
 
 import subprocess
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon, QKeySequence
-from PyQt5.QtWidgets import QDesktopWidget, QShortcut
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QDesktopWidget
 from siui.core import SiGlobal
 from siui.templates.application.application import SiliconApplication
 
 import config.CONFIG as F
-from parts.component import DynamicIsland, QuickActions
-from parts.component.GlobalLeftWindow import LayerLeftGlobalDrawer
+from parts.component import DynamicIsland
 from parts.event.send import show_message
 from parts.page import (AboutPage,
                         HomePage,
-                        AutoFormPage)
+                        AutoFormPage,
+                        SettingPage)
 
 PATH_CONFIG = F.CONFIG_PATH
 PATH_PIC = F.PNG_PATH
@@ -25,7 +24,6 @@ PATH_PIC = F.PNG_PATH
 class My_SiliconApplication(SiliconApplication):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.layer_left_global_drawer = LayerLeftGlobalDrawer(self)
         self.dynamic_island = DynamicIsland(self)
         self.layerMain().container_title.addWidget(self.dynamic_island)
 
@@ -51,18 +49,15 @@ class My_SiliconApplication(SiliconApplication):
 class MySiliconApp(My_SiliconApplication):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.setWindowIcon(QIcon(f"{PATH_PIC}/圆角-default.jpg"))
+        self.setWindowIcon(QIcon(f"{PATH_PIC}/logo.ico"))
 
         screen_geo = QDesktopWidget().screenGeometry()
-        self.stu = False
         self.setMinimumSize(1200, 500)
         self.resize(1350, 900)
         self.setMaximumSize(1500, 1200)
         self.move((screen_geo.width() - self.width()) // 2, (screen_geo.height() - self.height()) // 2)
-        self.layerMain().setTitle("Loot Hearts系列")
-        self.setWindowTitle("Wedding Invitation")
-
-        self.ShortcutKey()
+        self.layerMain().setTitle("Auto Excal")
+        self.setWindowTitle("Auto Excal")
 
         self.layerMain().addPage(HomePage(self),
                                  icon=SiGlobal.siui.iconpack.get("ic_fluent_home_filled"),
@@ -73,16 +68,11 @@ class MySiliconApp(My_SiliconApplication):
         self.layerMain().addPage(AboutPage(self),
                                  icon=SiGlobal.siui.iconpack.get("ic_fluent_info_filled"),
                                  hint="关于", side="bottom")
+        self.layerMain().addPage(SettingPage(self),
+                                 icon=SiGlobal.siui.iconpack.get("ic_fluent_wrench_settings_filled"),
+                                 hint="更新", side="bottom")
 
         self.layerMain().setPage(0)
 
         SiGlobal.siui.reloadAllWindowsStyleSheet()
 
-
-    def GlobalLeft(self):
-        SiGlobal.siui.windows["MAIN_WINDOW"].layerLeftGlobalDrawer().showLayer()
-
-    def ShortcutKey(self):
-        shortcut_show = QShortcut(QKeySequence(Qt.CTRL + Qt.Key_A), self)
-        shortcut_show.setContext(Qt.ApplicationShortcut)  # 设置为全局快捷键
-        shortcut_show.activated.connect(self.GlobalLeft)  # 连接 GlobalLeft 方法

@@ -7,8 +7,10 @@
 from .page_aboutpage import About
 from .page_autoexcalpage import Autoexcal
 from .page_homepage import Homepage
+from .page_settingpage import PageSettingPage
 
 
 AutoFormPage = Autoexcal
 HomePage = Homepage
 AboutPage = About
+SettingPage = PageSettingPage

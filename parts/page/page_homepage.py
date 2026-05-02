@@ -1,204 +1,145 @@
 #  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
 
-import time
-
-from PyQt5.QtCore import Qt
-from siui.components import SiPixLabel, Si, SiOptionCardLinear
-from siui.components.button import SiPushButtonRefactor
+from PyQt5.QtCore import Qt, QUrl
+from PyQt5.QtGui import QDesktopServices
+from siui.components import SiOptionCardLinear, SiPixLabel
 from siui.components.page import SiPage
 from siui.components.titled_widget_group import SiTitledWidgetGroup
-from siui.components.widgets import (
-    SiDenseHContainer,
-    SiDenseVContainer,
-    SiLabel,
-)
+from siui.components.widgets import SiDenseVContainer, SiLabel, SiSimpleButton
 from siui.core import GlobalFont, SiColor, SiGlobal
 from siui.gui import SiFont
 
-from parts.component.task import TaskCardLinear, Task
-from parts.component.themed_option_card import ThemedOptionCardPlane
+import config.CONFIG as F
 
-import config.CONFIG
-
-PATH_PNG = config.CONFIG.PNG_PATH
+PATH_PNG = F.PNG_PATH
 
 
 class Homepage(SiPage):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # 滚动区域
-        self.scroll_container = SiTitledWidgetGroup(self)
-        # 整个顶部
-        self.head_area = SiLabel(self)
-        self.head_area.setFixedHeight(550)
-        # 创建背景底图和渐变
-        self.background_image = SiPixLabel(self.head_area)
-        self.background_image.setFixedSize(1366, 300)
-        self.background_image.setBorderRadius(6)
-        self.background_image.load(f"{PATH_PNG}\\back.jpg")
 
-        self.background_fading_transition = SiLabel(self.head_area)
-        self.background_fading_transition.setGeometry(0, 100, 0, 200)
-        self.background_fading_transition.setStyleSheet(
-            """
-            background-color: qlineargradient(x1:0, y1:1, x2:0, y2:0, stop:0 {}, stop:1 {})
-            """.format(SiGlobal.siui.colors["INTERFACE_BG_B"],
-                       SiColor.trans(SiGlobal.siui.colors["INTERFACE_BG_B"], 0))
-        )
-        # 创建背景底图和渐变
-        self.title = SiLabel(self.head_area)
-        self.title.setGeometry(64, 0, 500, 128)
-        self.title.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
-        self.title.setText("Wedding Invitation")
-        self.title.setStyleSheet("color: {}".format(SiGlobal.siui.colors["TEXT_A"]))
+        self.setPadding(64)
+        self.setScrollMaximumWidth(960)
+        self.setTitle("主页")
+
+        self.scroll_container = SiTitledWidgetGroup(self)
+        self.scroll_container.setSpacing(16)
+
+        self.hero_container = SiDenseVContainer(self)
+        self.hero_container.setAdjustWidgetsSize(True)
+        self.hero_container.setSpacing(12)
+        self.hero_container.setAlignment(Qt.AlignCenter)
+
+        self.hero_image = SiPixLabel(self)
+        self.hero_image.setFixedSize(900, 260)
+        self.hero_image.setBorderRadius(12)
+        self.hero_image.load(f"{PATH_PNG}\\back.jpg")
+
+        self.title = SiLabel(self)
+        self.title.setAlignment(Qt.AlignCenter)
+        self.title.setText("Auto Excal")
         self.title.setFont(SiFont.tokenized(GlobalFont.XL_MEDIUM))
 
-        self.subtitle = SiLabel(self.head_area)
-        self.subtitle.setGeometry(64, 72, 500, 48)
-        self.subtitle.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
-        self.subtitle.setText("THE_AUTHOR_IS_A_GOOD_LOOKING_PYQT5_PROJECT_BY_UF4")
-        self.subtitle.setStyleSheet("color: {}".format(SiColor.trans(SiGlobal.siui.colors["TEXT_A"], 0.9)))
+        self.subtitle = SiLabel(self)
+        self.subtitle.setAlignment(Qt.AlignCenter)
+        self.subtitle.setText("导入 Excel 数据，整理成标准三列表，并批量填入网页表单。")
         self.subtitle.setFont(SiFont.tokenized(GlobalFont.S_MEDIUM))
 
-        self.container_for_cards = SiDenseHContainer(self.head_area)
-        self.container_for_cards.move(0, 170)
-        self.container_for_cards.setFixedHeight(400)
-        self.container_for_cards.setAlignment(Qt.AlignCenter)
-        self.container_for_cards.setSpacing(32)
-        # 添加卡片
-        self.option_card_project = ThemedOptionCardPlane(self)
-        self.option_card_project.setTitle("GitHub Repo")
-        self.option_card_project.setFixedSize(218, 270)
-        self.option_card_project.setThemeColor("#855198")
-        self.option_card_project.setDescription(
-            "connect to my project\r\n"
-            "home page.you can click\r\n"
-            "btu to project page")
-        self.option_card_project.setURL("https://github.com/UF4OVER/auto_excal")
+        self.hero_container.addWidget(self.hero_image)
+        self.hero_container.addWidget(self.title)
+        self.hero_container.addWidget(self.subtitle)
+        self.scroll_container.addWidget(self.hero_container)
 
-        self.option_card = ThemedOptionCardPlane(self)
-        self.option_card.setTitle("Bilibili")
-        self.option_card.setFixedSize(218, 270)
-        self.option_card.setThemeColor("#FB7299")
-        self.option_card.setDescription(
-            "connect to my bilibili\r\n"
-            "home page.you can click\r\n"
-            "btu to my page .")  # noqa: E501
-        self.option_card.setURL("https://space.bilibili.com/1000215778?spm_id_from=333.1007.0.0")
+        with self.scroll_container as group:
+            group.addTitle("核心流程")
 
-        self.option_card_demo = ThemedOptionCardPlane(self)
-        self.option_card_demo.setTitle("My Home Page")
-        self.option_card_demo.setFixedSize(218, 270)
-        self.option_card_demo.setThemeColor("#58A6FF")
-        self.option_card_demo.setDescription(
-            "connect to my home \r\n"
-            "page.you can click\r\n"
-            "btu to my page .")  # noqa: E501
-        self.option_card_demo.setURL("https://blog.uf4.top")
+            import_card = SiOptionCardLinear(self)
+            import_card.setTitle("1. 导入表格", "选择 Excel 文件，加载原始成绩数据。")
+            import_card.load(SiGlobal.siui.iconpack.get("ic_fluent_table_stack_right_filled"))
 
+            normalize_card = SiOptionCardLinear(self)
+            normalize_card.setTitle("2. 整理数据", "按默认列或自定义区间提取姓名、学号、分数。")
+            normalize_card.load(SiGlobal.siui.iconpack.get("ic_fluent_data_trending_regular"))
 
-        self.option_card_collaborator = ThemedOptionCardPlane(self)
-        self.option_card_collaborator.setTitle("TreaYang-002")
-        self.option_card_collaborator.setFixedSize(218, 270)
-        self.option_card_collaborator.setThemeColor("#0366D6")
-        self.option_card_collaborator.setDescription(
-            "connect to collaborator\r\n"
-            "home page.you can click\r\n"
-            "btu to page .")  # noqa: E501
-        self.option_card_collaborator.setURL("https://github.com/TreaYang-002")
+            browser_card = SiOptionCardLinear(self)
+            browser_card.setTitle("3. 打开浏览器并批量填表", "程序仅启动浏览器，后续由你控制目标页面与录入时机。")
+            browser_card.load(SiGlobal.siui.iconpack.get("ic_fluent_open_regular"))
 
-        # 添加到水平容器
+            group.addWidget(import_card)
+            group.addWidget(normalize_card)
+            group.addWidget(browser_card)
 
-        self.container_for_cards.addPlaceholder(64)
-        self.container_for_cards.addWidget(self.option_card_project)
-        self.container_for_cards.addWidget(self.option_card)
-        self.container_for_cards.addWidget(self.option_card_demo)
-        self.container_for_cards.addWidget(self.option_card_collaborator)
+        with self.scroll_container as group:
+            group.addTitle("使用建议")
 
-        # 添加到滚动区域容器
-        self.scroll_container.addWidget(self.head_area)
+            tips_card = SiOptionCardLinear(self)
+            tips_card.setTitle("浏览器准备", "请提前确认 Chromium/Edge 路径和调试地址配置正确。")
+            tips_card.load(SiGlobal.siui.iconpack.get("ic_fluent_wrench_settings_filled"))
 
-        self.body_area = SiLabel(self)
-        self.body_area.setSiliconWidgetFlag(Si.EnableAnimationSignals)
-        self.body_area.resized.connect(lambda _: self.scroll_container.adjustSize())
+            duplicate_card = SiOptionCardLinear(self)
+            duplicate_card.setTitle("数据检查", "加载完成后先检查去重结果，再执行批量输入。")
+            duplicate_card.load(SiGlobal.siui.iconpack.get("ic_fluent_task_list_ltr_filled"))
 
-        # 下面的 titledWidgetGroups
-        self.titled_widget_group = SiTitledWidgetGroup(self.body_area)
-        self.titled_widget_group.setSiliconWidgetFlag(Si.EnableAnimationSignals)
-        self.titled_widget_group.resized.connect(lambda size: self.body_area.setFixedHeight(size[1]))
-        self.titled_widget_group.move(64, 0)
+            group.addWidget(tips_card)
+            group.addWidget(duplicate_card)
 
-        # 开始搭建界面
-        # 控件的线性选项卡
+        with self.scroll_container as group:
+            group.addTitle("项目链接")
 
-        self.titled_widget_group.setSpacing(16)
-        self.titled_widget_group.addTitle("说明")
-        self.titled_widget_group.addWidget(WidgetsPanel(self))
+            repo_card = SiOptionCardLinear(self)
+            repo_card.setTitle("项目仓库", "查看 Auto Excal 的源码与更新说明。")
+            repo_card.load(SiGlobal.siui.iconpack.get("ic_fluent_home_database_regular"))
 
-        with self.titled_widget_group as group:
-            group.addTitle("快捷键")
-            shortcut_tab = SiOptionCardLinear(self)
-            shortcut_tab.setTitle("快捷键", "任意位置按下-> KEY_CTRL + KEY_A")
-            shortcut_tab.load(SiGlobal.siui.iconpack.get("ic_fluent_keyboard_layout_float_regular"))
+            repo_button = SiSimpleButton(self)
+            repo_button.resize(32, 32)
+            repo_button.attachment().load(SiGlobal.siui.iconpack.get("ic_fluent_open_regular"))
+            repo_button.clicked.connect(lambda: QDesktopServices.openUrl(QUrl(F.REPO_URL)))
+            repo_card.addWidget(repo_button)
 
-            open_left_layer_btu = SiPushButtonRefactor(self)
-            open_left_layer_btu.setText("打开左侧")
-            open_left_layer_btu.clicked.connect(
-                lambda: SiGlobal.siui.windows["MAIN_WINDOW"].layerLeftGlobalDrawer().showLayer())
+            release_card = SiOptionCardLinear(self)
+            release_card.setTitle("发布页", "保留版本发布入口，后续用户可在这里继续下载更新。")
+            release_card.load(SiGlobal.siui.iconpack.get("ic_fluent_arrow_download_regular"))
 
-            shortcut_tab.addWidget(open_left_layer_btu)
+            release_button = SiSimpleButton(self)
+            release_button.resize(32, 32)
+            release_button.attachment().load(SiGlobal.siui.iconpack.get("ic_fluent_open_regular"))
+            release_button.clicked.connect(lambda: QDesktopServices.openUrl(QUrl(F.RELEASES_URL)))
+            release_card.addWidget(release_button)
 
-            group.addWidget(shortcut_tab)
+            latest_card = SiOptionCardLinear(self)
+            latest_card.setTitle("下载最新版", f"当前版本 {F.VERSION}，点击跳转到 latest 发布页面。")
+            latest_card.load(SiGlobal.siui.iconpack.get("ic_fluent_arrow_download_regular"))
 
-        self.titled_widget_group.addPlaceholder(64)
+            latest_button = SiSimpleButton(self)
+            latest_button.resize(32, 32)
+            latest_button.attachment().load(SiGlobal.siui.iconpack.get("ic_fluent_open_regular"))
+            latest_button.clicked.connect(lambda: QDesktopServices.openUrl(QUrl(F.LATEST_RELEASE_URL)))
+            latest_card.addWidget(latest_button)
 
-        # 添加到滚动区域容器
-        self.body_area.setFixedHeight(self.titled_widget_group.height())
-        self.scroll_container.addWidget(self.body_area)
+            ui_card = SiOptionCardLinear(self)
+            ui_card.setTitle("Silicon UI", "当前界面依赖 PyQt-SiliconUI。")
+            ui_card.load(SiGlobal.siui.iconpack.get("ic_fluent_box_regular"))
 
-        # 添加到页面
+            ui_button = SiSimpleButton(self)
+            ui_button.resize(32, 32)
+            ui_button.attachment().load(SiGlobal.siui.iconpack.get("ic_fluent_open_regular"))
+            ui_button.clicked.connect(lambda: QDesktopServices.openUrl(QUrl("https://github.com/ChinaIceF/PyQt-SiliconUI")))
+            ui_card.addWidget(ui_button)
 
+            group.addWidget(repo_card)
+            group.addWidget(release_card)
+            group.addWidget(latest_card)
+            group.addWidget(ui_card)
+
+        self.scroll_container.addPlaceholder(64)
         self.setAttachment(self.scroll_container)
-        self.scroll_container.adjustSize()
+
+    def reloadStyleSheet(self):
+        super().reloadStyleSheet()
+        self.title.setStyleSheet(f"color: {SiGlobal.siui.colors['TEXT_A']}")
+        self.subtitle.setStyleSheet(f"color: {SiColor.trans(SiGlobal.siui.colors['TEXT_B'], 0.9)}")
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
-        w = event.size().width()
-        self.body_area.setFixedWidth(w)
-        self.background_image.setFixedWidth(w)
-        self.titled_widget_group.setFixedWidth(min(w - 128, 900))
-        self.background_fading_transition.setFixedWidth(w)
-
-
-class WidgetsPanel(SiDenseVContainer):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.setAdjustWidgetsSize(True)
-        self.setSpacing(12)
-
-        container_h_a = SiDenseVContainer(self)
-        container_h_a.setSpacing(12)
-
-        self.test_task_card = TaskCardLinear(
-            Task("语言详情", "全局语言：python，GUI框架：PyQt5，UI框架：siui", "环境开发详情",
-                 "IDE:Pycharm 24.1.6(pro)，python：3.10，siui：1.0.1", time.time(),
-                 self.getColor(SiColor.PROGRESS_BAR_COMPLETING)),
-            parent=self)
-        self.test_task_card.resize(SiGlobal.siui.windows["MAIN_WINDOW"].height(), 80)
-
-        self.test_task_card2 = TaskCardLinear(
-            Task("架构详情", "parts：页面组件，config：注册文件，pic：全局图片", "应用组成架构",
-                 "parts：页面代码，config：配置文件，pic：全局图片", time.time(),
-                 self.getColor(SiColor.PROGRESS_BAR_PROCESSING)),
-            parent=self)
-        self.test_task_card2.resize(SiGlobal.siui.windows["MAIN_WINDOW"].height(), 80)
-
-        container_h_a.addWidget(self.test_task_card)
-        container_h_a.addWidget(self.test_task_card2)
-        # 添加两个水平容器到自己
-        self.addWidget(container_h_a)
-
-    def resizeEvent(self, event):
-        super().resizeEvent(event)
+        self.hero_image.setFixedWidth(min(event.size().width() - 128, 900))

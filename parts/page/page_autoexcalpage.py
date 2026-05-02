@@ -19,16 +19,13 @@ from siui.components import (SiLabel,
 from siui.components.button import (SiSwitchRefactor,
                                     SiPushButtonRefactor)
 from siui.components.container import SiTriSectionPanelCard, SiDenseContainer
-from siui.components.editbox import SiLineEdit
+from siui.components import SiLineEditWithItemName
 from siui.components.page import SiPage
 from siui.core import SiGlobal, SiColor, Si
 
 import config.CONFIG as F
 from config import qss
-from parts.event.ocr import get_rand_code
 from parts.event.send import show_message
-
-PATH_CONFIG = F.CONFIG_PATH
 
 try:
     broswer_address = F.READ_CONFIG("chromium_options", "address")
@@ -36,12 +33,35 @@ try:
 
 except Exception as e:
     print(f"config.ini 配置文件读取失败: {e}")
-    browser_path = "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
+    browser_path = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
     broswer_address = "127.0.0.1:9222"
 
 co = ChromiumOptions()
 co.set_browser_path(browser_path)
 co.set_address(broswer_address)
+
+
+class SiLineEdit(SiLineEditWithItemName):
+    """兼容旧版项目里带标题输入框的写法。"""
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setNameSpacing(100)
+
+    def setTitleWidth(self, width: int):
+        self.setNameSpacing(width)
+
+    def setTitle(self, title: str):
+        self.setName(title)
+
+    def setText(self, text: str):
+        self.lineEdit().setText(text)
+
+    def text(self) -> str:
+        return self.lineEdit().text()
+
+    def notifyInvalidInput(self, *_args, **_kwargs):
+        return None
 
 
 class MainLoopThread(QThread):
@@ -435,8 +455,9 @@ class Autoexcal(SiPage):
         self.new_insert_table_widget.setColumnCount(0)
 
         self.index_current_data = 0
-        if os.path.exists('data.json'):
-            os.remove('data.json')
+        data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data.json')
+        if os.path.exists(data_path):
+            os.remove(data_path)
         # 去实例化线程
         self.main_loop_thread = None
         show_message(2, "成功", "表格数据已清空", "ic_fluent_eraser_medium_filled")
@@ -744,58 +765,8 @@ class Autoexcal(SiPage):
     @limit_for_table
     def open_broswer(self):
         try:
-            if self.choose_boswer_sw.isChecked():
-                self.browser = Chromium(co)
-            else:
-                self.browser = Chromium(co)
-                self.browser.latest_tab.get(F.READ_CONFIG("vpn", "vpn_url"))
-                if F.READ_CONFIG("ocr", "ocr_api_token") == "":
-                    show_message(3, "VPN", "请先设置OCR_Token来自动进入网站\r\n或者\r\n手动进入网站",
-                                 "ic_fluent_emoji_edit_filled")
-                    return
-
-                try:
-                    name = F.READ_CONFIG("vpn", "vpn_name")
-                    pwrd = F.READ_CONFIG("vpn", "vpn_password")
-                    name_input = self.browser.latest_tab.ele("@tabindex=1")
-                    pwrd_input = self.browser.latest_tab.ele("@id=loginPwd")
-                    rank_code = self.browser.latest_tab.ele("@tabindex=3")
-                    name_input.input(name)
-                    pwrd_input.input(pwrd)
-
-                    captcha_img = self.browser.latest_tab.ele("@class=password__code__image pointer")
-                    result = get_rand_code(captcha_img.get_screenshot(as_base64="jpg"))
-                    if result:
-                        rank_code.input(result)
-
-                        login_button = self.browser.latest_tab.ele("@class=button button--normal")
-                        login_button.click()
-
-                        comprehensive_information_portal = self.browser.latest_tab.ele("@title=综合信息门户")
-                        comprehensive_information_portal.click()
-
-                        info_name = self.browser.latest_tab.ele("@id=User_ID")
-                        info_name.input(F.READ_CONFIG("info", "name"))
-                        info_pwrd = self.browser.latest_tab.ele("@id=User_Pass")
-                        info_pwrd.input(F.READ_CONFIG("info", "password").format())
-
-                        self.browser.latest_tab.wait.doc_loaded()
-
-                        login_info_button = self.browser.latest_tab.ele("@id=btnLogin")
-                        login_info_button.click()
-
-                        label_href = self.browser.latest_tab.ele("@class=nav").ele("教务系统")
-                        label_href.click()
-
-                        label_href_1 = self.browser.latest_tab.ele("id=subtree3").ele("新增操行成绩")
-                        label_href_1.click()
-
-                    else:
-                        show_message(1, "警告", "验证码识别失败\r\n请手动输入", "ic_fluent_task_list_ltr_filled")
-                except Exception as e:
-                    print(f"无法登录: {e}")
-                    show_message(3, "提示", f"无法登录: {e}", "ic_fluent_task_list_ltr_filled")
-                    return
+            self.browser = Chromium(co)
+            show_message(2, "成功", "浏览器已打开，请手动进入目标页面", "ic_fluent_table_stack_right_filled")
         except Exception as e:
             print(f"无法启动浏览器: {e}")
             show_message(3, "提示", f"无法启动浏览器: {e}", "ic_fluent_task_list_ltr_filled")
@@ -834,7 +805,7 @@ class Autoexcal(SiPage):
         主循环，从当前索引位置开始输入49个数据
         """
         if self.browser:
-            self.last_tab = 'https://vpn.neepu.edu.cn/portal/#!/login'
+            self.last_tab = self.browser.latest_tab
             self.data = self.read_to_json()
             try:
                 start_index = self.index_current_data
@@ -868,6 +839,9 @@ class Autoexcal(SiPage):
 
     @limit_for_table
     def start_main_loop_in_thread(self):
+        if not self.browser:
+            show_message(3, "提示", "请先打开浏览器", "ic_fluent_error_circle_filled")
+            return
         # 实例化线程
         self.main_loop_thread = MainLoopThread(self, self.browser, self.index_current_data)
         self.main_loop_thread.finished.connect(self.on_main_loop_finished)

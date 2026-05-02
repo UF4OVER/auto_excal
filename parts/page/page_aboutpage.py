@@ -37,14 +37,13 @@ class About(SiPage):
         self.version_picture = SiPixLabel(self)
         self.version_picture.setFixedSize(256, 256)
         self.version_picture.setBorderRadius(128)
-        print(f'{F.PNG_PATH} / "default.jpg"')
         self.version_picture.load(f'{F.PNG_PATH / "default.jpg"}')
 
         self.version_label = SiLabel(self)
         self.version_label.setSiliconWidgetFlag(Si.AdjustSizeOnTextChanged)
         self.version_label.setFont(SiFont.tokenized(GlobalFont.M_NORMAL))
         self.version_label.setStyleSheet(f"color: {self.getColor(SiColor.TEXT_D)}")
-        self.version_label.setText("Wedding Invitation")
+        self.version_label.setText(f"Auto Excal v{F.VERSION}")
 
         version_picture_container.addWidget(self.version_picture)
         version_picture_container.addWidget(self.version_label)
@@ -52,7 +51,7 @@ class About(SiPage):
         with self.titled_widget_group as group:
             group.addTitle("关于")
             self.about_me = SiOptionCardLinear(self)
-            self.about_me.setTitle("关于我", "I am an ordinary person, now learning Python.")
+            self.about_me.setTitle("关于作者", "一个正在持续学习 Python 与桌面自动化的开发者。")
             self.about_me.load(SiGlobal.siui.iconpack.get("ic_fluent_share_screen_person_overlay_filled"))
 
             self.about_me_btu = SiSimpleButton(self)
@@ -68,12 +67,36 @@ class About(SiPage):
                 lambda: QDesktopServices.openUrl(QUrl("https://github.com/UF4OVER/auto_excal")))
 
             self.option_card_my_repo = SiOptionCardLinear(self)
-            self.option_card_my_repo.setTitle("开源仓库", "在 GitHub 上查看 Wedding Invitation 的项目主页")
+            self.option_card_my_repo.setTitle("开源仓库", "在 GitHub 上查看 Auto Excal 的项目主页")
             self.option_card_my_repo.load(SiGlobal.siui.iconpack.get("ic_fluent_home_database_regular"))
             self.option_card_my_repo.addWidget(self.button_to_me_repo)
 
+            self.button_to_release = SiSimpleButton(self)
+            self.button_to_release.resize(32, 32)
+            self.button_to_release.attachment().load(SiGlobal.siui.iconpack.get("ic_fluent_open_regular"))
+            self.button_to_release.clicked.connect(
+                lambda: QDesktopServices.openUrl(QUrl(F.RELEASES_URL)))
+
+            self.option_card_release = SiOptionCardLinear(self)
+            self.option_card_release.setTitle("发布页", "保留版本发布与下载入口，方便后续用户继续获取更新。")
+            self.option_card_release.load(SiGlobal.siui.iconpack.get("ic_fluent_arrow_download_regular"))
+            self.option_card_release.addWidget(self.button_to_release)
+
+            self.button_to_latest = SiSimpleButton(self)
+            self.button_to_latest.resize(32, 32)
+            self.button_to_latest.attachment().load(SiGlobal.siui.iconpack.get("ic_fluent_open_regular"))
+            self.button_to_latest.clicked.connect(
+                lambda: QDesktopServices.openUrl(QUrl(F.LATEST_RELEASE_URL)))
+
+            self.option_card_latest = SiOptionCardLinear(self)
+            self.option_card_latest.setTitle("下载最新版", f"当前版本 {F.VERSION}，点击跳转到 latest 发布页面。")
+            self.option_card_latest.load(SiGlobal.siui.iconpack.get("ic_fluent_arrow_download_regular"))
+            self.option_card_latest.addWidget(self.button_to_latest)
+
             group.addWidget(self.about_me)
             group.addWidget(self.option_card_my_repo)
+            group.addWidget(self.option_card_release)
+            group.addWidget(self.option_card_latest)
 
         with self.titled_widget_group as group:
             group.addTitle("UI开源库")

@@ -1,8 +1,10 @@
 #  Copyright (c) 2025 UF4OVER
 #   All rights reserved.
 
+import logging
 import webbrowser
 
+from PyQt5.QtWidgets import QApplication, QMessageBox
 from siui.components import SiSimpleButton, SiDenseVContainer, SiPixLabel, SiLabel, SiDenseHContainer
 from siui.core import SiColor, SiGlobal, GlobalFont
 from siui.gui import SiFont
@@ -10,6 +12,30 @@ from siui.templates.application.components.message.box import SiSideMessageBox
 import config.CONFIG
 
 PATH_PNG = config.CONFIG.PNG_PATH
+
+
+def _resolve_icon(icon_name: str, fallback: str = "ic_fluent_info_filled"):
+    try:
+        return SiGlobal.siui.iconpack.get(icon_name)
+    except Exception:
+        try:
+            return SiGlobal.siui.iconpack.get(fallback)
+        except Exception:
+            return None
+
+
+def _fallback_dialog(_type: int, title: str, text: str):
+    app = QApplication.instance()
+    if app is None:
+        print(f"{title}: {text}")
+        return
+
+    if _type == 0:
+        QMessageBox.critical(None, title, text)
+    elif _type == 3:
+        QMessageBox.warning(None, title, text)
+    else:
+        QMessageBox.information(None, title, text)
 
 
 def send_custom_message():
@@ -21,7 +47,7 @@ def send_custom_message():
     info_label = SiLabel()
     info_label.setFont(SiFont.tokenized(GlobalFont.S_NORMAL))
     info_label.setStyleSheet(f"color: {info_label.getColor(SiColor.TEXT_D)}; padding-left: 16px")
-    info_label.setText("Welcome to Loot Hearts")
+    info_label.setText("Welcome to Auto Excal")
     info_label.adjustSize()
 
     split_line = SiLabel()
@@ -32,7 +58,7 @@ def send_custom_message():
     avatar = SiPixLabel(container)
     avatar.resize(80, 80)
     avatar.setBorderRadius(40)
-    avatar.load(f"{PATH_PNG}\\logo.ico")
+    avatar.load(f"{PATH_PNG}\\avatar.png")
 
     container_v = SiDenseVContainer(container)
     container_v.setFixedWidth(200)
@@ -41,7 +67,7 @@ def send_custom_message():
     name_label = SiLabel()
     name_label.setFont(SiFont.tokenized(GlobalFont.M_BOLD))
     name_label.setStyleSheet(f"color: {name_label.getColor(SiColor.TEXT_B)}; padding-left:8px")
-    name_label.setText("Wedding Collection")
+    name_label.setText("Auto Excal")
     name_label.adjustSize()
 
     button_1 = SiSimpleButton()
@@ -90,9 +116,22 @@ def send_custom_message():
 
 
 def show_message(_type: int, title: str, text: str, icon: str):
-    SiGlobal.siui.windows["MAIN_WINDOW"].LayerRightMessageSidebar().send(
-        title=title,
-        text=text,
-        msg_type=_type,
-        icon=SiGlobal.siui.iconpack.get(f"{icon}"),
-        fold_after=5000)
+    try:
+        main_window = SiGlobal.siui.windows.get("MAIN_WINDOW")
+        if main_window is None:
+            raise RuntimeError("MAIN_WINDOW 尚未初始化")
+
+        resolved_icon = _resolve_icon(icon, "ic_fluent_error_circle_filled")
+        if resolved_icon is None:
+            raise RuntimeError(f"无可用图标: {icon}")
+
+        main_window.LayerRightMessageSidebar().send(
+            title=title,
+            text=text,
+            msg_type=_type,
+            icon=resolved_icon,
+            fold_after=5000,
+        )
+    except Exception:
+        logging.getLogger(__name__).exception("侧边消息发送失败，已回退到对话框提示")
+        _fallback_dialog(_type, title, text)

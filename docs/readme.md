@@ -4,35 +4,62 @@
 ## 编译应用
 ### 1. 编译应用的前提
 1. 编译前，请确保已经安装好 **python3.10**
-2. 升级pip到最新版本 `pip install --upgrade pip`
-3. 安装 virtualenv 管理环境 `pip install virtualenv`
-4. 创建一个虚拟环境 `virtualenv [virutalenv name]`
+2. 安装 `uv`
+3. 进入项目根目录
     ```bash
-    virtualenv [virutalenv name] # 创建一个虚拟环境
-   
-    virtualenv -p XXX\python.exe [virutalenv name] # 激活虚拟环境
+    cd E:\PROJECT_Python\auto_excal
     ```
-5. 切换其他解释器到`[virutalenv name]`的解释器
+4. 使用 `uv` 同步依赖和构建依赖
    ```bash
-   (base) (siui_env) PS E:\python\auto_excal_new\siui>conda deactivate  # 退出conda的base环境
-   
-   (siui_env) PS E:\python\auto_excal_new\siui>
+   uv sync --group build
    ```
-6. 安装依赖包`pip install -r requirements.txt`
-7. 注意，`siui` 的库并不能在 `PyPi` 上安装,你可以克隆这个项目，然后安装到本地<BR>
-   ```bash
-   git clone https://github.com/ChinaIceF/PyQt-SiliconUI.git  # 克隆项目到本地
-   
-   cd PyQt-SiliconUI
-   
-   python setup.py install # 注意安装到虚拟环境
-   ```
-8. 至此，环境搭建完成，可以开始编译了
+5. 至此，环境搭建完成，可以开始编译了
 ### 2. 编译应用
-1. **构建**：进入项目根目录，执行命令 `python setup.py build`
-2. **安装库**：可能有的库缺少，请手动查询安装，或者使用 `pip install -r requirements.txt`
-3. **构建**；上两部步完成后，会生成 `build` 文件夹，`build` 文件夹下生成一个 `exe.win-amd64-3.10` 文件夹，打开这个文件夹，找到 `Wedding Invitation.exe` 文件，若没有问题，则编译完成，双击即可打开无报错，**至此，这个应用就构建完毕了，可以进行分发**
-4. **压缩**：再将`upx.exe`添加到环境变量中，然后在根目录下执行`python zip.py [项目根目录]`,并等待压缩完成，这样可以减少文件的体积，并且不影响运行
-5. **分发**：将`ce.nsi`文件移动到`build`文件夹下，执行`makensis.exe ce.nsi`命令或者使用HM NIS Edit打开并编译，等待编译完成，无报错的话会在`build`文件夹下生成一个`setup.exe`文件，双击即可安装
+1. **构建可执行文件**：
+   ```bash
+   uv run cxfreeze build
+   ```
+2. **生成 zip 发布包**：
+   ```bash
+   uv run python zip.py --build-dir build/AutoExcal --output-dir dist --artifact-name AutoExcal-1.3.0-windows-amd64.zip --upx upx.exe
+   ```
+3. **构建结果**：构建后会生成 `build/AutoExcal`，zip 包位于 `dist/` 目录。
 ### 3. 运行应用
-在`build\exe.win-amd64-3.10`文件夹下找到`setup.exe`文件，双击运行进入安装程序
+开发环境直接运行：
+
+```bash
+uv run python main.py
+```
+
+### 4. 更新与下载
+
+- 项目仓库：`https://github.com/UF4OVER/auto_excal`
+- 发布页：`https://github.com/UF4OVER/auto_excal/releases`
+- 最新版入口：`https://github.com/UF4OVER/auto_excal/releases/latest`
+
+只要后续继续发布到 GitHub Releases，用户就还能通过上述链接继续下载更新版本。
+
+### 5. GitHub Actions 自动构建与发布
+
+项目已内置工作流：`.github/workflows/release.yml`
+
+当推送 tag 时，会自动：
+
+1. 使用 `uv` 安装依赖
+2. 使用 `cx_Freeze` 构建 Windows 可执行文件
+3. 使用 `zip.py` 生成 zip 发布包
+4. 按 tag 对应 commit 的提交信息创建 GitHub Release
+5. 上传 zip 作为 Release 资产
+
+本次版本发布约定：
+
+```bash
+git add .
+git commit -m "feat(release): migrate build pipeline to uv and pyproject"
+git tag 1.3.0
+git push origin HEAD
+git push origin 1.3.0
+```
+
+Release 名称和 tag 为 `1.3.0`，正文使用该 tag 对应提交的 commit message。
+

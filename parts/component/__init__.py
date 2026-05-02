@@ -16,5 +16,3 @@
 
 
 from .DynamicIsland import DynamicIsland as DynamicIsland
-from .QuickActions import quick_action as QuickActions
-from .logInToPortlet import LoginWindow as LoginToPortlet
